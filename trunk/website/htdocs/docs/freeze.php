@@ -13,8 +13,7 @@
 
 <h2>The GUI freeze problem</h2>
 
-<p>
-When you write Swing applications, you show a GUI to the user; the user clicks on some components (buttons, menus, etc.)
+<p>When you write Swing applications, you show a GUI to the user; the user clicks on some components (buttons, menus, etc.)
 to perform the desired action.<br>
 The code that executes the action is written in event listeners, and event listeners are always executed in the
 <b>Event Dispatch Thread</b>.<br>
@@ -38,18 +37,19 @@ events in the Event Queue get finally a chance to be executed.<br>
 Being repaint events, they're executed quickly, so first the button text will be change to "Sleeping...", and immediately
 after to "Slept !", too quick for the eye to see.<br>
 During the 10 seconds, the GUI was <b>frozen</b>.</p>
+<br><br>
 <pre>
-public class SimpleExample extends JFrame
+public class FreezeExample extends JFrame
 {
    public static void main(String[] args)
    {
-      SimpleExample example = new SimpleExample();
+      FreezeExample example = new FreezeExample();
       example.setVisible(true);
    }
 
-   public SimpleExample()
+   public FreezeExample()
    {
-      super("Foxtrot Example");
+      super("Freeze Example");
 
       final JButton button = new JButton("Take a nap !");
       button.addActionListener(new ActionListener()
@@ -79,8 +79,6 @@ public class SimpleExample extends JFrame
    }
 }
 </pre>
-
-</p>
 
 </td></tr>
 
