@@ -21,7 +21,9 @@
 <div class="toc-sect"><a href="async.php">SwingWorker</a></div>
 <div class="toc-chapt">4 - Synchronous solution</div>
 <div class="toc-sect"><a href="foxtrot.php">Foxtrot</a></div>
-<div class="toc-chapt">5 - Foxtrot & Swing</div>
+<div class="toc-chapt">5 - Foxtrot</div>
+<div class="toc-sect"><a href="api.php">Foxtrot API</a></div>
+<div class="toc-chapt">6 - Foxtrot & Swing</div>
 <div class="toc-sect"><a href="tips.php">Tips & Tricks</a></div>
 </td>
 </tr>
