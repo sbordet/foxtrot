@@ -176,7 +176,7 @@ See the terms of the BSD license in the documentation provided with this softwar
          </classpath>
       </junit>
    </target>
-
+<!--
    <target name="tests-report" depends="main">
       <mkdir dir="${dist.test.xml.dir}"/>
       <mkdir dir="${dist.test.html.dir}"/>
@@ -205,7 +205,7 @@ See the terms of the BSD license in the documentation provided with this softwar
          <report format="frames" todir="${dist.test.html.dir}"/>
       </junitreport>
    </target>
-
+-->
    <!--
       Creates a release building jars and docs an creating zip and tar.gz
       release file. The filenames are built using the version label
