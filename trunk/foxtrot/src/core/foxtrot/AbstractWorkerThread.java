@@ -29,6 +29,9 @@ public abstract class AbstractWorkerThread implements WorkerThread
       }
    };
 
+   /**
+    * Creates a new instance of this AbstractWorkerThread, called by subclasses.
+    */
    protected AbstractWorkerThread()
    {
    }
@@ -60,7 +63,7 @@ public abstract class AbstractWorkerThread implements WorkerThread
       finally
       {
          // Mark the task as completed
-         task.completed();
+         task.setCompleted(true);
 
          // Needed in case that no events are posted on the AWT Event Queue
          // via the normal mechanisms (mouse movements, key typing, etc):
