@@ -45,10 +45,10 @@ public class FoxtrotTest extends FoxtrotTestCase
                public Object run()
                {
                   // Check that I'm NOT in the AWT Event Dispatch Thread
-                  if (SwingUtilities.isEventDispatchThread()) fail();
+                  if (SwingUtilities.isEventDispatchThread()) fail("Must not be in the Event Dispatch Thread");
 
                   // Check that I'm really in the Foxtrot Worker Thread
-                  if (Thread.currentThread().getName().indexOf("Foxtrot") < 0) fail();
+                  if (Thread.currentThread().getName().indexOf("Foxtrot") < 0) fail("Must be in the Foxtrot Worker Thread");
 
                   return null;
                }
@@ -76,7 +76,10 @@ public class FoxtrotTest extends FoxtrotTestCase
             });
             long end = System.currentTimeMillis();
 
-            if (end - start < sleep) fail();
+            long elapsed = end - start;
+            System.out.println("Sleep time is: " + sleep + ", Worker.post() blocked for " + elapsed);
+
+            if (elapsed < sleep) fail("Worker.post() does not block");
          }
       });
    }
@@ -114,7 +117,7 @@ public class FoxtrotTest extends FoxtrotTestCase
             });
 
             // Check that the event posted with invokeLater has been dequeued
-            if (check.get() != 1) fail();
+            if (check.get() != 1) fail("Event has not been dequeued");
          }
       });
    }
@@ -200,7 +203,8 @@ public class FoxtrotTest extends FoxtrotTestCase
             long end = System.currentTimeMillis();
 
             // Must check that really elapsed all the time
-            if (end - start < sleep) fail();
+            long elapsed = end - start;
+            if (elapsed < sleep) fail("Worker.post() does not block in case of AWT exception");
          }
       });
    }
@@ -232,7 +236,8 @@ public class FoxtrotTest extends FoxtrotTestCase
             long end = System.currentTimeMillis();
 
             // Must check that really elapsed all the time
-            if (end - start < sleep) fail();
+            long elapsed = end - start;
+            if (elapsed < sleep) fail("Worker.post() does not block in case of AWT error: expected " + sleep + ", waited " + elapsed);
          }
       });
    }
@@ -263,7 +268,7 @@ public class FoxtrotTest extends FoxtrotTestCase
                      }
                   });
 
-                  if (counter.get() != 2) fail();
+                  if (counter.get() != 2) fail("Nested Task is not executed immediately");
 
                   counter.set(counter.get() + 1);
 
@@ -299,7 +304,7 @@ public class FoxtrotTest extends FoxtrotTestCase
                Worker.post(job);
             }
 
-            if (count.get() != times) fail();
+            if (count.get() != times) fail("Task is not reused");
          }
       });
    }
@@ -326,8 +331,8 @@ public class FoxtrotTest extends FoxtrotTestCase
 
             long epsilon = 100;
             long elapsed = end - start;
-            if (elapsed > sum + epsilon) fail();
-            if (elapsed < sum - epsilon) fail();
+            if (elapsed > sum + epsilon) fail("Elapsed time is: " + elapsed + ", expected time is: " + sum);
+            if (elapsed < sum - epsilon) fail("Elapsed time is: " + elapsed + ", expected time is: " + sum);
          }
       });
    }
@@ -389,6 +394,11 @@ public class FoxtrotTest extends FoxtrotTestCase
             final int count = 10;
             final MutableInteger counter = new MutableInteger(0);
 
+            // From Worker.post() I post some event on the Event Queue using invokeLater.
+            // The events posted are dequeued and they call again Worker.post(),
+            // that is not yet returned, so that Tasks are queued in the worker thread,
+            // and not yet executed. When the first Worker.post() returns, the enqueued
+            // Tasks get a chance to be executed.
             Worker.post(new Job()
             {
                public Object run()
@@ -411,13 +421,17 @@ public class FoxtrotTest extends FoxtrotTestCase
                      });
                   }
 
+                  // Wait for all tasks to be queued in the worker thread.
                   sleep(1000);
 
                   return null;
                }
             });
 
-            if (counter.get() != count) fail();
+            // Wait for all the enqueued Tasks in the worker thread to be executed.
+            sleep(1000);
+
+            assertEquals(count, counter.get());
          }
       });
    }
@@ -474,8 +488,8 @@ public class FoxtrotTest extends FoxtrotTestCase
             long plainElapsed = end - start;
             System.out.println("Plain Listener performance: " + count + " calls in " + plainElapsed + " ms");
 
-            int percentage = 5;
-            if ((workerElapsed - plainElapsed) * 100 > plainElapsed * percentage) fail();
+            int perthousand = 1;
+            if ((workerElapsed - plainElapsed) * 1000 > plainElapsed * perthousand) fail();
          }
       });
    }
