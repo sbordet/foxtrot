@@ -2,7 +2,7 @@ Welcome to Foxtrot, the easy API for the Java(TM) Foundation
 Classes (JFC/Swing).
 
 Foxtrot is bundled in a compressed file, that
-contains documentation, examples, libraries and source code,
+contains javadoc documentation, examples, libraries and source code,
 readable both from Unix, Linux and Windows machines.
 
 The structure of the compressed file is as follows:
@@ -11,5 +11,14 @@ The structure of the compressed file is as follows:
 /lib     contains the Foxtrot jars: core jar, the examples jar 
          and the source jar
 
-Refer to the included documentation for further details on how 
-to use the Foxtrot API.
+The core jar is foxtrot.jar and should be added to the classpath.
+
+For example, if a Swing application is contained in myapp.jar 
+(and uses Foxtrot), then the command line to start would be similar 
+to this one:
+
+> java -classpath foxtrot.jar;myapp.jar my.app.Main
+
+
+Refer to the documentation on the web site (http://foxtrot.sourceforge.net) 
+for further details on how to use the Foxtrot API.
