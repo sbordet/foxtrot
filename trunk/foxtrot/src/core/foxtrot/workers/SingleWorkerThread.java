@@ -47,7 +47,12 @@ public class SingleWorkerThread extends AbstractWorkerThread implements Runnable
       return "Foxtrot Single Worker Thread";
    }
 
-   public void stop()
+   /**
+    * Stops abruptly this WorkerThread.
+    * If a Task is executing, its execution will be completed,
+    * but pending tasks will not be executed until a restart()
+    */
+   protected void stop()
    {
       if (thread != null)
       {
@@ -73,6 +78,8 @@ public class SingleWorkerThread extends AbstractWorkerThread implements Runnable
     */
    public void postTask(Task t)
    {
+      if (!isAlive()) start();
+
       // Synchronized since the variable current is accessed from two threads.
       // See takeTask()
       synchronized (this)
@@ -141,7 +148,7 @@ public class SingleWorkerThread extends AbstractWorkerThread implements Runnable
 
    /**
     * The worker thread dequeues one {@link foxtrot.Task} from the internal queue via {@link #takeTask}
-    * and then runs it calling {@link #runTask}
+    * and then executes it.
     */
    public void run()
    {
@@ -164,6 +171,10 @@ public class SingleWorkerThread extends AbstractWorkerThread implements Runnable
       }
    }
 
+   /**
+    * Executes the given {@link foxtrot.Task}.
+    * This implementation will just call {@link #runTask}.
+    */
    protected void run(Task task)
    {
       runTask(task);
