@@ -1,3 +1,9 @@
+grant codebase "file:${user.dir}/dist/lib/foxtrot.jar"
+{
+   permission java.awt.AWTPermission "accessEventQueue";
+   permission java.util.PropertyPermission "sun.awt.exception.handler", "read";
+};
+
 grant codebase "file:${user.dir}/dist/lib/foxtrot-test.jar"
 {
    // Needed by Swing implementation
@@ -5,6 +11,6 @@ grant codebase "file:${user.dir}/dist/lib/foxtrot-test.jar"
 
    permission java.awt.AWTPermission "showWindowWithoutWarningBanner";
 
-   // Needed by Foxtrot Framework
-   permission java.lang.reflect.ReflectPermission "suppressAccessChecks";
+   // Needed by the tests
+   permission java.util.PropertyPermission "sun.awt.exception.handler", "read, write";
 };
