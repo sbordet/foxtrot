@@ -20,9 +20,7 @@ This way, Foxtrot is compatible with Java Web Start.
 
 The docs/ directory contains the Foxtrot API in Javadoc format.
 
-The distribution root directory contains this file, the BSD license, 
-and a policy file with the permissions needed by foxtrot.jar and by
-the test jars.
+The distribution root directory contains this file and the BSD license.
 
 
 USAGE
@@ -44,20 +42,7 @@ command line (from the distribution root directory):
 
 TESTS
 
-To run the tests included in the distribution, use the following 
-command line (from the distribution root directory):
-
-> java -cp lib\foxtrot.jar;lib\foxtrot-test-runner.jar foxtrot.test.TestRunner
-
-or the following one, to run under a security manager:
-
-> java -Djava.security.manager -Djava.security.policy==java.policy \
-       -cp lib\foxtrot.jar;lib\foxtrot-test-runner.jar foxtrot.test.TestRunner
-
-If the tests are run without security manager one test must fail.
-When the tests run, it's normal that stack traces are printed in the console;
-just look at the summary printed when the tests are completed to see if all 
-tests have passed.
+From Foxtrot version 2.0, tests are based on JUnit 3.8.1.
 
 
 MORE INFORMATION
