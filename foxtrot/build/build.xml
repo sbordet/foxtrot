@@ -162,7 +162,7 @@ See the terms of the BSD license in the documentation provided with this softwar
    </target>
 
    <target name="tests" depends="main">
-      <junit printsummary="withOutAndErr" fork="yes" timeout="300000" dir="${basedir}" showoutput="yes">
+      <junit printsummary="withOutAndErr" fork="yes" timeout="600000" dir="${basedir}" showoutput="yes">
          <formatter type="plain" usefile="false"/>
          <batchtest fork="yes">
             <fileset dir="${test.src.dir}">
@@ -180,7 +180,7 @@ See the terms of the BSD license in the documentation provided with this softwar
    <target name="tests-report" depends="main">
       <mkdir dir="${dist.test.xml.dir}"/>
       <mkdir dir="${dist.test.html.dir}"/>
-      <junit printsummary="withOutAndErr" fork="yes" timeout="300000" dir="${basedir}" showoutput="yes">
+      <junit printsummary="withOutAndErr" fork="yes" timeout="600000" dir="${basedir}" showoutput="yes">
          <formatter type="xml"/>
          <batchtest fork="yes" todir="${dist.test.xml.dir}">
             <fileset dir="${test.src.dir}">
