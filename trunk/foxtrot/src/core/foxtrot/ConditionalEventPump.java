@@ -168,8 +168,14 @@ public class ConditionalEventPump implements EventPump
          // It should never happen: the contract of the Worker.post method is strong: don't return
          // until the Task has finished. We use awt exception handler to enforce this contract, but
          // an awt exception handler provided by the user may fail to respect this contract.
-         if (t instanceof RuntimeException) {throw (RuntimeException)t;}
-         else {throw (Error)t;}
+         if (t instanceof RuntimeException)
+         {
+            throw (RuntimeException)t;
+         }
+         else
+         {
+            throw (Error)t;
+         }
       }
       catch (Throwable x)
       {
