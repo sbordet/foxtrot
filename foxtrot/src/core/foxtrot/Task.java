@@ -11,6 +11,8 @@ package foxtrot;
 import java.security.AccessControlContext;
 import java.security.AccessController;
 
+import javax.swing.SwingUtilities;
+
 /**
  * A time-consuming task to be executed in the Worker Thread that may throw checked exceptions. <br>
  * Users must implement the {@link #run} method with the time-consuming code, and not worry about
@@ -169,5 +171,21 @@ public abstract class Task
       setResult(null);
       setThrowable(null);
       setCompleted(false);
+   }
+
+   void postRun()
+   {
+      // Needed in case that no events are posted on the AWT Event Queue
+      // via the normal mechanisms (mouse movements, key typing, etc):
+      // the AWT Event Queue is waiting in EventQueue.getNextEvent(),
+      // posting this one will wake it up and allow the event pump to
+      // finish its job and release control to the original pump
+      SwingUtilities.invokeLater(new Runnable()
+      {
+         public final void run()
+         {
+            if (Worker.debug) System.out.println("[Task] Run completed for task " + Task.this);
+         }
+      });
    }
 }
