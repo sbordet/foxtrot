@@ -12,7 +12,7 @@ import java.security.AccessControlContext;
 import java.security.AccessController;
 
 /**
- * A time-consuming task to be executed in the Worker Thread. <p>
+ * A time-consuming task to be executed in the Worker Thread that may throw checked exceptions. <p>
  * Users must implement the {@link #run} method with the time-consuming code, and not worry about
  * exceptions, for example:
  * <pre>
@@ -25,7 +25,7 @@ import java.security.AccessController;
  *     }
  * };
  * </pre>
- * Exception thrown by the <code>run()</code> method will be rethrown automatically by
+ * Exceptions and Errors thrown by the <code>run()</code> method will be rethrown automatically by
  * {@link Worker#post Worker.post(Task task)}.
  *
  * @see Worker
@@ -60,7 +60,7 @@ public abstract class Task
 	 * Accessed by the AWT Event Dispatch Thread.
 	 * Package protected, used by Worker
 	 */
-	synchronized Object getResult() throws Exception
+	final synchronized Object getResultOrThrow() throws Exception
 	{
 		Throwable t = getThrowable();
 		if (t != null)
@@ -68,6 +68,11 @@ public abstract class Task
 			if (t instanceof Exception) throw (Exception)t;
 			else throw (Error)t;
 		}
+		return getResult();
+	}
+
+	final synchronized Object getResult()
+	{
 		return m_result;
 	}
 
@@ -76,9 +81,10 @@ public abstract class Task
 	 * Synchronized since the variable is accessed from 2 threads
 	 * Accessed by the Foxtrot Worker Thread.
 	 * Package protected, used by Worker
+	 * @see #getResultOrThrow
 	 * @see #getResult
 	 */
-	synchronized void setResult(Object o)
+	final synchronized void setResult(Object o)
 	{
 		m_result = o;
 	}
@@ -88,7 +94,7 @@ public abstract class Task
 	 * Synchronized since the variable is accessed from 2 threads
 	 * Accessed by the AWT Event Dispatch Thread.
 	 */
-	private synchronized Throwable getThrowable()
+	synchronized Throwable getThrowable()
 	{
 		return m_throwable;
 	}
@@ -100,7 +106,7 @@ public abstract class Task
 	 * Package protected, used by Worker
 	 * @see #getThrowable
 	 */
-	synchronized void setThrowable(Throwable x)
+	final synchronized void setThrowable(Throwable x)
 	{
 		m_throwable = x;
 	}
@@ -122,7 +128,7 @@ public abstract class Task
 	 * Package protected, used by Worker
 	 * @see #isCompleted
 	 */
-	synchronized void completed()
+	final synchronized void completed()
 	{
 		m_completed = true;
 	}
@@ -132,7 +138,7 @@ public abstract class Task
 	 * Accessed by the Foxtrot Worker Thread.
 	 * Package protected, used by Worker
 	 */
-	synchronized AccessControlContext getSecurityContext()
+	final synchronized AccessControlContext getSecurityContext()
 	{
 		return m_securityContext;
 	}
