@@ -3,7 +3,7 @@
 <tr><td align="center" colspan="3">
 <a href="http://foxtrot.sourceforge.net"><img class="nav-btn-en" hspace="10" src="../images/cnvhome.gif"/></a>
 <a href="toc.php"><img class="nav-btn-en" hspace="10" src="../images/cnvup.gif"/></a>
-<img class="nav-btn-dis" hspace="10" src="../images/cnvprev.gif"/>
+<a href="introduction.php"><img class="nav-btn-en" hspace="10" src="../images/cnvprev.gif"/></a>
 <img class="nav-btn-dis" hspace="10" src="../images/cnvnext.gif"/>
 </td></tr>
 

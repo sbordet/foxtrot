@@ -18,9 +18,9 @@
 <div class="toc-chapt">2 - The problem</div>
 <div class="toc-sect"><a href="freeze.php">GUI freeze</a></div>
 <div class="toc-chapt">3 - Asynchronous solution</div>
-<div class="toc-sect">SwingWorker</div>
+<div class="toc-sect"><a href="todo.php">SwingWorker</a></div>
 <div class="toc-chapt">4 - Synchronous solution</div>
-<div class="toc-sect">Foxtrot</div>
+<div class="toc-sect"><a href="todo.php">Foxtrot</a></div>
 </td>
 </tr>
 
