@@ -77,11 +77,16 @@ public class ProgressExample extends JFrame
 		{
 			running = true;
 
+			// We just started, set the task as not interrupted, to
+			// clear any eventual previous status
+			setTaskInterrupted(false);
+
 			// We will execute a long operation, change the text signaling
 			// that the user can interrupt the operation
 			button.setText("Cancel");
 
 			// getData() will block until the heavy operation is finished
+			// and the AWT-Swing events will be dequeued and processed
 			ArrayList list = getData();
 
 			// getData() finished or was interrupted ?
@@ -95,28 +100,31 @@ public class ProgressExample extends JFrame
 			{
 				// Task completed successfully, do whatever useful with the list
 				// For example, populate a JComboBox
-				javax.swing.DefaultComboBoxModel model = new javax.swing.DefaultComboBoxModel(list.toArray());
 				// The reader will finish this part :)
+				javax.swing.DefaultComboBoxModel model = new javax.swing.DefaultComboBoxModel(list.toArray());
+
+				// Restore anyway the button's text
+				button.setText("Run Task !");
+
+				// Restore anyway the interrupt status for another call
+				setTaskInterrupted(false);
+
+				// We're not running anymore
+				running = false;
 			}
-
-			// Restore anyway the button's text
-			button.setText("Run Task !");
-
-			// Restore anyway the interrupt status for another call
-			setTaskInterrupted(false);
-
-			// We're not running anymore
-			running = false;
 		}
 		else
 		{
 			// Here if we want to interrupt the Task
 
+			// Restore the button text to the previous value
+			button.setText("Run Task !");
+
 			// Interrupt the task
 			setTaskInterrupted(true);
 
-			// Restore the button text to the previous value
-			button.setText("Run Task !");
+			// We've been interrupted
+			running = false;
 		}
 	}
 
