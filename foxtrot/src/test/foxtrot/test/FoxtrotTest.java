@@ -25,6 +25,7 @@ import javax.swing.SwingUtilities;
 
 import foxtrot.Task;
 import foxtrot.Worker;
+import foxtrot.Job;
 
 /**
  * Tests for the Foxtrot framework
@@ -449,7 +450,34 @@ public class FoxtrotTest
 		}
 		end = System.currentTimeMillis();
 		System.out.println("Plain Listener performance: " + count + " calls in " + (end - start) + " ms");
+	}
 
+	public void testJob(JFrame frame) throws Exception
+	{
+		JButton button = createButton(frame, "Job");
+
+		button.addActionListener(new ActionListener()
+		{
+			public void actionPerformed(ActionEvent e)
+			{
+				Worker.post(new Job()
+				{
+					public Object run()
+					{
+						try
+						{
+							Thread.sleep(1000);
+						}
+						catch (InterruptedException e1)
+						{
+						}
+						return null;
+					}
+				});
+			}
+		});
+
+		button.doClick();
 	}
 
 	public void testSecurity(JFrame frame) throws Exception
