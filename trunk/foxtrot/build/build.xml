@@ -14,7 +14,7 @@ See the terms of the BSD license in the documentation provided with this softwar
 
    <property name="name" value="foxtrot"/>
    <!-- REMEMBER: change also the manifest information -->
-   <property name="version" value="2.0-beta1"/>
+   <property name="version" value="2.0-beta2"/>
 
    <property name="src.dir" value="${basedir}/src"/>
    <property name="core.src.dir" value="${src.dir}/core"/>
@@ -166,7 +166,7 @@ See the terms of the BSD license in the documentation provided with this softwar
       <mkdir dir="${dist.test.xml.dir}"/>
       <mkdir dir="${dist.test.html.dir}"/>
       <junit printsummary="withOutAndErr" fork="yes" timeout="300000" dir="${basedir}" showoutput="yes">
-         <formatter type="plain" usefile="false"/> 
+         <formatter type="plain" usefile="false"/>
          <batchtest fork="yes" todir="${dist.test.xml.dir}">
             <fileset dir="${test.src.dir}">
                <include name="foxtrot/test/**/*Test.java"/>
