@@ -149,6 +149,7 @@ public class DefaultWorkerThread extends AbstractWorkerThread implements Runnabl
          try
          {
             Task t = takeTask();
+            if (debug) System.out.println("[DefaultWorkerThread] Dequeued Task " + t);
             runTask(t);
          }
          catch (InterruptedException x)
