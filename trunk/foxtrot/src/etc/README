@@ -11,14 +11,17 @@ The structure of the compressed file is as follows:
 /lib     contains the Foxtrot jars: core jar, the examples jar 
          and the source jar
 
-The core jar is foxtrot.jar and, from Foxtrot version 1.1, must be 
-included in the boot classpath.
+The core jar is foxtrot.jar and must be included in the classpath.
+It is no longer necessary, from Foxtrot version 1.2, to include 
+foxtrot.jar in the boot classpath, thanks to a patch contributed 
+by Dan Holmsand (dan@eyebee.com). 
+This way, Foxtrot is compatible with Java Web Start.
 
 For example, if a Swing application is contained in myapp.jar 
 (and uses Foxtrot), then the command line to start would be similar 
-to this one:
+to this one (in Windows):
 
-> java -Xbootclasspath/a:foxtrot.jar -classpath myapp.jar my.app.Main
+> java -classpath foxtrot.jar;myapp.jar my.app.Main
 
 
 Refer to the documentation on the web site (http://foxtrot.sourceforge.net) 
