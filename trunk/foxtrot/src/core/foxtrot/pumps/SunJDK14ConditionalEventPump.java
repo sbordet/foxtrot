@@ -29,13 +29,14 @@ import foxtrot.Task;
  * @author <a href="mailto:biorn_steedom@users.sourceforge.net">Simone Bordet</a>
  * @version $Revision$
  */
-public abstract class SunJDK14ConditionalEventPump implements EventPump
+public abstract class SunJDK14ConditionalEventPump implements EventPump, EventFilterable
 {
    private static final boolean debug = false;
-
    private static Class conditionalClass;
    private static Method pumpEventsMethod;
    protected static Class sequencedEventClass;
+
+   private EventFilter filter;
 
    static
    {
@@ -100,17 +101,33 @@ public abstract class SunJDK14ConditionalEventPump implements EventPump
          String name = method.getName();
          if (!"evaluate".equals(name)) throw new Error("Unknown " + conditionalClass.getName() + " method: " + name);
 
-         // Now let's try to find a workaround for BUG #4531693 and related
-         AWTEvent nextEvent = waitForEvent();
-         if (debug) System.out.println("[SunJDK14ConditionalEventPump] Next Event: " + nextEvent);
-         if (sequencedEventClass.isInstance(nextEvent))
+         while (true)
          {
-            // Next event is a SequencedEvent: we must handle them carefully
-            return canPumpSequencedEvent(nextEvent);
-         }
-         else
-         {
-            return task.isCompleted() ? Boolean.FALSE : Boolean.TRUE;
+            // Now let's try to find a workaround for BUG #4531693 and related
+            AWTEvent nextEvent = waitForEvent();
+            if (debug) System.out.println("[SunJDK14ConditionalEventPump] Next Event: " + nextEvent);
+
+            // The EventDispatchThread has been interrupted, exit
+            if (nextEvent == null) return Boolean.FALSE;
+
+            Boolean result = null;
+            if (sequencedEventClass.isInstance(nextEvent))
+            {
+               // Next event is a SequencedEvent: we must handle them carefully
+               result = canPumpSequencedEvent(nextEvent);
+            }
+            else
+            {
+               result = task.isCompleted() ? Boolean.FALSE : Boolean.TRUE;
+            }
+
+            if (!result.booleanValue()) return result;
+
+            if (filter == null || filter.accept(nextEvent)) return result;
+
+            // Event has been filtered, pop the event from the EventQueue
+            nextEvent = getEventQueue().getNextEvent();
+            if (debug) System.out.println("[SunJDK14ConditionalEventPump] AWT Event: " + nextEvent + " filtered out by filter " + filter);
          }
       }
 
@@ -183,6 +200,16 @@ public abstract class SunJDK14ConditionalEventPump implements EventPump
       }
    }
 
+   public void setEventFilter(EventFilter filter)
+   {
+      this.filter = filter;
+   }
+
+   public EventFilter getEventFilter()
+   {
+      return filter;
+   }
+
    public void pumpEvents(Task task)
    {
       // A null task may be passed for initialization of this class.
@@ -231,9 +258,9 @@ public abstract class SunJDK14ConditionalEventPump implements EventPump
    /**
     * There are 2 cases when a SequencedEvent 'event' is pumped by Foxtrot:
     * 1) Foxtrot was NOT called by another SequencedEvent, so 'event' is the first SequencedEvent
-    *    of a series of SequencedEvents.
+    * of a series of SequencedEvents.
     * 2) Foxtrot was called by another SequencedEvent, and thus 'event' is not the first
-    *    SequencedEvent of a series of SequencedEvents.
+    * SequencedEvent of a series of SequencedEvents.
     * In the first case, Foxtrot pumps 'event' regularly: if the task ends before the last
     * SequencedEvent of the series is executed, Foxtrot will return and let the AWT mechanism
     * to dispatch the remaining SequencedEvent(s), that so are dispatched in order, as they require.
