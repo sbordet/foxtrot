@@ -255,6 +255,78 @@ public class FoxtrotTest
 		button.doClick();
 	}
 
+	public void testAWTException(JFrame frame) throws Exception
+	{
+		JButton button = createButton(frame, "AWT Exception");
+
+		button.addActionListener(new ActionListener()
+		{
+			public void actionPerformed(ActionEvent e)
+			{
+				SwingUtilities.invokeLater(new Runnable()
+				{
+					public void run()
+					{
+						throw new NullPointerException();
+					}
+				});
+
+				final long sleep = 1000;
+				long start = System.currentTimeMillis();
+				post(new Task()
+				{
+					public Object run() throws Exception
+					{
+						Thread.sleep(sleep);
+						return null;
+					}
+				});
+				long end = System.currentTimeMillis();
+
+				// Must check that really elapsed all the time
+				if (end - start < sleep) {throw new RuntimeException();}
+			}
+		});
+
+		button.doClick();
+	}
+
+	public void testAWTError(JFrame frame) throws Exception
+	{
+		JButton button = createButton(frame, "AWT Error");
+
+		button.addActionListener(new ActionListener()
+		{
+			public void actionPerformed(ActionEvent e)
+			{
+				SwingUtilities.invokeLater(new Runnable()
+				{
+					public void run()
+					{
+						throw new Error();
+					}
+				});
+
+				final long sleep = 1000;
+				long start = System.currentTimeMillis();
+				post(new Task()
+				{
+					public Object run() throws Exception
+					{
+						Thread.sleep(sleep);
+						return null;
+					}
+				});
+				long end = System.currentTimeMillis();
+
+				// Must check that really elapsed all the time
+				if (end - start < sleep) {throw new RuntimeException();}
+			}
+		});
+
+		button.doClick();
+	}
+
 	public void testRecursion(JFrame frame) throws Exception
 	{
 		final JButton button = createButton(frame, "Recursion");
