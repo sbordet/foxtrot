@@ -11,17 +11,17 @@
 
 <tr><td class="documentation">
 
-<h2>Asynchronous solutions</h2>
+<h2>SwingWorker: asynchronous solution</h2>
 
 <p>Solutions for the <a href="freeze.php">GUI freeze problem</a> have been proposed; asynchronous solutions
 rely on the combined usage of a worker thread and of SwingUtilities.invokeLater(). We will see in few lines why
 they're called asynchronous.</p>
 <p>The main idea behind asynchronous solution is to return quickly from the time-consuming listener, after having
 delegated the worker thread to do 2 things:
-<ul><ul>
+<ul>
 <li>Execute the time-consuming task
 <li>Post an event to the Event Queue using SwingUtilities.invokeLater
-</ul></ul>
+</ul>
 </p>
 <p>Take a look at the code below that uses the SwingWorker, based on the asynchronous solution.</p>
 <p>Let's concentrate on the button's listener: the first statement, as in the freeze example, changes

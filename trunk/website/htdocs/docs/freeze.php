@@ -26,7 +26,7 @@ events are queued but not processed until the time-consuming listener has finish
 The user feels the application has hung.<br>
 When the time-consuming listener finishes, all pending events are processed, and if they quick to execute (like
 repaint events) it appears they're are executed like a storm.</p>
-<p>Take a look at the following code, or look at the Foxtrot examples for code samples.</p>
+<p>Take a look at the following code.</p>
 <p>Let's concentrate on the button's listener: the first statement changes the text of the button. This
 cause JButton to post a repaint event to the Event Queue, that is not be executed until this listener finishes.<br>
 But the listener is waiting for 10 seconds, so what happens is that the button remains pressed, and its text doesn't
