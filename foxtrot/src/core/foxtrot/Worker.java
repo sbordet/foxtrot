@@ -82,7 +82,9 @@ public class Worker
 	/**
 	 * Enqueues the given task to be executed in the worker thread. <br>
 	 * This method can be called only from the Event Dispatch Thread, and blocks until the task has been executed,
-	 * either by finishing normally or throwing an exception.
+	 * either by finishing normally or throwing an exception. <br>
+	 * Event in case of AWT events that throw RuntimeExceptions or Errors, this method will not return until
+	 * the Task is finished.
 	 * @throws IllegalStateException if the method is not called from the Event Dispatch Thread
 	 */
 	public static synchronized Object post(Task task) throws Exception
@@ -239,7 +241,7 @@ public class Worker
 			catch (InvocationTargetException x)
 			{
 				Throwable t = x.getTargetException();
-				System.err.println("Exception occurred during event dispatching:");
+				System.err.println("Foxtrot - Exception occurred during event dispatching:");
 				t.printStackTrace();
 
 				System.err.println("Foxtrot - WARNING: uncaught exception during event dispatching, Task is still running !");
@@ -266,11 +268,23 @@ public class Worker
 		}
 	}
 
+	/**
+	 * A class that handles RuntimeExceptions or Errors thrown during dispatching of AWT events. <p>
+	 * The name of this class is used as a value of the property <code>sun.awt.exception.handler</code>, and
+	 * the AWT event dispatch mechanism calls it when an unexpected exception or error is thrown during
+	 * event dispatching. <br>
+	 * If the user specified a different exception handler, this one will not be used.
+	 */
 	public static class AWTThrowableHandler
 	{
+		/**
+		 * The callback method invoked by the AWT event dispatch mechanism when an unexpected
+		 * exception or error is thrown during event dispatching. <br>
+		 * It just logs the exception.
+		 */
 		public void handle(Throwable t)
 		{
-			System.err.println("Exception occurred during event dispatching:");
+			System.err.println("Foxtrot - Exception occurred during event dispatching:");
 			t.printStackTrace();
 		}
 	}
@@ -319,18 +333,15 @@ public class Worker
 						t.setThrowable(x);
 					}
 
-					synchronized (t)
-					{
-						// Mark the task as completed
-						t.completed();
-					}
+					// Mark the task as completed
+					t.completed();
 
 					// In any case, completed or interrupted, remove the task
 					removeTask();
 
 					// Needed in case that no events are posted on the AWT Event Queue:
 					// posting this one we exit from pumpEvents(), that is waiting in
-					// EventQueue.getNextEvent
+					// EventQueue.getNextEvent()
 					SwingUtilities.invokeLater(EMPTY_EVENT);
 				}
 				catch (InterruptedException x)
