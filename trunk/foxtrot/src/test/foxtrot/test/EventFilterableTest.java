@@ -31,7 +31,7 @@ public class EventFilterableTest extends FoxtrotTestCase
 
    public void testEventFiltering() throws Exception
    {
-       if (isJRE13() && !isJRE14())
+       if (!isJRE14())
        {
           invokeTest(new Runnable()
           {
