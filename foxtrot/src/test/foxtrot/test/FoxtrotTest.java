@@ -13,6 +13,8 @@ import java.awt.event.ActionListener;
 import java.util.ArrayList;
 
 import javax.swing.JButton;
+import javax.swing.JDialog;
+import javax.swing.JFrame;
 import javax.swing.SwingUtilities;
 
 import foxtrot.Job;
@@ -474,6 +476,48 @@ public class FoxtrotTest extends FoxtrotTestCase
 
             int percentage = 5;
             if ((workerElapsed - plainElapsed) * 100 > plainElapsed * percentage) fail();
+         }
+      });
+   }
+
+   public void testPumpSequencedEvents() throws Exception
+   {
+      invokeTest(new Runnable()
+      {
+         public void run()
+         {
+            final JDialog dialog = new JDialog((JFrame)null, true);
+
+            SwingUtilities.invokeLater(new Runnable()
+            {
+               public void run()
+               {
+                  dialog.setVisible(false);
+               }
+            });
+
+            dialog.setVisible(true);
+
+            final MutableInteger pumped = new MutableInteger(0);
+            SwingUtilities.invokeLater(new Runnable()
+            {
+               public void run()
+               {
+                  pumped.set(pumped.get() + 1);
+               }
+            });
+
+            Worker.post(new Job()
+            {
+               public Object run()
+               {
+                  sleep(1000);
+                  return null;
+               }
+            });
+
+            // Verify that the event has been pumped
+            if (pumped.get() != 1) fail();
          }
       });
    }
