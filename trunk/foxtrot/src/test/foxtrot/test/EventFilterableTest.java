@@ -10,12 +10,13 @@ package foxtrot.test;
 
 import java.awt.AWTEvent;
 
-import foxtrot.Worker;
-import foxtrot.Job;
+import javax.swing.SwingUtilities;
+
 import foxtrot.EventPump;
-import foxtrot.pumps.JDK13QueueEventPump;
-import foxtrot.pumps.EventFilterable;
+import foxtrot.Job;
+import foxtrot.Worker;
 import foxtrot.pumps.EventFilter;
+import foxtrot.pumps.EventFilterable;
 
 /**
  *
@@ -29,55 +30,41 @@ public class EventFilterableTest extends FoxtrotTestCase
       super(s);
    }
 
-   public void testEventFiltering() throws Exception
+   public void testEventNotFiltered() throws Exception
    {
-       if (!isJRE14())
+       invokeTest(new Runnable()
        {
-          invokeTest(new Runnable()
+          public void run()
           {
-             public void run()
+             EventPump pump = Worker.getEventPump();
+
+             final MutableHolder check = new MutableHolder(null);
+             EventFilterable filterable = null;
+             EventFilter oldFilter = null;
+             try
              {
-                Worker.setEventPump(new JDK13QueueEventPump());
-
-                EventPump pump = Worker.getEventPump();
-
-                final MutableInteger count = new MutableInteger(0);
-                EventFilterable filterable = null;
-                EventFilter oldFilter = null;
-                try
+                SwingUtilities.invokeLater(new Runnable()
                 {
-                   if (pump instanceof EventFilterable)
+                   public void run()
                    {
-                      filterable = (EventFilterable)pump;
-                      oldFilter = filterable.getEventFilter();
-                      filterable.setEventFilter(new EventFilter()
-                      {
-                         public boolean accept(AWTEvent event)
-                         {
-                            count.set(count.get() + 1);
-                            return true;
-                         }
-                      });
+                      if (check.get() == Boolean.FALSE) check.set(Boolean.TRUE);
                    }
+                });
 
-                   Worker.post(new Job()
+                if (pump instanceof EventFilterable)
+                {
+                   filterable = (EventFilterable)pump;
+                   oldFilter = filterable.getEventFilter();
+                   filterable.setEventFilter(new EventFilter()
                    {
-                      public Object run()
+                      public boolean accept(AWTEvent event)
                       {
-                         sleep(5000);
-                         return null;
+                         if (check.get() == null) check.set(Boolean.FALSE);
+                         return true;
                       }
                    });
                 }
-                finally
-                {
-                   filterable.setEventFilter(oldFilter);
-                }
 
-                // Ensure that at least we have one event, the one posted at the end of the Task to wakeup the queue
-                if (count.get() != 1) fail();
-
-                // Be sure that after everything is again ok
                 Worker.post(new Job()
                 {
                    public Object run()
@@ -86,11 +73,100 @@ public class EventFilterableTest extends FoxtrotTestCase
                       return null;
                    }
                 });
-
-                // Should not have been called again
-                if (count.get() != 1) fail();
              }
-          });
-       }
+             finally
+             {
+                if (filterable != null) filterable.setEventFilter(oldFilter);
+             }
+
+             // Ensure that we've passed from the filter and dispatched the event
+             if (check.get() != Boolean.TRUE) fail();
+
+             check.set(null);
+
+             // Be sure that after everything is again ok
+             Worker.post(new Job()
+             {
+                public Object run()
+                {
+                   sleep(5000);
+                   return null;
+                }
+             });
+
+             // Should not have been called again
+             if (check.get() != null) fail();
+          }
+       });
+   }
+
+   public void testEventFiltered() throws Exception
+   {
+       invokeTest(new Runnable()
+       {
+          public void run()
+          {
+             EventPump pump = Worker.getEventPump();
+
+             final MutableHolder check = new MutableHolder(null);
+             EventFilterable filterable = null;
+             EventFilter oldFilter = null;
+             try
+             {
+                SwingUtilities.invokeLater(new Runnable()
+                {
+                   public void run()
+                   {
+                      if (check.get() == Boolean.FALSE) check.set(Boolean.TRUE);
+                   }
+                });
+
+                if (pump instanceof EventFilterable)
+                {
+                   filterable = (EventFilterable)pump;
+                   oldFilter = filterable.getEventFilter();
+                   filterable.setEventFilter(new EventFilter()
+                   {
+                      public boolean accept(AWTEvent event)
+                      {
+                         check.set(Boolean.FALSE);
+                         return false;
+                      }
+                   });
+                }
+
+                Worker.post(new Job()
+                {
+                   public Object run()
+                   {
+                      sleep(5000);
+                      return null;
+                   }
+                });
+             }
+             finally
+             {
+                if (filterable != null) filterable.setEventFilter(oldFilter);
+             }
+
+             // Ensure that we've passed from the filter and not dispatched the event
+             if (check.get() != Boolean.FALSE) fail();
+
+             check.set(null);
+
+             // Be sure that after everything is again ok
+             Worker.post(new Job()
+             {
+                public Object run()
+                {
+                   sleep(5000);
+                   return null;
+                }
+             });
+
+             // Should not have been called again
+             if (check.get() != null) fail();
+          }
+       });
    }
 }
