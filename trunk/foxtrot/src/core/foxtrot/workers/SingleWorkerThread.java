@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2002, Simone Bordet
+ * Copyright (c) 2002-2005, Simone Bordet
  * All rights reserved.
  *
  * This software is distributable under the BSD license.
@@ -16,12 +16,11 @@ import foxtrot.Task;
  * {@link foxtrot.Task}s subclasses. <br>
  * Tasks execution is serialized: tasks are enqueued and executed one after the other.
  *
- * @author <a href="mailto:biorn_steedom@users.sourceforge.net">Simone Bordet</a>
  * @version $Revision$
  */
 public class SingleWorkerThread extends AbstractWorkerThread implements Runnable
 {
-   private static final boolean debug = false;
+   static final boolean debug = false;
 
    private Thread thread;
    private Link current;

@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2002, Simone Bordet
+ * Copyright (c) 2002-2005, Simone Bordet
  * All rights reserved.
  *
  * This software is distributable under the BSD license.
@@ -8,14 +8,8 @@
 
 package foxtrot;
 
-import java.security.AccessController;
-import java.security.PrivilegedAction;
-
 import javax.swing.SwingUtilities;
 
-import foxtrot.pumps.JDK13QueueEventPump;
-import foxtrot.pumps.SunJDK140ConditionalEventPump;
-import foxtrot.pumps.SunJDK141ConditionalEventPump;
 import foxtrot.workers.SingleWorkerThread;
 
 /**
@@ -51,21 +45,70 @@ import foxtrot.workers.SingleWorkerThread;
  * <code>foxtrot.worker.thread</code>, respectively, to a full qualified name of a class
  * implementing, respectively, the above interfaces.
  *
- * @author <a href="mailto:biorn_steedom@users.sourceforge.net">Simone Bordet</a>
  * @version $Revision$
  */
-public class Worker
+public class Worker extends AbstractSyncWorker
 {
-   private static EventPump eventPump;
-   private static WorkerThread workerThread;
-
-   static final boolean debug = false;
+   private static Worker instance = new Worker();
 
    /**
     * Cannot be instantiated, use static methods only.
     */
    private Worker()
    {
+   }
+
+   /**
+    * Returns the WorkerThread used to run {@link foxtrot.Task}s subclasses in a thread
+    * that is not the Event Dispatch Thread.
+    * @see #setWorkerThread
+    */
+   public static WorkerThread getWorkerThread()
+   {
+      return instance.workerThread();
+   }
+
+   /**
+    * Sets the WorkerThread used to run {@link foxtrot.Task}s subclasses in a thread
+    * that is not the Event Dispatch Thread.
+    * @see #getWorkerThread
+    * @throws java.lang.IllegalArgumentException If workerThread is null
+    */
+   public static void setWorkerThread(WorkerThread workerThread)
+   {
+      instance.workerThread(workerThread);
+   }
+
+   WorkerThread createDefaultWorkerThread()
+   {
+      return new SingleWorkerThread();
+   }
+
+   /**
+    * Returns the EventPump used to pump events from the AWT Event Queue.
+    * If no calls to {@link #setEventPump} have been made a default pump is returned;
+    * this default pump is first obtained by looking up a class name specified by the
+    * system property <code>foxtrot.event.pump</code>, then by instantiating the
+    * suitable pump for the Java version that is running the code.
+    * @see #setEventPump
+    */
+   public static EventPump getEventPump()
+   {
+      return instance.eventPump();
+   }
+
+   /**
+    * Sets the EventPump to be used to pump events from the AWT Event Queue. <br />
+    * After calling this method, subsequent invocation of {@link #post(Task)}
+    * or {@link #post(Job)} will use the newly installed EventPump.
+    * Use with care, since implementing correcly a new EventPump is not easy.
+    * Foxtrot's default EventPumps are normally sufficient.
+    * @see #getEventPump
+    * @throws IllegalArgumentException If eventPump is null
+    */
+   public static void setEventPump(EventPump eventPump)
+   {
+      instance.eventPump(eventPump);
    }
 
    /**
@@ -82,40 +125,7 @@ public class Worker
     */
    public static Object post(Task task) throws Exception
    {
-      initializeWorkerThread();
-      initializeEventPump();
-
-      boolean isEventThread = SwingUtilities.isEventDispatchThread();
-      if (!isEventThread && !workerThread.isWorkerThread())
-      {
-         throw new IllegalStateException("Worker.post() can be called only from the AWT Event Dispatch Thread or from another Task");
-      }
-
-      // It is possible that the worker thread is stopped when an applet is destroyed.
-      // Here we restart it in case has been stopped.
-      // Useful also if the WorkerThread has been replaced but not started by the user
-      if (!workerThread.isAlive()) workerThread.start();
-
-      if (isEventThread)
-      {
-         workerThread.postTask(task);
-
-         // The following line blocks until the task has been executed
-         eventPump.pumpEvents(task);
-      }
-      else
-      {
-         workerThread.runTask(task);
-      }
-
-      try
-      {
-         return task.getResultOrThrow();
-      }
-      finally
-      {
-         task.reset();
-      }
+      return instance.post(task, getWorkerThread(), getEventPump());
    }
 
    /**
@@ -126,160 +136,6 @@ public class Worker
     */
    public static Object post(Job job)
    {
-      try
-      {
-         return post((Task)job);
-      }
-      catch (RuntimeException x)
-      {
-         throw x;
-      }
-      catch (Exception x)
-      {
-         // If it happens, it's a bug
-         if (debug)
-         {
-            System.err.println("[Worker] PANIC: checked exception thrown by a Job !");
-            x.printStackTrace();
-         }
-
-         // I should throw an UndeclaredThrowableException, but that is
-         // available only in JDK 1.3+, so here I use RuntimeException
-         throw new RuntimeException(x.toString());
-      }
-      catch (Error x)
-      {
-         throw x;
-      }
-   }
-
-   /**
-    * Returns the EventPump used to pump events from the AWT Event Queue.
-    * @see #setEventPump
-    */
-   public static EventPump getEventPump()
-   {
-      initializeEventPump();
-      return eventPump;
-   }
-
-   /**
-    * Sets the EventPump to be used to pump events from the AWT Event Queue. <br>
-    * After calling this method, subsequent invocation of {@link #post(Task)}
-    * or {@link #post(Job)} will use the newly installed EventPump.
-    * @see #getEventPump
-    * @throws IllegalArgumentException If eventPump is null
-    */
-   public static void setEventPump(EventPump eventPump)
-   {
-      if (eventPump == null) throw new IllegalArgumentException("EventPump cannot be null");
-      Worker.eventPump = eventPump;
-   }
-
-   /**
-    * Returns the WorkerThread used to run {@link Task}s or {@link Job}s in a thread
-    * that is not the Event Dispatch Thread.
-    * @see #setWorkerThread
-    */
-   public static WorkerThread getWorkerThread()
-   {
-      initializeWorkerThread();
-      return workerThread;
-   }
-
-   /**
-    * Sets the WorkerThread used to run {@link Task}s or {@link Job}s in a thread
-    * that is not the Event Dispatch Thread. <br>
-    * After calling this method, subsequent invocation of {@link #post(Task)}
-    * or {@link #post(Job)} will use the newly installed WorkerThread.
-    * @see #getWorkerThread
-    * @throws IllegalArgumentException If workerThread is null
-    */
-   public static void setWorkerThread(WorkerThread workerThread)
-   {
-      if (workerThread == null) throw new IllegalArgumentException("WorkerThread cannot be null");
-      Worker.workerThread = workerThread;
-   }
-
-   private static void initializeWorkerThread()
-   {
-      if (workerThread != null) return;
-
-      // First look into the system property
-      String workerThreadClassName = (String)AccessController.doPrivileged(new PrivilegedAction()
-      {
-         public Object run()
-         {
-            return System.getProperty("foxtrot.worker.thread");
-         }
-      });
-
-      if (workerThreadClassName == null)
-      {
-         workerThread = new SingleWorkerThread();
-      }
-      else
-      {
-         ClassLoader loader = Worker.class.getClassLoader();
-         if (loader == null) loader = ClassLoader.getSystemClassLoader();
-         try
-         {
-            workerThread = (WorkerThread)loader.loadClass(workerThreadClassName).newInstance();
-         }
-         catch (Throwable x)
-         {
-            workerThread = new SingleWorkerThread();
-         }
-      }
-
-      if (debug) System.out.println("[Worker] Initialized WorkerThread: " + workerThread);
-   }
-
-   private static void initializeEventPump()
-   {
-      if (eventPump != null) return;
-
-      // First look into the system property
-      String eventPumpClassName = (String)AccessController.doPrivileged(new PrivilegedAction()
-      {
-         public Object run()
-         {
-            return System.getProperty("foxtrot.event.pump");
-         }
-      });
-
-      if (eventPumpClassName != null)
-      {
-         ClassLoader loader = Worker.class.getClassLoader();
-         if (loader == null) loader = ClassLoader.getSystemClassLoader();
-         try
-         {
-            eventPump = (EventPump)loader.loadClass(eventPumpClassName).newInstance();
-            return;
-         }
-         catch (Throwable ignored)
-         {
-            // Fall through
-         }
-      }
-
-      if (JREVersion.isJRE141())
-      {
-         eventPump = new SunJDK141ConditionalEventPump();
-      }
-      else if (JREVersion.isJRE140())
-      {
-         eventPump = new SunJDK140ConditionalEventPump();
-      }
-      else if (JREVersion.isJRE13() || JREVersion.isJRE12())
-      {
-         eventPump = new JDK13QueueEventPump();
-      }
-      else
-      {
-         throw new Error("The current JRE is not supported");
-      }
-
-      if (debug) System.out.println("[Worker] Initialized EventPump: " + eventPump);
+      return instance.post(job, getWorkerThread(), getEventPump());
    }
 }
