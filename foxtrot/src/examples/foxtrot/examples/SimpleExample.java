@@ -35,104 +35,104 @@ import foxtrot.Worker;
  */
 public class SimpleExample extends JFrame
 {
-	private boolean sleeping;
-	private JButton button;
+   private boolean sleeping;
+   private JButton button;
 
-	public static void main(String[] args)
-	{
-		SimpleExample example = new SimpleExample();
-		example.setVisible(true);
-	}
+   public static void main(String[] args)
+   {
+      SimpleExample example = new SimpleExample();
+      example.setVisible(true);
+   }
 
-	public SimpleExample()
-	{
-		super("Foxtrot Example");
+   public SimpleExample()
+   {
+      super("Foxtrot Example");
 
-		button = new JButton("Take a nap !");
-		button.addActionListener(new ActionListener()
-		{
-			public void actionPerformed(ActionEvent e)
-			{
-				if (sleeping)
-					wakeUp();
-				else
-					sleep();
-			}
-		});
+      button = new JButton("Take a nap !");
+      button.addActionListener(new ActionListener()
+      {
+         public void actionPerformed(ActionEvent e)
+         {
+            if (sleeping)
+               wakeUp();
+            else
+               sleep();
+         }
+      });
 
-		setDefaultCloseOperation(EXIT_ON_CLOSE);
+      setDefaultCloseOperation(EXIT_ON_CLOSE);
 
-		Container c = getContentPane();
-		c.setLayout(new GridBagLayout());
-		c.add(button);
+      Container c = getContentPane();
+      c.setLayout(new GridBagLayout());
+      c.add(button);
 
-		setSize(300,200);
+      setSize(300, 200);
 
-		Dimension screen = Toolkit.getDefaultToolkit().getScreenSize();
-		Dimension size = getSize();
-		int x = (screen.width - size.width) >> 1;
-		int y = (screen.height - size.height) >> 1;
-		setLocation(x, y);
-	}
+      Dimension screen = Toolkit.getDefaultToolkit().getScreenSize();
+      Dimension size = getSize();
+      int x = (screen.width - size.width) >> 1;
+      int y = (screen.height - size.height) >> 1;
+      setLocation(x, y);
+   }
 
-	private void sleep()
-	{
-		button.setText("Wake me up!");
-		workerSleep();
+   private void sleep()
+   {
+      button.setText("Wake me up!");
+      workerSleep();
 //		freezeSleep();
-		button.setText("Take a nap!");
-	}
+      button.setText("Take a nap!");
+   }
 
-	private void workerSleep()
-	{
-		try
-		{
-			Worker.post(new Task()
-			{
-				public Object run() throws InterruptedException
-				{
-					synchronized (SimpleExample.this)
-					{
-						sleeping = true;
-						SimpleExample.this.wait();
-						sleeping = false;
-					}
-					return null;
-				}
-			});
-		}
-		catch (InterruptedException x)
-		{
-            x.printStackTrace();
-		}
-		catch (Exception x)
-		{
-			// Never thrown
-		}
-	}
+   private void workerSleep()
+   {
+      try
+      {
+         Worker.post(new Task()
+         {
+            public Object run() throws InterruptedException
+            {
+               synchronized (SimpleExample.this)
+               {
+                  sleeping = true;
+                  SimpleExample.this.wait();
+                  sleeping = false;
+               }
+               return null;
+            }
+         });
+      }
+      catch (InterruptedException x)
+      {
+         x.printStackTrace();
+      }
+      catch (Exception x)
+      {
+         // Never thrown
+      }
+   }
 
-	private void freezeSleep()
-	{
-		try
-		{
-			synchronized (this)
-			{
-				sleeping = true;
-				wait();
-				sleeping = false;
-			}
-		}
-		catch (InterruptedException x)
-		{
-			x.printStackTrace();
-		}
-	}
+   private void freezeSleep()
+   {
+      try
+      {
+         synchronized (this)
+         {
+            sleeping = true;
+            wait();
+            sleeping = false;
+         }
+      }
+      catch (InterruptedException x)
+      {
+         x.printStackTrace();
+      }
+   }
 
-	private void wakeUp()
-	{
-		synchronized (this)
-		{
-			notifyAll();
-		}
-	}
+   private void wakeUp()
+   {
+      synchronized (this)
+      {
+         notifyAll();
+      }
+   }
 }
