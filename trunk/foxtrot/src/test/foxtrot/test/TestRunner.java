@@ -1,3 +1,11 @@
+/**
+ * Copyright (c) 2002, Simone Bordet
+ * All rights reserved.
+ *
+ * This software is distributable under the BSD license.
+ * See the terms of the BSD license in the documentation provided with this software.
+ */
+
 package foxtrot.test;
 
 import java.awt.Container;
@@ -17,6 +25,7 @@ import javax.swing.SwingUtilities;
 
 /**
  *
+ * @author <a href="mailto:biorn_steedom@users.sourceforge.net">Simone Bordet</a>
  * @version $Revision$
  */
 public class TestRunner

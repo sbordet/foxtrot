@@ -1,3 +1,11 @@
+/**
+ * Copyright (c) 2002, Simone Bordet
+ * All rights reserved.
+ *
+ * This software is distributable under the BSD license.
+ * See the terms of the BSD license in the documentation provided with this software.
+ */
+
 package foxtrot.examples;
 
 import java.awt.BorderLayout;
@@ -25,6 +33,7 @@ import foxtrot.Worker;
  * for the progressive operation, but just use the Foxtrot API.
  * And, of course, with Foxtrot the GUI can be interrupted in any moment.
  *
+ * @author <a href="mailto:biorn_steedom@users.sourceforge.net">Simone Bordet</a>
  * @version $Revision$
  */
 public class ProgressExample extends JFrame

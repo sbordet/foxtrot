@@ -1,3 +1,11 @@
+/**
+ * Copyright (c) 2002, Simone Bordet
+ * All rights reserved.
+ *
+ * This software is distributable under the BSD license.
+ * See the terms of the BSD license in the documentation provided with this software.
+ */
+
 package foxtrot;
 
 import java.security.AccessController;
@@ -11,7 +19,7 @@ import javax.swing.SwingUtilities;
  * {@link Task}s and {@link Job}s. <br>
  * Tasks execution is serialized: tasks are enqueued and executed one after the other.
  *
- * @author <a href="mailto:simone.bordet@hp.com">Simone Bordet</a>
+ * @author <a href="mailto:biorn_steedom@users.sourceforge.net">Simone Bordet</a>
  * @version $Revision$
  */
 public class SingleWorkerThread extends AbstractWorkerThread implements Runnable
