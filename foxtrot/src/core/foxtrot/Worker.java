@@ -14,8 +14,15 @@ import java.awt.EventQueue;
 import java.awt.MenuComponent;
 import java.awt.Toolkit;
 import java.awt.ActiveEvent;
+import java.awt.FoxtrotConditional;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.security.AccessController;
+import java.security.PrivilegedAction;
+import java.security.PrivilegedExceptionAction;
+import java.security.PrivilegedActionException;
+import java.net.URLClassLoader;
+import java.net.URL;
 
 import javax.swing.SwingUtilities;
 
@@ -55,13 +62,18 @@ public class Worker
 	private static Link m_current;
 	private static Thread m_thread;
 	private static Object m_lock = new Object();
-	private static EventQueue m_awtQueue = Toolkit.getDefaultToolkit().getSystemEventQueue();
+	private static EventQueue m_queue;
 
-	private static final boolean m_debug = false;
+	private static final boolean m_debug = true;
 
 	static
 	{
+		m_queue = Toolkit.getDefaultToolkit().getSystemEventQueue();
+
 		m_thread = new Thread(new Runner(), "Foxtrot Worker Thread");
+		// Daemon, since if someone loads this class without using it,
+		// the JVM should shut down on main thread's termination
+		m_thread.setDaemon(true);
 		m_thread.start();
 		if (m_debug)
 		{
@@ -69,14 +81,10 @@ public class Worker
 		}
 	}
 
-	private static void interrupt()
-	{
-		if (m_debug)
-		{
-			System.out.println("Ending Foxtrot Worker");
-		}
-		m_thread.interrupt();
-	}
+	/**
+	 * Cannot be instantiated, use static methods only.
+	 */
+	private Worker() {}
 
 	/**
 	 * Enqueues the given task to be executed in the worker thread. <br>
@@ -88,14 +96,16 @@ public class Worker
 	{
 		if (!SwingUtilities.isEventDispatchThread())
 		{
-			throw new IllegalStateException("This method can be called only from AWT Thread");
+			throw new IllegalStateException("This method can be called only from the AWT Event Dispatch Thread");
 		}
 
 		addTask(task);
 
-		AWTEventDequeuer dequeuer = new AWTEventDequeuer(task);
-		// The following line blocks until the task has been executed
-		dequeuer.dequeue();
+		// Must create a new object every time, since from pumpEvents() I can pump an event that ends up calling
+		// again post, and thus coming here again.
+		EventPump pump = new EventPump(task);
+		// The following line blocks until the task has been executed, or it is interrupted
+		pump.pumpEvents();
 
 		return task.getResult();
 	}
@@ -108,7 +118,7 @@ public class Worker
 		{
 			if (hasTasks())
 			{
-				// Add the given task at the end of the queue
+				// Append the given task at the end of the queue
 				Link item = m_current;
 				while (item.m_next != null)
 				{
@@ -148,18 +158,27 @@ public class Worker
 				{
 					System.out.println("Waiting for tasks...");
 				}
+
 				m_lock.wait();
 			}
 
-			// Taking the current task and shifting to the next in the queue
-			Link item = m_current;
-			m_current = m_current.m_next;
-			Task t = item.m_task;
+			// Taking the current task
+			Task t = m_current.m_task;
+
 			if (m_debug)
 			{
 				System.out.println("Returning posted task:" + t);
 			}
+
 			return t;
+		}
+	}
+
+	private static void removeTask()
+	{
+		synchronized (m_lock)
+		{
+			m_current = m_current.m_next;
 		}
 	}
 
@@ -171,87 +190,68 @@ public class Worker
 		}
 	}
 
-	private static class AWTEventDequeuer
+	private static void stop()
 	{
+		if (m_debug)
+		{
+			System.out.println("Ending Foxtrot Worker");
+		}
+		m_thread.interrupt();
+	}
+
+	/**
+	 * The class that dequeues events from the EventQueue
+	 */
+	private static class EventPump
+	{
+		private static Method m_pumpMethod;
+
+		static
+		{
+			try
+			{
+				Class dispatchThreadClass = ClassLoader.getSystemClassLoader().loadClass("java.awt.EventDispatchThread");
+				Class conditionalClass = ClassLoader.getSystemClassLoader().loadClass("java.awt.Conditional");
+				m_pumpMethod = dispatchThreadClass.getDeclaredMethod("pumpEvents", new Class[] {conditionalClass});
+				m_pumpMethod.setAccessible(true);
+			}
+			catch (Exception x) {x.printStackTrace();}
+		}
+
 		private Task m_task;
 
-		private AWTEventDequeuer(Task t)
+		private EventPump(Task t)
 		{
 			m_task = t;
 		}
 
-		private void dequeue()
+		private void pumpEvents()
 		{
 			try
 			{
 				if (m_debug)
 				{
-					System.out.println("Start dequeueing events from AWT Event Queue:" + this);
+					System.out.println("Start dequeueing events from AWT Event Queue: " + this);
 				}
 
-				while (!m_task.isCompleted())
-				{
-					// get next AWT event
-					AWTEvent event = m_awtQueue.getNextEvent();
-
-					if (m_debug)
-					{
-						System.out.println("Event dequeued from AWT:" + event);
-					}
-
-					Object src = event.getSource();
-
-					try
-					{
-						// Dispatch the event
-						// In JDK 1.1 events posted using SwingUtilities.invokeLater are subclasses of AWTEvent
-						// with source a dummy subclass of Component
-						// In JDK 1.2 and superior events posted using SwingUtilities.invokeLater are subclasses
-						// of AWTEvent that implement ActiveEvent with source the Toolkit implementation
-						if (src instanceof Component)
-						{
-							Component c = (Component)src;
-							c.dispatchEvent(event);
-						}
-						else if (src instanceof MenuComponent)
-						{
-							MenuComponent mc = (MenuComponent)src;
-							mc.dispatchEvent(event);
-						}
-						else if (event instanceof ActiveEvent)
-						{
-							ActiveEvent e = (ActiveEvent)event;
-							e.dispatch();
-						}
-						else
-						{
-							System.err.println("Unable to dispatch event: " + event);
-						}
-					}
-					catch (Throwable x)
-					{
-						// JDK 1.1 just prints the stack trace, while jdk 1.3 (not sure for jdk 1.2)
-						// may plug in a handler for this exception, see EventDispatchThread; for now just print the stack
-						System.err.println("Exception occurred during event dispatching:");
-						x.printStackTrace();
-					}
-				}
-
+				// Invoke EventDispatchThread.pumpEvents(new FoxtrotConditional(m_task));
+				// This call blocks until the task is completed
+				m_pumpMethod.invoke(Thread.currentThread(), new Object[] {new FoxtrotConditional(m_task)});
+			}
+			catch (Throwable x)	{x.printStackTrace();}
+			finally
+			{
 				if (m_debug)
 				{
-					System.out.println("Stop dequeueing events from AWT Event Queue");
+					System.out.println("Stop dequeueing events from AWT Event Queue: " + this);
 				}
-			}
-			catch (InterruptedException ignored)
-			{
-				/* Normally the AWT Event Queue is not interrupted */
 			}
 		}
 	}
 
 	private static class Runner implements Runnable
 	{
-		private static Runnable EMPTY_EVENT = new Runnable() {public void run() {}};
+		private static Runnable EMPTY_EVENT = new Runnable() {public final void run() {}};
 
 		public void run()
 		{
@@ -264,26 +264,46 @@ public class Worker
 			{
 				try
 				{
-					Task t = getTask();
+					final Task t = getTask();
+
 					if (m_debug)
 					{
 						System.out.println("Got posted task:" + t);
 					}
+
 					try
 					{
-						Object obj = t.run();
+						// Run the Task
+						Object obj = AccessController.doPrivileged(new PrivilegedExceptionAction()
+						{
+							public Object run() throws Exception
+							{
+								return t.run();
+							}
+						}, t.getSecurityContext());
+
 						t.setResult(obj);
 					}
-					catch (Exception x)
+					catch (PrivilegedActionException x)
 					{
-						t.setException(x);
+						t.setThrowable(x.getException());
+					}
+					catch (Throwable x)
+					{
+						t.setThrowable(x);
 					}
 
-					// Notify that the task completed
-					t.setCompleted(true);
+					synchronized (t)
+					{
+						// Mark the task as completed
+						t.completed();
+					}
+
+					// In any case, completed or interrupted, remove the task
+					removeTask();
 
 					// Needed in case that no events are posted on the AWT Event Queue:
-					// posting this one we exit from dequeue, that is waiting in
+					// posting this one we exit from pumpEvents(), that is waiting in
 					// EventQueue.getNextEvent
 					SwingUtilities.invokeLater(EMPTY_EVENT);
 				}
@@ -291,7 +311,7 @@ public class Worker
 				{
 					if (m_debug)
 					{
-						System.out.println("Foxtrot Worker interrupted");
+						System.out.println("Foxtrot Worker Thread interrupted, shutting down");
 					}
 					break;
 				}
