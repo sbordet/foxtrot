@@ -6,26 +6,31 @@
  * See the terms of the BSD license in the documentation provided with this software.
  */
 
-package foxtrot;
+package foxtrot.workers;
+
+import foxtrot.AbstractWorkerThread;
+import foxtrot.Task;
 
 /**
- * Full implementation of {@link WorkerThread} that uses a single worker thread to run
- * {@link Task}s and {@link Job}s. <br>
+ * Full implementation of {@link foxtrot.WorkerThread} that uses a single worker thread to run
+ * {@link foxtrot.Task}s and {@link foxtrot.Job}s. <br>
  * Tasks execution is serialized: tasks are enqueued and executed one after the other.
  *
  * @author <a href="mailto:biorn_steedom@users.sourceforge.net">Simone Bordet</a>
  * @version $Revision$
  */
-public class SingleWorkerThread extends AbstractWorkerThread implements Runnable
+public class DefaultWorkerThread extends AbstractWorkerThread implements Runnable
 {
+   private static final boolean debug = false;
+
    private Thread thread;
    private Link current;
 
    public void start()
    {
-      if (Worker.debug) System.out.println("[Foxtrot] Starting Worker Thread");
+      if (debug) System.out.println("[DefaultWorkerThread] Starting");
 
-      if (thread != null && thread.isAlive()) thread.interrupt();
+      if (thread != null && thread.isAlive()) stop();
 
       thread = new Thread(this, getThreadName());
       // Daemon, since the JVM should shut down on Event Dispatch Thread termination
@@ -38,12 +43,12 @@ public class SingleWorkerThread extends AbstractWorkerThread implements Runnable
     */
    protected String getThreadName()
    {
-      return "Foxtrot Single Worker Thread";
+      return "Foxtrot Default Worker Thread";
    }
 
    private void stop()
    {
-      if (Worker.debug) System.out.println("[Foxtrot] Ending Worker Thread");
+      if (debug) System.out.println("[DefaultWorkerThread] Ending " + thread);
 
       thread.interrupt();
    }
@@ -71,7 +76,7 @@ public class SingleWorkerThread extends AbstractWorkerThread implements Runnable
       {
          if (hasTasks())
          {
-            if (Worker.debug) System.out.println("[Foxtrot] Worker Thread queue not empty, enqueueing task:" + t);
+            if (debug) System.out.println("[DefaultWorkerThread] Task queue not empty, enqueueing task:" + t);
 
             // Append the given task at the end of the queue
             Link item = current;
@@ -80,7 +85,7 @@ public class SingleWorkerThread extends AbstractWorkerThread implements Runnable
          }
          else
          {
-            if (Worker.debug) System.out.println("[Foxtrot] Worker Thread queue empty, adding task:" + t);
+            if (debug) System.out.println("[DefaultWorkerThread] Task queue empty, adding task:" + t);
 
             // Add the given task and notify waiting
             current = new Link(t);
@@ -90,7 +95,7 @@ public class SingleWorkerThread extends AbstractWorkerThread implements Runnable
    }
 
    /**
-    * Removes and returns the first available {@link Task} from the internal queue.
+    * Removes and returns the first available {@link foxtrot.Task} from the internal queue.
     * If no Tasks are available, this method blocks until a Task is posted via
     * {@link #postTask}
     */
@@ -102,7 +107,7 @@ public class SingleWorkerThread extends AbstractWorkerThread implements Runnable
       {
          while (!hasTasks())
          {
-            if (Worker.debug) System.out.println("[Foxtrot] Worker Thread queue empty, waiting for tasks");
+            if (debug) System.out.println("[DefaultWorkerThread] Task queue empty, waiting for tasks");
 
             wait();
          }
@@ -124,7 +129,7 @@ public class SingleWorkerThread extends AbstractWorkerThread implements Runnable
 
    /**
     * Returns whether the worker thread has been interrupted or not.
-    * @see Thread#isInterrupted
+    * @see java.lang.Thread#isInterrupted
     */
    protected boolean isThreadInterrupted()
    {
@@ -132,12 +137,12 @@ public class SingleWorkerThread extends AbstractWorkerThread implements Runnable
    }
 
    /**
-    * The worker thread dequeues one {@link Task} from the internal queue via {@link #takeTask}
+    * The worker thread dequeues one {@link foxtrot.Task} from the internal queue via {@link #takeTask}
     * and then runs it calling {@link #runTask}
     */
    public void run()
    {
-      if (Worker.debug) System.out.println("[Foxtrot] Worker Thread started");
+      if (debug) System.out.println("[DefaultWorkerThread] Started " + thread);
 
       while (!isThreadInterrupted())
       {
@@ -148,7 +153,7 @@ public class SingleWorkerThread extends AbstractWorkerThread implements Runnable
          }
          catch (InterruptedException x)
          {
-            if (Worker.debug) System.out.println("[Foxtrot] Worker Thread interrupted, shutting down");
+            if (debug) System.out.println("[DefaultWorkerThread] Interrupted " + thread);
             break;
          }
       }
