@@ -1,27 +1,44 @@
 Welcome to Foxtrot, the easy API for the Java(TM) Foundation
 Classes (JFC/Swing).
 
-Foxtrot is bundled in a compressed file, that
-contains javadoc documentation, examples, libraries and source code,
+Foxtrot is bundled in a compressed file, that contains 
+javadoc documentation, examples, libraries, tests and source code,
 readable both from Unix, Linux and Windows machines.
 
 The structure of the compressed file is as follows:
 
-/docs    contains the documentation
-/lib     contains the Foxtrot jars: core jar, the examples jar 
+docs/    contains the documentation
+lib/     contains the Foxtrot jars: core jar, the examples jar 
          and the source jar
 
-The core jar is foxtrot.jar and must be included in the classpath.
+The core jar is lib/foxtrot.jar and must be included in the classpath.
 It is no longer necessary, from Foxtrot version 1.2, to include 
-foxtrot.jar in the boot classpath, thanks to a patch contributed 
-by Dan Holmsand (dan@eyebee.com). 
+foxtrot.jar in the boot classpath. 
 This way, Foxtrot is compatible with Java Web Start.
+
+The docs/ directory contains the Foxtrot API in Javadoc format, and
+a policy file with the permissions needed by foxtrot.jar.
 
 For example, if a Swing application is contained in myapp.jar 
 (and uses Foxtrot), then the command line to start would be similar 
 to this one (in Windows):
 
 > java -classpath foxtrot.jar;myapp.jar my.app.Main
+
+To run the tests included in the distribution, use the following 
+command line:
+
+> java -cp lib\foxtrot.jar;lib\foxtrot-test-runner.jar foxtrot.test.TestRunner
+
+or the following one, to run under a security manager:
+
+> java -Djava.security.manager -Djava.security.policy==java.policy \
+       -cp lib\foxtrot.jar;lib\foxtrot-test-runner.jar foxtrot.test.TestRunner
+
+If the tests are run without security manager one must fail.
+When the tests run, it's normal that stack traces are printed in the console;
+just look at the summary printed when the tests are completed to see if all 
+tests have passed.
 
 
 Refer to the documentation on the web site (http://foxtrot.sourceforge.net) 
