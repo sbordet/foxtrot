@@ -89,7 +89,7 @@ public class SimpleExample extends JFrame
 		{
 			Worker.post(new Task()
 			{
-				public Object run() throws Exception
+				public Object run() throws InterruptedException
 				{
 					synchronized (SimpleExample.this)
 					{
@@ -101,7 +101,14 @@ public class SimpleExample extends JFrame
 				}
 			});
 		}
-		catch (Exception ignored) {}
+		catch (InterruptedException x)
+		{
+            x.printStackTrace();
+		}
+		catch (Exception x)
+		{
+			// Never thrown
+		}
 	}
 
 	private void freezeSleep()
@@ -115,7 +122,10 @@ public class SimpleExample extends JFrame
 				sleeping = false;
 			}
 		}
-		catch (Exception ignored) {}
+		catch (InterruptedException x)
+		{
+			x.printStackTrace();
+		}
 	}
 
 	private void wakeUp()
