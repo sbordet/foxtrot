@@ -76,10 +76,7 @@ public class Worker
 
 		start();
 
-		if (m_debug)
-		{
-			System.out.println("Foxtrot Worker initialized successfully");
-		}
+		if (m_debug) System.out.println("Foxtrot Worker initialized successfully");
 	}
 
 	/**
@@ -89,33 +86,41 @@ public class Worker
 
 	/**
 	 * Enqueues the given task to be executed in the worker thread. <br>
-	 * This method can be called only from the Event Dispatch Thread, and blocks until the task has been executed,
+	 * If this method is called from the Event Dispatch Thread, it blocks until the task has been executed,
 	 * either by finishing normally or throwing an exception. <br>
-	 * Even in case of AWT events that throw RuntimeExceptions or Errors, this method will not return until
-	 * the Task is finished.
-	 * @throws IllegalStateException if the method is not called from the Event Dispatch Thread
+	 * If this method is called by the worker thread, and thus is called from another Task,
+	 * it executes the new Task immediately and then returns the control to the calling Task. <br>
+	 * While executing Tasks, it dequeues AWT events from the AWT Event Queue; even in case of AWT events
+	 * that throw RuntimeExceptions or Errors, this method will not return until the first Task
+	 * (posted from the Event Dispatch Thread) is finished.
+	 * @throws IllegalStateException if is not called from the Event Dispatch Thread nor from the worker thread.
 	 */
-	public static synchronized Object post(Task task) throws Exception
+	public static Object post(Task task) throws Exception
 	{
-		if (!SwingUtilities.isEventDispatchThread())
+		boolean isEventThread = SwingUtilities.isEventDispatchThread();
+		if (!isEventThread && !isWorkerThread())
 		{
-			throw new IllegalStateException("This method can be called only from the AWT Event Dispatch Thread");
+			throw new IllegalStateException("This method can be called only from the AWT Event Dispatch Thread or from the another Task");
 		}
 
-		// It is possible that the worker thread is stopped when an applet is destroyed.
-		// Here we restart it in case has been stopped.
-		if (!m_thread.isAlive())
+		if (isEventThread)
 		{
-			start();
+			// It is possible that the worker thread is stopped when an applet is destroyed.
+			// Here we restart it in case has been stopped.
+			if (!m_thread.isAlive()) start();
+
+			addTask(task);
+
+			// Must create a new object every time, since from pumpEvents() I can pump an event that ends up calling
+			// again post, and thus coming here again.
+			EventPump pump = new EventPump(task);
+			// The following line blocks until the task has been executed, or it is interrupted
+			pump.pumpEvents();
 		}
-
-		addTask(task);
-
-		// Must create a new object every time, since from pumpEvents() I can pump an event that ends up calling
-		// again post, and thus coming here again.
-		EventPump pump = new EventPump(task);
-		// The following line blocks until the task has been executed, or it is interrupted
-		pump.pumpEvents();
+		else
+		{
+			runTask(task);
+		}
 
 		return task.getResult();
 	}
@@ -136,20 +141,14 @@ public class Worker
 				}
 				item.m_next = new Link(t);
 
-				if (m_debug)
-				{
-					System.out.println("Worker queue not empty, enqueueing task:" + t);
-				}
+				if (m_debug) System.out.println("Worker queue not empty, enqueueing task:" + t);
 			}
 			else
 			{
 				// Add the given task
 				m_current = new Link(t);
 
-				if (m_debug)
-				{
-					System.out.println("Worker queue empty, adding task:" + t);
-				}
+				if (m_debug) System.out.println("Worker queue empty, adding task:" + t);
 
 				m_lock.notifyAll();
 			}
@@ -164,10 +163,7 @@ public class Worker
 		{
 			while (!hasTasks())
 			{
-				if (m_debug)
-				{
-					System.out.println("Waiting for tasks...");
-				}
+				if (m_debug) System.out.println("Waiting for tasks...");
 
 				m_lock.wait();
 			}
@@ -175,10 +171,7 @@ public class Worker
 			// Taking the current task
 			Task t = m_current.m_task;
 
-			if (m_debug)
-			{
-				System.out.println("Returning posted task:" + t);
-			}
+			if (m_debug) System.out.println("Returning posted task:" + t);
 
 			return t;
 		}
@@ -202,10 +195,8 @@ public class Worker
 
 	private static void start()
 	{
-		if (m_debug)
-		{
-			System.out.println("Starting Foxtrot Worker");
-		}
+		if (m_debug) System.out.println("Starting Foxtrot Worker");
+
 		m_thread = new Thread(new Runner(), "Foxtrot Worker Thread");
 		// Daemon, since if someone loads this class without using it,
 		// the JVM should shut down on main thread's termination
@@ -215,11 +206,44 @@ public class Worker
 
 	private static void stop()
 	{
-		if (m_debug)
-		{
-			System.out.println("Ending Foxtrot Worker");
-		}
+		if (m_debug) System.out.println("Ending Foxtrot Worker");
+
 		m_thread.interrupt();
+	}
+
+	private static boolean isWorkerThread()
+	{
+		return Thread.currentThread() == m_thread;
+	}
+
+	private static void runTask(final Task task)
+	{
+		try
+		{
+			// Run the Task
+			Object obj = AccessController.doPrivileged(new PrivilegedExceptionAction()
+			{
+				public Object run() throws Exception
+				{
+					return task.run();
+				}
+			}, task.getSecurityContext());
+
+			task.setResult(obj);
+		}
+		catch (PrivilegedActionException x)
+		{
+			task.setThrowable(x.getException());
+		}
+		catch (Throwable x)
+		{
+			task.setThrowable(x);
+		}
+		finally
+		{
+			// Mark the task as completed
+			task.completed();
+		}
 	}
 
 	/**
@@ -289,10 +313,7 @@ public class Worker
 
 			try
 			{
-				if (m_debug)
-				{
-					System.out.println("Start dequeueing events from AWT Event Queue: " + this);
-				}
+				if (m_debug) System.out.println("Start dequeueing events from AWT Event Queue: " + this);
 
 				// Invoke EventDispatchThread.pumpEvents(new FoxtrotConditional(m_task));
 				// This call blocks until the task is completed
@@ -321,10 +342,7 @@ public class Worker
 			}
 			finally
 			{
-				if (m_debug)
-				{
-					System.out.println("Stop dequeueing events from AWT Event Queue: " + this);
-				}
+				if (m_debug) System.out.println("Stop dequeueing events from AWT Event Queue: " + this);
 			}
 		}
 	}
@@ -373,10 +391,7 @@ public class Worker
 
 		public void run()
 		{
-			if (m_debug)
-			{
-				System.out.println("Foxtrot Worker Thread started");
-			}
+			if (m_debug) System.out.println("Foxtrot Worker Thread started");
 
 			while (!m_thread.isInterrupted())
 			{
@@ -384,35 +399,9 @@ public class Worker
 				{
 					final Task t = getTask();
 
-					if (m_debug)
-					{
-						System.out.println("Got posted task:" + t);
-					}
+					if (m_debug) System.out.println("Got posted task:" + t);
 
-					try
-					{
-						// Run the Task
-						Object obj = AccessController.doPrivileged(new PrivilegedExceptionAction()
-						{
-							public Object run() throws Exception
-							{
-								return t.run();
-							}
-						}, t.getSecurityContext());
-
-						t.setResult(obj);
-					}
-					catch (PrivilegedActionException x)
-					{
-						t.setThrowable(x.getException());
-					}
-					catch (Throwable x)
-					{
-						t.setThrowable(x);
-					}
-
-					// Mark the task as completed
-					t.completed();
+					runTask(t);
 
 					// In any case, completed or interrupted, remove the task
 					removeTask();
@@ -424,10 +413,7 @@ public class Worker
 				}
 				catch (InterruptedException x)
 				{
-					if (m_debug)
-					{
-						System.out.println("Foxtrot Worker Thread interrupted, shutting down");
-					}
+					if (m_debug) System.out.println("Foxtrot Worker Thread interrupted, shutting down");
 					break;
 				}
 			}
