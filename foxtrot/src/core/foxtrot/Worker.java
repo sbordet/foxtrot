@@ -14,6 +14,7 @@ import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
+import java.lang.reflect.UndeclaredThrowableException;
 import java.security.AccessController;
 import java.security.PrivilegedAction;
 import java.security.PrivilegedActionException;
@@ -122,7 +123,33 @@ public class Worker
 			runTask(task);
 		}
 
-		return task.getResult();
+		return task.getResultOrThrow();
+	}
+
+	public static Object post(Job job)
+	{
+		try
+		{
+			return post((Task)job);
+		}
+		catch (RuntimeException x)
+		{
+			throw x;
+		}
+		catch (Exception x)
+		{
+			// Must not happen
+			if (m_debug)
+			{
+				System.err.println("Foxtrot - WARNING: checked exception thrown by a Job");
+				x.printStackTrace();
+			}
+			throw new UndeclaredThrowableException(x);
+		}
+		catch (Error x)
+		{
+			throw x;
+		}
 	}
 
 	private static void addTask(Task t)
