@@ -88,9 +88,10 @@ public class FoxtrotExample extends JFrame
          {</span><span class="event">
             button.setText("Sleeping...");</span><span class="code">
 
+            String text = null;
             try
             {</span><span class="event">
-               String text = (String)Worker.post(new Task()</span><span class="code">
+               text = (String)Worker.post(new Task()</span><span class="code">
                {
                   public Object run() throws Exception
                   {</span><span class="foxtrot">
