@@ -11,6 +11,9 @@ package foxtrot.test;
 import javax.swing.SwingUtilities;
 
 import junit.framework.TestCase;
+import foxtrot.Worker;
+import foxtrot.Job;
+import foxtrot.WorkerThread;
 
 /**
  * Base class for Foxtrot tests
@@ -76,12 +79,36 @@ public class FoxtrotTestCase extends TestCase
                }
             }
 
-            // Mark the test as finished
-            synchronized (lock)
+            // Here the test should be finished.
+            // However, there may be tasks pending in both the WorkerThread queue
+            // and in EventQueue, so here I guarantee that those pending will be
+            // executed before starting the next test
+            SwingUtilities.invokeLater(new Runnable()
             {
-               barrier.set(0);
-               lock.notifyAll();
-            }
+               public void run()
+               {
+                  WorkerThread workerThread = Worker.getWorkerThread();
+                  if (!workerThread.isAlive()) workerThread.start();
+                  workerThread.postTask(new Job()
+                  {
+                     public Object run()
+                     {
+                        SwingUtilities.invokeLater(new Runnable()
+                        {
+                           public void run()
+                           {
+                              synchronized (lock)
+                              {
+                                 barrier.set(0);
+                                 lock.notifyAll();
+                              }
+                           }
+                        });
+                        return null;
+                     }
+                  });
+               }
+            });
          }
       });
 
@@ -113,26 +140,50 @@ public class FoxtrotTestCase extends TestCase
 
    protected boolean isJRE14()
    {
-      return canLoadClass("java.nio.ByteBuffer");
+      return loadClass("java.awt.SequencedEvent") != null;
    }
 
-   protected boolean isJRE13()
+   protected boolean isJRE140()
    {
-      return canLoadClass("java.lang.reflect.Proxy");
+      Class cls = loadClass("java.awt.SequencedEvent");
+      if (cls == null) return false;
+      try
+      {
+         cls.getDeclaredMethod("getFirst", null);
+         return false;
+      }
+      catch (NoSuchMethodException x)
+      {
+      }
+      return true;
    }
 
-   protected boolean canLoadClass(String className)
+   protected boolean isJRE141()
+   {
+      Class cls = loadClass("java.awt.SequencedEvent");
+      if (cls == null) return false;
+      try
+      {
+         cls.getDeclaredMethod("getFirst", null);
+         return true;
+      }
+      catch (NoSuchMethodException x)
+      {
+      }
+      return false;
+   }
+
+   private Class loadClass(String className)
    {
       // We ask directly to the boot classloader
       try
       {
-         Class.forName(className, false, null);
-         return true;
+         return Class.forName(className, false, null);
       }
       catch (ClassNotFoundException ignored)
       {
       }
-      return false;
+      return null;
    }
 
    private class ThrowableHolder
