@@ -38,7 +38,7 @@ public abstract class AbstractWorkerThread implements WorkerThread
 
    public void runTask(final Task task)
    {
-      if (Worker.debug) System.out.println("[Foxtrot] Executing task " + task);
+      if (Worker.debug) System.out.println("[AbstractWorkerThread] Executing task " + task);
 
       try
       {
@@ -73,5 +73,4 @@ public abstract class AbstractWorkerThread implements WorkerThread
          SwingUtilities.invokeLater(EMPTY_EVENT);
       }
    }
-
 }
