@@ -272,7 +272,7 @@ public class Worker
 
 				// Invoke EventDispatchThread.pumpEvents(new FoxtrotConditional(m_task));
 				// This call blocks until the task is completed
-				Object conditional = Proxy.newProxyInstance(null, new Class[] {m_conditionalClass}, new FoxtrotConditional(m_task));
+				Object conditional = Proxy.newProxyInstance(m_conditionalClass.getClassLoader(), new Class[] {m_conditionalClass}, new FoxtrotConditional(m_task));
 				m_pumpMethod.invoke(Thread.currentThread(), new Object[] {conditional});
 			}
 			catch (InvocationTargetException x)
