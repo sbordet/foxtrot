@@ -56,7 +56,7 @@ public class Worker
    private static EventPump eventPump;
    private static WorkerThread workerThread;
 
-   static final boolean debug = true;
+   static final boolean debug = false;
 
    /**
     * Cannot be instantiated, use static methods only.
@@ -105,7 +105,14 @@ public class Worker
          workerThread.runTask(task);
       }
 
-      return task.getResultOrThrow();
+      try
+      {
+         return task.getResultOrThrow();
+      }
+      finally
+      {
+         task.reset();
+      }
    }
 
    /**
