@@ -14,16 +14,17 @@ See the terms of the BSD license in the documentation provided with this softwar
 
 	<property name="name" value="foxtrot"/>
 	<!-- REMEMBER: change also the manifest information -->
-	<property name="version" value="1.0"/>
+	<property name="version" value="1.0.1"/>
 
 	<property name="src.dir" value="${basedir}/src"/>
 	<property name="core.src.dir" value="${src.dir}/core"/>
 	<property name="examples.src.dir" value="${src.dir}/examples"/>
-	<!--property name="docs.src.dir" value="${src.dir}/docs"/-->
+	<property name="test.src.dir" value="${src.dir}/test"/>
 
 	<property name="classes.dir" value="${basedir}/classes"/>
 	<property name="core.classes.dir" value="${classes.dir}/core"/>
 	<property name="examples.classes.dir" value="${classes.dir}/examples"/>
+	<property name="test.classes.dir" value="${classes.dir}/test"/>
 
 	<property name="etc.dir" value="${basedir}/src/etc"/>
 
@@ -35,6 +36,7 @@ See the terms of the BSD license in the documentation provided with this softwar
 
 	<property name="core.jar.file" value="${dist.lib.dir}/${name}.jar"/>
 	<property name="examples.jar.file" value="${dist.lib.dir}/${name}-examples.jar"/>
+	<property name="test.jar.file" value="${dist.lib.dir}/${name}-test.jar"/>
 	<property name="src.jar.file" value="${dist.lib.dir}/${name}-src.jar"/>
 
 	<patternset id="core.classes">
@@ -43,6 +45,10 @@ See the terms of the BSD license in the documentation provided with this softwar
 
 	<patternset id="examples.classes">
 		<include name="foxtrot/examples/**/*.class"/>
+	</patternset>
+
+	<patternset id="test.classes">
+		<include name="foxtrot/test/**/*.class"/>
 	</patternset>
 
 	<patternset id="src.files">
@@ -60,6 +66,14 @@ See the terms of the BSD license in the documentation provided with this softwar
 		<mkdir dir="${examples.classes.dir}"/>
 		<javac srcdir="${examples.src.dir}"
 						 destdir="${examples.classes.dir}"
+						 debug="on"
+						 deprecation="on"
+						 classpath="${core.classes.dir}">
+		</javac>
+
+		<mkdir dir="${test.classes.dir}"/>
+		<javac srcdir="${test.src.dir}"
+						 destdir="${test.classes.dir}"
 						 debug="on"
 						 deprecation="on"
 						 classpath="${core.classes.dir}">
@@ -83,12 +97,22 @@ See the terms of the BSD license in the documentation provided with this softwar
  			</fileset>
 		</jar>
 
+		<jar jarfile="${test.jar.file}"
+			 manifest="${etc.dir}/manifest.mf">
+ 			<fileset dir="${test.classes.dir}">
+ 				<patternset refid="test.classes"/>
+ 			</fileset>
+		</jar>
+
 		<jar jarfile="${src.jar.file}"
 			 manifest="${etc.dir}/manifest.mf">
  			<fileset dir="${core.src.dir}">
  				<patternset refid="src.files"/>
  			</fileset>
  			<fileset dir="${examples.src.dir}">
+ 				<patternset refid="src.files"/>
+ 			</fileset>
+ 			<fileset dir="${test.src.dir}">
  				<patternset refid="src.files"/>
  			</fileset>
 		</jar>
@@ -113,15 +137,11 @@ See the terms of the BSD license in the documentation provided with this softwar
 
 	</target>
 
-	<target name="docs">
-
-	</target>
-
 	<!--
 		Creates a release building jars and docs an creating zip and tar.gz
 		release file. The filenames are built using the version label
 	-->
-	<target name="release" depends="clean, jar, javadocs, docs">
+	<target name="release" depends="clean, jar, javadocs">
 		<mkdir dir="${dist.release.dir}"/>
 
 		<!-- Miscellaneous files -->
@@ -130,9 +150,10 @@ See the terms of the BSD license in the documentation provided with this softwar
 					 includes="README,LICENSE"/>
 		</copy>
 
-		<!-- The core, examples and source foxtrot jars -->
+		<!-- The core, examples, tests and source foxtrot jars -->
 		<copy file="${core.jar.file}" todir="${dist.release.dir}/lib"/>
 		<copy file="${examples.jar.file}" todir="${dist.release.dir}/lib"/>
+		<copy file="${test.jar.file}" todir="${dist.release.dir}/lib"/>
 		<copy file="${src.jar.file}" todir="${dist.release.dir}/lib"/>
 
 		<!-- The documentation -->
