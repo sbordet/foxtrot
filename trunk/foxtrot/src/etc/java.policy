@@ -1,4 +1,4 @@
-grant codebase "file:${user.dir}/dist/lib/foxtrot.jar"
+grant codebase "file:${user.dir}/lib/foxtrot.jar"
 {
    // Needed by Swing implementation
    permission java.awt.AWTPermission "accessEventQueue";
@@ -11,16 +11,16 @@ grant codebase "file:${user.dir}/dist/lib/foxtrot.jar"
 };
 
 
-grant codebase "file:${user.dir}/dist/lib/foxtrot-test-runner.jar"
+grant codebase "file:${user.dir}/lib/foxtrot-test-runner.jar"
 {
    permission java.awt.AWTPermission "showWindowWithoutWarningBanner";
    permission java.util.PropertyPermission "user.dir", "read";
-   permission java.io.FilePermission "dist/lib/foxtrot.jar", "read";
-   permission java.io.FilePermission "dist/lib/foxtrot-test.jar", "read";
+   permission java.io.FilePermission "lib/foxtrot.jar", "read";
+   permission java.io.FilePermission "lib/foxtrot-test.jar", "read";
    permission java.lang.RuntimePermission "createClassLoader";
    permission java.lang.RuntimePermission "setContextClassLoader";
 };
 
-grant codebase "file:${user.dir}/dist/lib/foxtrot-test.jar"
+grant codebase "file:${user.dir}/lib/foxtrot-test.jar"
 {
 };
