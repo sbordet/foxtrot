@@ -31,6 +31,8 @@ public class FoxtrotTestCase extends TestCase
    /**
     * Invokes the given Runnable in the AWT Event Dispatch Thread and waits for its
     * completion, either by returning or by throwing.
+    * This is necessary since tests are run in the "main" thread by JUnit and instead
+    * we have to start them from the AWT Event Dispatch Thread.
     */
    protected void invokeTest(final Runnable run) throws Exception
    {
