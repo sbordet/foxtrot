@@ -64,7 +64,8 @@ No worries about code executed after Worker.post().
 Foxtrot framework.</p>
 <h3>Acknowledgements</h3>
 <p>Marco Cravero had the first idea of exploring how dialogs work to find a better solution for using threads in Swing.<br>
-Simone Bordet implemented the Foxtrot API following this idea.</p>
+Simone Bordet implemented the Foxtrot API following this idea.<br>
+Luca Berra suggested the 'Foxtrot' name.</p>
 <br><br>
 <pre>
 public class FoxtrotExample extends JFrame
