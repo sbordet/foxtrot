@@ -34,120 +34,139 @@ import java.security.AccessController;
  */
 public abstract class Task
 {
-	private Object m_result;
-	private Throwable m_throwable;
-	private boolean m_completed;
-	private AccessControlContext m_securityContext;
+   private Object result;
+   private Throwable throwable;
+   private boolean completed;
+   private AccessControlContext securityContext;
 
-	/**
-	 * Creates a new Task
-	 */
-	protected Task()
-	{
-		m_securityContext = AccessController.getContext();
-	}
+   /**
+    * Creates a new Task.
+    */
+   protected Task()
+   {
+      securityContext = AccessController.getContext();
+   }
 
-	/**
-	 * The method to implement with time-consuming code.
-	 * It must NOT be synchronized or synchronize on this instance.
-	 */
-	public abstract Object run() throws Exception;
+   /**
+    * The method to implement with time-consuming code.
+    * It must NOT be synchronized or synchronize on this instance.
+    */
+   public abstract Object run() throws Exception;
 
-	/**
-	 * Returns the result of this Task operation, as set in {@ #setResult}.
-	 * If an exception or an error is thrown by {@link #run}, it is rethrown here.
-	 * Synchronized since the variable is accessed from 2 threads.
-	 * Accessed by the AWT Event Dispatch Thread.
-	 * Package protected, used by Worker
-	 */
-	final synchronized Object getResultOrThrow() throws Exception
-	{
-		Throwable t = getThrowable();
-		if (t != null)
-		{
-			if (t instanceof Exception) throw (Exception)t;
-			else throw (Error)t;
-		}
-		return getResult();
-	}
+   /**
+    * Returns the result of this Task operation, as set by {@link #setResult}.
+    * If an exception or an error is thrown by {@link #run}, it is rethrown here.
+    * Synchronized since the variable is accessed from 2 threads.
+    * Accessed by the AWT Event Dispatch Thread.
+    * Package protected, used by Worker
+    * @see #setResult
+    * @see #setThrowable
+    */
+   final synchronized Object getResultOrThrow() throws Exception
+   {
+      Throwable t = getThrowable();
+      if (t != null)
+      {
+         if (t instanceof Exception)
+            throw (Exception)t;
+         else
+            throw (Error)t;
+      }
+      return getResult();
+   }
 
-	/**
-	 * Returns the result of this Task operation
-	 * Synchronized since the variable is accessed from 2 threads
-	 * Accessed by the AWT Event Dispatch Thread.
-	 * Package protected, used by Worker
-	 * @see #setResult
-	 * @see #getResultOrThrow
-	 */
-	final synchronized Object getResult()
-	{
-		return m_result;
-	}
+   /**
+    * Returns the result of this Task operation, as set by {@link #setResult}.
+    * Synchronized since the variable is accessed from 2 threads
+    * Accessed by the AWT Event Dispatch Thread.
+    * @see #getResultOrThrow
+    */
+   private final synchronized Object getResult()
+   {
+      return result;
+   }
 
-	/**
-	 * Sets the result of this Task operation, as returned by the {@link #run} method.
-	 * Synchronized since the variable is accessed from 2 threads
-	 * Accessed by the Foxtrot Worker Thread.
-	 * Package protected, used by Worker
-	 * @see #getResultOrThrow
-	 * @see #getResult
-	 */
-	final synchronized void setResult(Object o)
-	{
-		m_result = o;
-	}
+   /**
+    * Sets the result of this Task operation, as returned by the {@link #run} method.
+    * Synchronized since the variable is accessed from 2 threads
+    * Accessed by the Foxtrot Worker Thread.
+    * Package protected, used by {@link AbstractWorkerThread}
+    * @see #getResultOrThrow
+    * @see #getResult
+    */
+   final synchronized void setResult(Object result)
+   {
+      this.result = result;
+   }
 
-	/**
-	 * Returns the throwable as set in {@link #setThrowable}.
-	 * Synchronized since the variable is accessed from 2 threads
-	 * Accessed by the AWT Event Dispatch Thread.
-	 */
-	final synchronized Throwable getThrowable()
-	{
-		return m_throwable;
-	}
+   /**
+    * Returns the throwable as set by {@link #setThrowable}.
+    * Synchronized since the variable is accessed from 2 threads
+    * Accessed by the AWT Event Dispatch Thread.
+    * @see #setThrowable
+    */
+   final synchronized Throwable getThrowable()
+   {
+      return throwable;
+   }
 
-	/**
-	 * Sets the throwable eventually thrown by the {@link #run} method.
-	 * Synchronized since the variable is accessed from 2 threads
-	 * Accessed by the Foxtrot Worker Thread.
-	 * Package protected, used by Worker
-	 * @see #getThrowable
-	 */
-	final synchronized void setThrowable(Throwable x)
-	{
-		m_throwable = x;
-	}
+   /**
+    * Sets the throwable eventually thrown by the {@link #run} method.
+    * Synchronized since the variable is accessed from 2 threads
+    * Accessed by the Foxtrot Worker Thread.
+    * Package protected, used by {@link AbstractWorkerThread}
+    * @see #getThrowable
+    */
+   final synchronized void setThrowable(Throwable x)
+   {
+      throwable = x;
+   }
 
-	/**
-	 * Returns if this Task is completed.
-	 * Synchronized since the variable is accessed from 2 threads
-	 * Accessed by the AWT Event Dispatch Thread.
-	 */
-	public final synchronized boolean isCompleted()
-	{
-		return m_completed;
-	}
+   /**
+    * Returns if this Task is completed.
+    */
+   public final synchronized boolean isCompleted()
+   {
+// Synchronized since the variable is accessed from 2 threads
+// Accessed by the AWT Event Dispatch Thread.
+      return completed;
+   }
 
-	/**
-	 * Marks this Task as completed.
-	 * Synchronized since the variable is accessed from 2 threads
-	 * Accessed by the Foxtrot Worker Thread.
-	 * Package protected, used by Worker
-	 * @see #isCompleted
-	 */
-	final synchronized void completed()
-	{
-		m_completed = true;
-	}
+   /**
+    * Sets the completion status of this Task.
+    * Synchronized since the variable is accessed from 2 threads.
+    * Accessed by the Foxtrot Worker Thread and the AWT Event Dispatch Thread.
+    * Package protected, used by {@link AbstractWorkerThread}
+    * @see #isCompleted
+    */
+   final synchronized void setCompleted(boolean value)
+   {
+      completed = value;
+   }
 
-	/**
-	 * Returns the protection domain stack at the moment of instantiation of this Task
-	 * Accessed by the Foxtrot Worker Thread.
-	 * Package protected, used by Worker
-	 */
-	final synchronized AccessControlContext getSecurityContext()
-	{
-		return m_securityContext;
-	}
+   /**
+    * Returns the protection domain stack at the moment of instantiation of this Task.
+    * Synchronized since the variable is accessed from 2 threads
+    * Accessed by the Foxtrot Worker Thread.
+    * Package protected, used by {@link AbstractWorkerThread}
+    * @see #Task
+    */
+   final synchronized AccessControlContext getSecurityContext()
+   {
+      return securityContext;
+   }
+
+   /**
+    * Resets the internal status of this Task, that can be therefore be reused.
+    * Synchronized since the variables are accessed from 2 threads
+    * Accessed by the AWT Event Dispatch Thread.
+    * Package protected, used by Worker
+    * @see #isCompleted
+    */
+   final synchronized void reset()
+   {
+      setResult(null);
+      setThrowable(null);
+      setCompleted(false);
+   }
 }
