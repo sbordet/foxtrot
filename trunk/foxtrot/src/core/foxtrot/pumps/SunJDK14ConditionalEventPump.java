@@ -17,7 +17,6 @@ import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
 import java.security.AccessController;
 import java.security.PrivilegedAction;
-import java.security.PrivilegedActionException;
 import java.security.PrivilegedExceptionAction;
 
 import foxtrot.EventPump;
@@ -30,14 +29,13 @@ import foxtrot.Task;
  * @author <a href="mailto:biorn_steedom@users.sourceforge.net">Simone Bordet</a>
  * @version $Revision$
  */
-public class SunJDK14ConditionalEventPump implements EventPump
+public abstract class SunJDK14ConditionalEventPump implements EventPump
 {
    private static final boolean debug = false;
 
    private static Class conditionalClass;
-   private static Class sequencedEventClass;
-   private static Method pumpEvents;
-   private static Method getFirst;
+   private static Method pumpEventsMethod;
+   protected static Class sequencedEventClass;
 
    static
    {
@@ -50,11 +48,9 @@ public class SunJDK14ConditionalEventPump implements EventPump
                ClassLoader loader = ClassLoader.getSystemClassLoader();
                conditionalClass = loader.loadClass("java.awt.Conditional");
                sequencedEventClass = loader.loadClass("java.awt.SequencedEvent");
-               getFirst = sequencedEventClass.getDeclaredMethod("getFirst", new Class[0]);
-               getFirst.setAccessible(true);
                Class dispatchThreadClass = loader.loadClass("java.awt.EventDispatchThread");
-               pumpEvents = dispatchThreadClass.getDeclaredMethod("pumpEvents", new Class[]{conditionalClass});
-               pumpEvents.setAccessible(true);
+               pumpEventsMethod = dispatchThreadClass.getDeclaredMethod("pumpEvents", new Class[]{conditionalClass});
+               pumpEventsMethod.setAccessible(true);
 
                // See remarks for use of this property in java.awt.EventDispatchThread
                String property = "sun.awt.exception.handler";
@@ -73,17 +69,7 @@ public class SunJDK14ConditionalEventPump implements EventPump
             }
          });
       }
-      catch (PrivilegedActionException x)
-      {
-         if (debug) x.printStackTrace();
-         throw new Error(x.toString());
-      }
-      catch (RuntimeException x)
-      {
-         if (debug) x.printStackTrace();
-         throw x;
-      }
-      catch (Exception x)
+      catch (Throwable x)
       {
          if (debug) x.printStackTrace();
          throw new Error(x.toString());
@@ -94,7 +80,7 @@ public class SunJDK14ConditionalEventPump implements EventPump
     * Implements the <code>java.awt.Conditional</code> interface, that is package private,
     * with a JDK 1.3+ dynamic proxy.
     */
-   private static class Conditional implements InvocationHandler
+   private class Conditional implements InvocationHandler
    {
       private Task task;
 
@@ -126,34 +112,6 @@ public class SunJDK14ConditionalEventPump implements EventPump
          {
             return task.isCompleted() ? Boolean.FALSE : Boolean.TRUE;
          }
-      }
-
-      private Boolean canPumpSequencedEvent(AWTEvent event)
-      {
-         // There are 2 cases when a SequencedEvent 'event' is pumped by Foxtrot:
-         // 1) Foxtrot was NOT called by another SequencedEvent, so 'event' is the first SequencedEvent
-         //    of a series of SequencedEvents.
-         // 2) Foxtrot was called by another SequencedEvent, and thus 'event' is not the first
-         //    SequencedEvent of a series of SequencedEvents.
-         // In the first case, Foxtrot pumps 'event' regularly: if the task ends before the last
-         // SequencedEvent of the series is executed, Foxtrot will return and let the AWT mechanism
-         // to dispatch the remaining SequencedEvent(s), that so are dispatched in order, as they require.
-         // In the second case, the event from which Worker.post() is called (that ended up in calling
-         // this method) originated from a previous SequencedEvent. In this case, the SequencedEvent
-         // 'event' we will pump is not the first SequencedEvent, so 'event' will wait for the previous
-         // SequencedEvent to be disposed (which cannot happen until we return from this method);
-         // this blocks the EventDispatchThread and hangs the Swing application (BUG #4531693 and related).
-         // We return immediately, and will make the EventDispatchThread to wait until the Task is finished.
-         // Side effect is, of course, freezing of the GUI, which is however far better than a hang.
-         try
-         {
-            Object first = getFirst.invoke(event, null);
-            if (first == event) return Boolean.TRUE;
-         }
-         catch (Exception ignored)
-         {
-         }
-         return Boolean.FALSE;
       }
 
       private EventQueue getEventQueue()
@@ -202,7 +160,7 @@ public class SunJDK14ConditionalEventPump implements EventPump
 
          // Invoke java.awt.EventDispatchThread.pumpEvents(new Conditional(task));
          Object conditional = Proxy.newProxyInstance(conditionalClass.getClassLoader(), new Class[]{conditionalClass}, new Conditional(task));
-         pumpEvents.invoke(Thread.currentThread(), new Object[]{conditional});
+         pumpEventsMethod.invoke(Thread.currentThread(), new Object[]{conditional});
       }
       catch (InvocationTargetException x)
       {
@@ -236,6 +194,25 @@ public class SunJDK14ConditionalEventPump implements EventPump
       }
    }
 
+   /**
+    * There are 2 cases when a SequencedEvent 'event' is pumped by Foxtrot:
+    * 1) Foxtrot was NOT called by another SequencedEvent, so 'event' is the first SequencedEvent
+    *    of a series of SequencedEvents.
+    * 2) Foxtrot was called by another SequencedEvent, and thus 'event' is not the first
+    *    SequencedEvent of a series of SequencedEvents.
+    * In the first case, Foxtrot pumps 'event' regularly: if the task ends before the last
+    * SequencedEvent of the series is executed, Foxtrot will return and let the AWT mechanism
+    * to dispatch the remaining SequencedEvent(s), that so are dispatched in order, as they require.
+    * In the second case, the event from which Worker.post() is called (that ended up in calling
+    * this method) originated from a previous SequencedEvent. In this case, the SequencedEvent
+    * 'event' we will pump is not the first SequencedEvent, so 'event' will wait for the previous
+    * SequencedEvent to be disposed (which cannot happen until we return from this method);
+    * this blocks the EventDispatchThread and hangs the Swing application (BUG #4531693 and related).
+    * We return immediately, and will make the EventDispatchThread to wait until the Task is finished.
+    * Side effect is, of course, freezing of the GUI, which is however far better than a hang.
+    */
+   protected abstract Boolean canPumpSequencedEvent(AWTEvent event);
+
    private void waitForTask(Task task)
    {
       try
@@ -248,8 +225,10 @@ public class SunJDK14ConditionalEventPump implements EventPump
             }
          }
       }
-      catch (InterruptedException ignored)
+      catch (InterruptedException x)
       {
+         // Someone interrupted the Event Dispatch Thread, re-interrupt
+         Thread.currentThread().interrupt();
       }
    }
 }
