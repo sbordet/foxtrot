@@ -8,519 +8,489 @@
 
 package foxtrot.test;
 
-import java.awt.Container;
-import java.awt.Dimension;
-import java.awt.Toolkit;
-import java.awt.event.ActionEvent;
+import java.util.ArrayList;
 import java.awt.event.ActionListener;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
+import java.awt.event.ActionEvent;
 
-import javax.swing.BoxLayout;
-import javax.swing.JButton;
-import javax.swing.JFrame;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
+import javax.swing.JButton;
 
+import foxtrot.Job;
 import foxtrot.Task;
 import foxtrot.Worker;
-import foxtrot.Job;
 
 /**
- * Tests for the Foxtrot framework
+ * Tests for the basic Foxtrot functionality.
  *
  * @author <a href="mailto:biorn_steedom@users.sourceforge.net">Simone Bordet</a>
  * @version $Revision$
  */
-public class FoxtrotTest
+public class FoxtrotTest extends FoxtrotTestCase
 {
-	public void testThreads(JFrame frame) throws Exception
-	{
-		JButton button = createButton(frame, "Threads");
-
-		button.addActionListener(new ActionListener()
-		{
-			public void actionPerformed(ActionEvent e)
-			{
-				post(new Task()
-				{
-					public Object run() throws Exception
-					{
-						// Check that I'm NOT in the AWT Event Dispatch Thread
-						if (SwingUtilities.isEventDispatchThread()) {throw new RuntimeException();}
-
-						// Check that I'm really in the Foxtrot Worker Thread
-						if (Thread.currentThread().getName().indexOf("Foxtrot") < 0) {throw new RuntimeException();}
-
-						return null;
-					}
-				});
-			}
-		});
-
-		button.doClick();
-	}
-
-	public void testBlocking(JFrame frame) throws Exception
-	{
-		JButton button = createButton(frame, "Blocking");
-
-		button.addActionListener(new ActionListener()
-		{
-			public void actionPerformed(ActionEvent e)
-			{
-				final long sleep = 1000;
-
-				long start = System.currentTimeMillis();
-				post(new Task()
-				{
-					public Object run() throws Exception
-					{
-						Thread.sleep(sleep);
-						return null;
-					}
-				});
-				long end = System.currentTimeMillis();
-
-				if (end - start < sleep) {throw new RuntimeException();}
-			}
-		});
-
-		button.doClick();
-	}
-
-	public void testDequeueing(JFrame frame) throws Exception
-	{
-		final String original = "Dequeueing";
-		final JButton button = createButton(frame, original);
-
-		button.addActionListener(new ActionListener()
-		{
-			public void actionPerformed(ActionEvent e)
-			{
-				final String text = "Dequeueing - Text Change";
-
-				// This event is dequeued only after Worker.post
-				SwingUtilities.invokeLater(new Runnable()
-				{
-					public void run()
-					{
-						button.setText(text);
-					}
-				});
-
-				// Check that the text is still the original one
-				if (!button.getText().equals(original)) {throw new RuntimeException();}
-
-				post(new Task()
-				{
-					public Object run() throws Exception
-					{
-						Thread.sleep(1000);
-						return null;
-					}
-				});
-
-				// Check that the event posted with invokeLater has been dequeued
-				if (!button.getText().equals(text)) {throw new RuntimeException();}
-			}
-		});
-
-		button.doClick();
-	}
-
-	public void testException(JFrame frame) throws Exception
-	{
-		JButton button = createButton(frame, "Exception");
-
-		button.addActionListener(new ActionListener()
-		{
-			public void actionPerformed(ActionEvent e)
-			{
-				try
-				{
-					Worker.post(new Task()
-					{
-						public Object run() throws Exception
-						{
-							throw new NumberFormatException();
-						}
-					});
-					throw new RuntimeException();
-				}
-				catch (NumberFormatException x) {}
-				catch (Throwable x) {throw new RuntimeException();}
-			}
-		});
-
-		button.doClick();
-	}
-
-	public void testError(JFrame frame) throws Exception
-	{
-		JButton button = createButton(frame, "Error");
-
-		button.addActionListener(new ActionListener()
-		{
-			public void actionPerformed(ActionEvent e)
-			{
-				try
-				{
-					Worker.post(new Task()
-					{
-						public Object run() throws Exception
-						{
-							throw new NoClassDefFoundError();
-						}
-					});
-					throw new RuntimeException();
-				}
-				catch (NoClassDefFoundError x) {}
-				catch (Throwable x) {throw new RuntimeException();}
-			}
-		});
-
-		button.doClick();
-	}
-
-	public void testAWTException(JFrame frame) throws Exception
-	{
-		JButton button = createButton(frame, "AWT Exception");
-
-		button.addActionListener(new ActionListener()
-		{
-			public void actionPerformed(ActionEvent e)
-			{
-				SwingUtilities.invokeLater(new Runnable()
-				{
-					public void run()
-					{
-						throw new NullPointerException();
-					}
-				});
-
-				final long sleep = 1000;
-				long start = System.currentTimeMillis();
-				post(new Task()
-				{
-					public Object run() throws Exception
-					{
-						Thread.sleep(sleep);
-						return null;
-					}
-				});
-				long end = System.currentTimeMillis();
-
-				// Must check that really elapsed all the time
-				if (end - start < sleep) {throw new RuntimeException();}
-			}
-		});
-
-		button.doClick();
-	}
-
-	public void testAWTError(JFrame frame) throws Exception
-	{
-		JButton button = createButton(frame, "AWT Error");
-
-		button.addActionListener(new ActionListener()
-		{
-			public void actionPerformed(ActionEvent e)
-			{
-				SwingUtilities.invokeLater(new Runnable()
-				{
-					public void run()
-					{
-						throw new Error();
-					}
-				});
-
-				final long sleep = 1000;
-				long start = System.currentTimeMillis();
-				post(new Task()
-				{
-					public Object run() throws Exception
-					{
-						Thread.sleep(sleep);
-						return null;
-					}
-				});
-				long end = System.currentTimeMillis();
-
-				// Must check that really elapsed all the time
-				if (end - start < sleep) {throw new RuntimeException();}
-			}
-		});
-
-		button.doClick();
-	}
-
-	public void testTaskQueueing(JFrame frame) throws Exception
-	{
-		final JButton button = createButton(frame, "Task Queueing");
-
-		button.addActionListener(new ActionListener()
-		{
-			private int m_max = 5;
-			private int m_count = 1;
-			public void actionPerformed(ActionEvent e)
-			{
-				if (m_count <= m_max)
-				{
-					long start = System.currentTimeMillis();
-					post(new Task()
-					{
-						public Object run() throws Exception
-						{
-							SwingUtilities.invokeLater(new Runnable()
-							{
-								public void run()
-								{
-									++m_count;
-									button.doClick();
-								}
-							});
-
-							Thread.sleep(1000 * m_count);
-
-							return null;
-						}
-					});
-					long end = System.currentTimeMillis();
-					System.out.println("Time: " + (end - start));
-				}
-			}
-		});
-
-		button.doClick();
-	}
-
-	public void testPostFromTask(JFrame frame) throws Exception
-	{
-		JButton button = createButton(frame, "Post from Task");
-
-		button.addActionListener(new ActionListener()
-		{
-			private int m_counter;
-			public void actionPerformed(ActionEvent e)
-			{
-				post(new Task()
-				{
-					public Object run() throws Exception
-					{
-						post(new Task()
-						{
-							public Object run() throws Exception
-							{
-								++m_counter;
-								return null;
-							}
-						});
-						return null;
-					}
-				});
-
-				if (m_counter != 1) throw new RuntimeException();
-			}
-		});
-
-		button.doClick();
-	}
-
-	public void testPostInInvokeLater(JFrame frame) throws Exception
-	{
-		final JButton button = createButton(frame, "Post from invokeLater");
-
-		button.addActionListener(new ActionListener()
-		{
-			public void actionPerformed(ActionEvent e)
-			{
-				post(new Task()
-				{
-					public Object run() throws Exception
-					{
-						for (int i = 0; i < 5; ++i)
-						{
-							SwingUtilities.invokeLater(new Runnable()
-							{
-								public void run()
-								{
-									post(new Task()
-									{
-										public Object run() throws Exception
-										{
-											Thread.sleep(1000);
-											return null;
-										}
-									});
-								}
-							});
-						}
-
-						Thread.sleep(2000);
-						return null;
-					}
-				});
-			}
-		});
-
-		button.doClick();
-	}
-
-	public void testLoad(JFrame frame) throws Exception
-	{
-		// Run this test with a very small heap: with 2 mega of heap there are no out of memory errors
-		// (less than 2 mega is defaulted to 2 mega, it seems): java -Xms2m -Xmx2m -verbosegc
-		// Also, may be worth to add dummy expensive data members (new byte[1000000] for example) to the
-		// Worker.Link class and/or Task class.
-
-		JButton button = createButton(frame, "Load");
-
-		button.addActionListener(new ActionListener()
-		{
-			public void actionPerformed(ActionEvent e)
-			{
-				post(new Task()
-				{
-					public Object run() throws Exception
-					{
-						return null;
-					}
-				});
-			}
-		});
-
-		int count = 1000;
-		for (int i = 0; i < count; ++i)
-		{
-			button.doClick();
-		}
-	}
-
-	public void testPerformance(JFrame frame) throws Exception
-	{
-		JButton button = createButton(frame, "Performance");
-		int count = 100;
-
-		ActionListener listener = new ActionListener()
-		{
-			public void actionPerformed(ActionEvent e)
-			{
-				try
-				{
-					Worker.post(new Task()
-					{
-						public Object run() throws Exception
-						{
-							Thread.sleep(100);
-							return null;
-						}
-					});
-				}
-				catch (Exception x) {throw new RuntimeException();}
-			}
-		};
-		button.addActionListener(listener);
-
-		long start = System.currentTimeMillis();
-		for (int i = 0; i < count; ++i)
-		{
-			button.doClick();
-		}
-		long end = System.currentTimeMillis();
-		System.out.println("Worker.post performance: " + count + " calls in " + (end - start) + " ms");
-
-		button.removeActionListener(listener);
-
-		listener = new ActionListener()
-		{
-			public void actionPerformed(ActionEvent e)
-			{
-				try	{Thread.sleep(100);}
-				catch (InterruptedException x) {}
-			}
-		};
-		button.addActionListener(listener);
-
-		start = System.currentTimeMillis();
-		for (int i = 0; i < count; ++i)
-		{
-			button.doClick();
-		}
-		end = System.currentTimeMillis();
-		System.out.println("Plain Listener performance: " + count + " calls in " + (end - start) + " ms");
-	}
-
-	public void testJob(JFrame frame) throws Exception
-	{
-		JButton button = createButton(frame, "Job");
-
-		button.addActionListener(new ActionListener()
-		{
-			public void actionPerformed(ActionEvent e)
-			{
-				Worker.post(new Job()
-				{
-					public Object run()
-					{
-						try {Thread.sleep(1000);}
-						catch (InterruptedException x) {}
-						return null;
-					}
-				});
-			}
-		});
-
-		button.doClick();
-	}
-
-	public void testSecurity(JFrame frame) throws Exception
-	{
-		// This test must be run under a security manager, and with the policy file present in the src/etc directory
-
-        JButton button = createButton(frame, "Security");
-
-		button.addActionListener(new ActionListener()
-		{
-			public void actionPerformed(ActionEvent e)
-			{
-				// No permission to read the file from here
-				try
-				{
-					Worker.post(new Task()
-					{
-						public Object run() throws Exception
-						{
-							return System.getProperty("user.dir");
-						}
-					});
-					throw new RuntimeException();
-				}
-				catch (SecurityException x) {}
-				catch (Throwable x) {x.printStackTrace(); throw new RuntimeException();}
-			}
-		});
-
-		button.doClick();
-	}
-
-	private JButton createButton(JFrame frame, String text)
-	{
-		JButton button = new JButton(text);
-		JPanel pane = (JPanel)frame.getContentPane();
-		pane.add(button);
-		pane.revalidate();
-		return button;
-	}
-
-	private Object post(Task task)
-	{
-		try
-		{
-			return Worker.post(task);
-		}
-		catch (RuntimeException x) {throw x;}
-		catch (Throwable x) {x.printStackTrace(); throw new RuntimeException();}
-	}
+   public FoxtrotTest(String s)
+   {
+      super(s);
+   }
+
+   public void testThreads() throws Exception
+   {
+      invokeTest(new Runnable()
+      {
+         public void run()
+         {
+            Worker.post(new Job()
+            {
+               public Object run()
+               {
+                  // Check that I'm NOT in the AWT Event Dispatch Thread
+                  if (SwingUtilities.isEventDispatchThread()) fail();
+
+                  // Check that I'm really in the Foxtrot Worker Thread
+                  if (Thread.currentThread().getName().indexOf("Foxtrot") < 0) fail();
+
+                  return null;
+               }
+            });
+         }
+      });
+   }
+
+   public void testBlocking() throws Exception
+   {
+      invokeTest(new Runnable()
+      {
+         public void run()
+         {
+            final long sleep = 1000;
+
+            long start = System.currentTimeMillis();
+            Worker.post(new Job()
+            {
+               public Object run()
+               {
+                  sleep(sleep);
+                  return null;
+               }
+            });
+            long end = System.currentTimeMillis();
+
+            if (end - start < sleep) fail();
+         }
+      });
+   }
+
+   public void testDequeuing() throws Exception
+   {
+      invokeTest(new Runnable()
+      {
+         public void run()
+         {
+            final MutableInteger check = new MutableInteger(0);
+            final long sleep = 1000;
+
+            // This event will be dequeued only after Worker.post()
+            SwingUtilities.invokeLater(new Runnable()
+            {
+               public void run()
+               {
+                  check.set(1);
+               }
+            });
+
+            sleep(2 * sleep);
+
+            // Check that the text is still the original one
+            if (check.get() != 0) fail();
+
+            Worker.post(new Job()
+            {
+               public Object run()
+               {
+                  sleep(sleep);
+                  return null;
+               }
+            });
+
+            // Check that the event posted with invokeLater has been dequeued
+            if (check.get() != 1) fail();
+         }
+      });
+   }
+
+   public void testTaskException() throws Exception
+   {
+      invokeTest(new Runnable()
+      {
+         public void run()
+         {
+            try
+            {
+               Worker.post(new Task()
+               {
+                  public Object run() throws NumberFormatException
+                  {
+                     return new NumberFormatException();
+                  }
+               });
+            }
+            catch (NumberFormatException ignored)
+            {
+            }
+            catch (Throwable x)
+            {
+               fail();
+            }
+         }
+      });
+   }
+
+   public void testTaskError() throws Exception
+   {
+      invokeTest(new Runnable()
+      {
+         public void run()
+         {
+            try
+            {
+               Worker.post(new Job()
+               {
+                  public Object run()
+                  {
+                     return new NoClassDefFoundError();
+                  }
+               });
+            }
+            catch (NoClassDefFoundError ignored)
+            {
+            }
+            catch (Throwable x)
+            {
+               fail();
+            }
+         }
+      });
+   }
+
+   public void testAWTException() throws Exception
+   {
+      invokeTest(new Runnable()
+      {
+         public void run()
+         {
+            SwingUtilities.invokeLater(new Runnable()
+            {
+               public void run()
+               {
+                  throw new RuntimeException();
+               }
+            });
+
+            final long sleep = 1000;
+            long start = System.currentTimeMillis();
+            Worker.post(new Job()
+            {
+               public Object run()
+               {
+                  sleep(sleep);
+                  return null;
+               }
+            });
+            long end = System.currentTimeMillis();
+
+            // Must check that really elapsed all the time
+            if (end - start < sleep) fail();
+         }
+      });
+   }
+
+   public void testAWTError() throws Exception
+   {
+      invokeTest(new Runnable()
+      {
+         public void run()
+         {
+            SwingUtilities.invokeLater(new Runnable()
+            {
+               public void run()
+               {
+                  throw new Error();
+               }
+            });
+
+            final long sleep = 1000;
+            long start = System.currentTimeMillis();
+            Worker.post(new Job()
+            {
+               public Object run()
+               {
+                  sleep(sleep);
+                  return null;
+               }
+            });
+            long end = System.currentTimeMillis();
+
+            // Must check that really elapsed all the time
+            if (end - start < sleep) fail();
+         }
+      });
+   }
+
+   public void testPostFromTask() throws Exception
+   {
+      invokeTest(new Runnable()
+      {
+         public void run()
+         {
+            final MutableInteger counter = new MutableInteger(0);
+
+            Worker.post(new Job()
+            {
+               public Object run()
+               {
+                  counter.set(counter.get() + 1);
+
+                  Worker.post(new Job()
+                  {
+                     public Object run()
+                     {
+                        if (counter.get() != 1) fail();
+
+                        counter.set(counter.get() + 1);
+                        return null;
+                     }
+                  });
+
+                  if (counter.get() != 2) fail();
+
+                  counter.set(counter.get() + 1);
+
+                  return null;
+               }
+            });
+
+            if (counter.get() != 3) fail();
+         }
+      });
+   }
+
+   public void testTaskReuse() throws Exception
+   {
+      invokeTest(new Runnable()
+      {
+         public void run()
+         {
+            final MutableInteger count = new MutableInteger(0);
+
+            Job job = new Job()
+            {
+               public Object run()
+               {
+                  count.set(count.get() + 1);
+                  return null;
+               }
+            };
+
+            int times = 2;
+            for (int i = 0; i < times; ++i)
+            {
+               Worker.post(job);
+            }
+
+            if (count.get() != times) fail();
+         }
+      });
+   }
+
+   public void testPostFromInvokeLater() throws Exception
+   {
+      // TODO: understand better this beast and how to test it
+      invokeTest(new Runnable()
+      {
+         public void run()
+         {
+            MutableInteger counter = new MutableInteger(0);
+            postFromInvokeLater(counter);
+         }
+      });
+   }
+
+   private void postFromInvokeLater(final MutableInteger counter)
+   {
+      long start = System.currentTimeMillis();
+      final int deep = counter.get() + 1;
+
+      Job job = new Job()
+      {
+         public Object run()
+         {
+            SwingUtilities.invokeLater(new Runnable()
+            {
+               public void run()
+               {
+                  counter.set(counter.get() + 1);
+                  if (counter.get() < 5) postFromInvokeLater(counter);
+               }
+            });
+
+            sleep(1000 * deep);
+
+            return null;
+         }
+      };
+
+      Worker.post(job);
+
+      long end = System.currentTimeMillis();
+      System.out.println("Time: " + (end - start) + " for job " + job);
+   }
+
+   public void testTaskQueueing() throws Exception
+   {
+      invokeTest(new Runnable()
+      {
+         public void run()
+         {
+            final int count = 10;
+            final MutableInteger counter = new MutableInteger(0);
+
+            Worker.post(new Job()
+            {
+               public Object run()
+               {
+                  for (int i = 0; i < 10; ++i)
+                  {
+                     SwingUtilities.invokeLater(new Runnable()
+                     {
+                        public void run()
+                        {
+                           Worker.post(new Job()
+                           {
+                              public Object run()
+                              {
+                                 counter.set(counter.get() + 1);
+                                 return null;
+                              }
+                           });
+                        }
+                     });
+                  }
+
+                  sleep(1000);
+
+                  return null;
+               }
+            });
+
+            if (counter.get() != count) fail();
+         }
+      });
+   }
+
+   public void testPerformance() throws Exception
+   {
+      invokeTest(new Runnable()
+      {
+         public void run()
+         {
+            JButton button = new JButton();
+            int count = 100;
+            final long sleep = 100;
+
+            ActionListener listener = new ActionListener()
+            {
+               public void actionPerformed(ActionEvent e)
+               {
+                  Worker.post(new Job()
+                  {
+                     public Object run()
+                     {
+                        sleep(sleep);
+                        return null;
+                     }
+                  });
+               }
+            };
+            button.addActionListener(listener);
+
+            long start = System.currentTimeMillis();
+            for (int i = 0; i < count; ++i) button.doClick();
+            long end = System.currentTimeMillis();
+            long workerElapsed = end - start;
+            System.out.println("Worker.post(Job) performance: " + count + " calls in " + workerElapsed + " ms");
+
+            button.removeActionListener(listener);
+
+            listener = new ActionListener()
+            {
+               public void actionPerformed(ActionEvent e)
+               {
+                  sleep(sleep);
+               }
+            };
+            button.addActionListener(listener);
+
+            start = System.currentTimeMillis();
+            for (int i = 0; i < count; ++i)
+            {
+               button.doClick();
+            }
+            end = System.currentTimeMillis();
+            long plainElapsed = end - start;
+            System.out.println("Plain Listener performance: " + count + " calls in " + plainElapsed + " ms");
+
+            int percentage = 5;
+            if ((workerElapsed - plainElapsed) * 100 > plainElapsed * percentage) fail();
+         }
+      });
+   }
+
+   public void testMemoryLeaks() throws Exception
+   {
+      invokeTest(new Runnable()
+      {
+         public void run()
+         {
+            ArrayList list = new ArrayList();
+
+            int times = 1024;
+            for (int i = 0; i < times; ++i)
+            {
+               try
+               {
+                  Job job = new FatJob();
+                  list.add(job);
+                  Worker.post(job);
+               }
+               catch (OutOfMemoryError x)
+               {
+                  list.clear();
+                  break;
+               }
+            }
+
+            // Try again, without mantaining jobs alive
+            int j = 0;
+            for (; j < times; ++j)
+            {
+               Job job = new FatJob();
+               Worker.post(job);
+            }
+
+            if (j < times) fail();
+         }
+      });
+   }
+
+   private static class FatJob extends Job
+   {
+      // An heavy data member to explode the heap
+      private byte[] fatty = new byte[1024 * 1024];
+
+      public Object run()
+      {
+         return null;
+      }
+   }
+
+
 }
