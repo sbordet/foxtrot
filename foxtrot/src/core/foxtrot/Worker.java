@@ -8,13 +8,18 @@
 
 package foxtrot;
 
+import java.awt.AWTEvent;
+import java.awt.Component;
 import java.awt.EventQueue;
-import java.awt.FoxtrotConditional;
+import java.awt.MenuComponent;
 import java.awt.Toolkit;
+import java.awt.ActiveEvent;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.security.AccessController;
-import java.security.PrivilegedActionException;
+import java.security.PrivilegedAction;
 import java.security.PrivilegedExceptionAction;
+import java.security.PrivilegedActionException;
 
 import javax.swing.SwingUtilities;
 
@@ -60,7 +65,13 @@ public class Worker
 
 	static
 	{
-		m_queue = Toolkit.getDefaultToolkit().getSystemEventQueue();
+		m_queue = (EventQueue)AccessController.doPrivileged(new PrivilegedAction()
+		{
+			public Object run()
+			{
+				return Toolkit.getDefaultToolkit().getSystemEventQueue();
+			}
+		});
 
 		m_thread = new Thread(new Runner(), "Foxtrot Worker Thread");
 		// Daemon, since if someone loads this class without using it,
@@ -196,18 +207,29 @@ public class Worker
 	 */
 	private static class EventPump
 	{
-		private static Method m_pumpMethod;
+		private static EventThrowableHandler m_handler;
 
 		static
 		{
-			try
+			// See remarks in java.awt.EventDispatchThread about this property
+            String handler = (String)AccessController.doPrivileged(new PrivilegedAction()
 			{
-				Class dispatchThreadClass = ClassLoader.getSystemClassLoader().loadClass("java.awt.EventDispatchThread");
-				Class conditionalClass = ClassLoader.getSystemClassLoader().loadClass("java.awt.Conditional");
-				m_pumpMethod = dispatchThreadClass.getDeclaredMethod("pumpEvents", new Class[] {conditionalClass});
-				m_pumpMethod.setAccessible(true);
+				public Object run()
+				{
+					return System.getProperty("sun.awt.exception.handler");
+				}
+			});
+
+			if (handler != null && handler.length() > 0)
+			{
+				try
+				{
+					Object exceptionHandler = Thread.currentThread().getContextClassLoader().loadClass(handler).newInstance();
+					Method method = exceptionHandler.getClass().getMethod("handle", new Class[] {Throwable.class});
+					m_handler = new EventThrowableHandler(exceptionHandler, method);
+				}
+				catch (Throwable ignored) {}
 			}
-			catch (Exception x) {x.printStackTrace();}
 		}
 
 		private Task m_task;
@@ -223,20 +245,111 @@ public class Worker
 			{
 				if (m_debug)
 				{
-					System.out.println("Start dequeueing events from AWT Event Queue: " + this);
+					System.out.println("Start dequeueing events from AWT Event Queue:" + this);
 				}
 
-				// Invoke EventDispatchThread.pumpEvents(new FoxtrotConditional(m_task));
-				// This call blocks until the task is completed
-				m_pumpMethod.invoke(Thread.currentThread(), new Object[] {new FoxtrotConditional(m_task)});
-			}
-			catch (Throwable x)	{x.printStackTrace();}
-			finally
-			{
+				while (!m_task.isCompleted())
+				{
+					// get next AWT event
+					AWTEvent event = m_queue.getNextEvent();
+
+					if (m_debug)
+					{
+						System.out.println("Event dequeued from AWT Event Queue: " + this + " - " + event);
+					}
+
+					try
+					{
+						dispatch(event);
+					}
+					catch (Throwable x)
+					{
+						handleThrowable(x);
+					}
+				}
+
 				if (m_debug)
 				{
 					System.out.println("Stop dequeueing events from AWT Event Queue: " + this);
 				}
+			}
+			catch (InterruptedException ignored)
+			{
+				// Normally the AWT Event Queue is not interrupted.
+				// Set again the interrupted flag in any case
+				Thread.currentThread().interrupt();
+			}
+		}
+
+		private void dispatch(AWTEvent event)
+		{
+			Object src = event.getSource();
+
+			// Dispatch the event
+			// In JDK 1.1 events posted using SwingUtilities.invokeLater are subclasses of AWTEvent
+			// with source a dummy subclass of Component
+			// In JDK 1.2 and superior events posted using SwingUtilities.invokeLater are subclasses
+			// of AWTEvent that implement ActiveEvent with source the Toolkit implementation
+			if (src instanceof Component)
+			{
+				Component c = (Component)src;
+				c.dispatchEvent(event);
+			}
+			else if (src instanceof MenuComponent)
+			{
+				MenuComponent mc = (MenuComponent)src;
+				mc.dispatchEvent(event);
+			}
+			else if (event instanceof ActiveEvent)
+			{
+				// ActiveEvent is JDK 1.1 is in package java.awt.peer, while in JDK 1.2 and superior
+				// is in package java.awt. Just change the import statement to compile against JDK 1.1
+				ActiveEvent e = (ActiveEvent)event;
+				e.dispatch();
+			}
+			else
+			{
+				System.err.println("Unable to dispatch event: " + event);
+			}
+		}
+
+		private void handleThrowable(Throwable x)
+		{
+			if (m_handler == null)
+			{
+				System.err.println("Exception occurred during event dispatching:");
+				x.printStackTrace();
+			}
+			else
+			{
+				m_handler.handle(x);
+			}
+		}
+	}
+
+	private static class EventThrowableHandler
+	{
+		private Object m_handler;
+		private Method m_method;
+
+		private EventThrowableHandler(Object handler, Method method)
+		{
+			m_handler = handler;
+			m_method = method;
+		}
+
+		private void handle(Throwable t)
+		{
+			try
+			{
+				m_method.invoke(m_handler, new Object[] {t});
+			}
+			catch (Throwable x)
+			{
+				if (m_debug) {x.printStackTrace();}
+
+				System.err.println("Exception occurred during event exception handling:");
+				t.printStackTrace();
 			}
 		}
 	}

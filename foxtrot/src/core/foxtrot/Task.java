@@ -109,8 +109,10 @@ public abstract class Task
 	 * Returns if this Task is completed.
 	 * Synchronized since the variable is accessed from 2 threads
 	 * Accessed by the AWT Event Dispatch Thread.
+	 * Package protected, used by Worker
+	 * @see #completed
 	 */
-	public synchronized boolean isCompleted()
+	synchronized boolean isCompleted()
 	{
 		return m_completed;
 	}
