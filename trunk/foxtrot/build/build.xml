@@ -103,6 +103,7 @@ See the terms of the BSD license in the documentation provided with this softwar
  			<fileset dir="${test.classes.dir}">
  				<patternset refid="test.classes"/>
  			</fileset>
+ 			<fileset dir="${etc.dir}" includes="java.policy"/>
 		</jar>
 
 		<jar jarfile="${src.jar.file}"
