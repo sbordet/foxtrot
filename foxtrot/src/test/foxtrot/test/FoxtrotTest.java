@@ -8,12 +8,12 @@
 
 package foxtrot.test;
 
-import java.util.ArrayList;
-import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.util.ArrayList;
 
-import javax.swing.SwingUtilities;
 import javax.swing.JButton;
+import javax.swing.SwingUtilities;
 
 import foxtrot.Job;
 import foxtrot.Task;
@@ -99,7 +99,7 @@ public class FoxtrotTest extends FoxtrotTestCase
 
             sleep(2 * sleep);
 
-            // Check that the text is still the original one
+            // Check that the value is still the original one
             if (check.get() != 0) fail();
 
             Worker.post(new Job()
@@ -249,6 +249,7 @@ public class FoxtrotTest extends FoxtrotTestCase
                {
                   counter.set(counter.get() + 1);
 
+                  // Nested Worker.post()
                   Worker.post(new Job()
                   {
                      public Object run()
@@ -303,32 +304,60 @@ public class FoxtrotTest extends FoxtrotTestCase
 
    public void testPostFromInvokeLater() throws Exception
    {
-      // TODO: understand better this beast and how to test it
       invokeTest(new Runnable()
       {
          public void run()
          {
+            int max = 5;
             MutableInteger counter = new MutableInteger(0);
-            postFromInvokeLater(counter);
+
+            long start = System.currentTimeMillis();
+
+            postFromInvokeLater(counter, max);
+
+            long end = System.currentTimeMillis();
+
+            // We used the default WorkerThread, be sure task times were summed
+            long sum = 0;
+            for (int i = 0; i < max; ++i) sum += i + 1;
+            sum *= 1000;
+
+            long epsilon = 100;
+            if ((end - start) > sum + epsilon) fail();
          }
       });
    }
 
-   private void postFromInvokeLater(final MutableInteger counter)
+   private void postFromInvokeLater(final MutableInteger counter, final int maxDeep)
    {
-      long start = System.currentTimeMillis();
       final int deep = counter.get() + 1;
 
       Job job = new Job()
       {
          public Object run()
          {
+            // Here I recurse on calling Worker.post(), that is: I am in event0, that calls
+            // Worker.post(task1) that dequeues event1 that calls Worker.post(task2) that dequeues event2
+            // that calls Worker.post(task3) and so on.
+            // Since Worker.post() calls are synchronous, the Worker.post(task1) call returns
+            // only when the task1 is finished AND event1 is finished; but event1 is finished
+            // only when Worker.post(task2) returns; Worker.post(task2) returns only when task2
+            // is finished AND event2 is finished; but event2 is finished only when Worker.post(task3)
+            // returns; and so on.
+            // The total execution time is dependent on the implementation of the WorkerThread:
+            // if it enqueues tasks (like the default implementation) we have (roughly) that:
+            // time(task1) = time(task3) + time(task2)
+            // even if to execute only task1 taskes a very short time.
+            // If the worker implementation uses parallel threads to execute tasks, then (roughly):
+            // time(task1) = max(time(task3), time(task2)).
+            // In general, it is a bad idea to use Foxtrot this way: you probably need an asynchronous
+            // solution.
             SwingUtilities.invokeLater(new Runnable()
             {
                public void run()
                {
-                  counter.set(counter.get() + 1);
-                  if (counter.get() < 5) postFromInvokeLater(counter);
+                  counter.set(deep);
+                  if (deep < maxDeep) postFromInvokeLater(counter, maxDeep);
                }
             });
 
@@ -338,10 +367,13 @@ public class FoxtrotTest extends FoxtrotTestCase
          }
       };
 
+      // job1 sleeps 1 s, but Worker.post(job1) returns after event1 is finished.
+      // event1 runs Worker.post(job2); job2 sleeps 2 s, but Worker.post(job2) returns after event2 is finished.
+      // event2 runs Worker.post(job3); job3 sleeps 3 s, but Worker.post(job3) returns after event3 is finished.
+      // event3 runs Worker.post(job4); job4 sleeps 4 s, but Worker.post(job4) returns after event4 is finished.
+      // event4 runs Worker.post(job5); job5 sleeps 5 s.
+      // Worker.post(job1) returns after 1+2+3+4+5 s since the default implementation enqueues tasks.
       Worker.post(job);
-
-      long end = System.currentTimeMillis();
-      System.out.println("Time: " + (end - start) + " for job " + job);
    }
 
    public void testTaskQueueing() throws Exception
@@ -491,6 +523,4 @@ public class FoxtrotTest extends FoxtrotTestCase
          return null;
       }
    }
-
-
 }
