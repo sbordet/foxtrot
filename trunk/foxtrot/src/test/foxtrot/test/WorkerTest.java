@@ -382,7 +382,7 @@ public class WorkerTest extends FoxtrotTestCase
       // event2 runs Worker.post(job3); job3 sleeps 3 s, but Worker.post(job3) returns after event3 is finished.
       // event3 runs Worker.post(job4); job4 sleeps 4 s, but Worker.post(job4) returns after event4 is finished.
       // event4 runs Worker.post(job5); job5 sleeps 5 s.
-      // Worker.post(job1) returns after 1+2+3+4+5 s since the default implementation enqueues tasks.
+      // Worker.post(job1) returns after 5+4+3+2+1 s since the default implementation enqueues tasks.
       Worker.post(job);
    }
 
