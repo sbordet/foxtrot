@@ -12,7 +12,7 @@
 <tr><td class="documentation">
 
 <h2>Foxtrot: synchronous solution</h2>
-<p>The Foxtrot framework is based on a different approach than asynchronous solutions. While a worker thread is still
+<p>The <b>Foxtrot</b> framework is based on a different approach than asynchronous solutions. While a worker thread is still
 used to execute time-consuming tasks, SwingUtilities.invokeLater() is not used.<br>
 The main problem of the asynchronous solution is that it lets the listener returns immediately. This is done to allow the
 Event Dispatch Thread to dequeue the next event and to process it.<br>
