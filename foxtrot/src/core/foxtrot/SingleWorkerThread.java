@@ -8,12 +8,6 @@
 
 package foxtrot;
 
-import java.security.AccessController;
-import java.security.PrivilegedExceptionAction;
-import java.security.PrivilegedActionException;
-
-import javax.swing.SwingUtilities;
-
 /**
  * Full implementation of {@link WorkerThread} that uses a single worker thread to run
  * {@link Task}s and {@link Job}s. <br>
