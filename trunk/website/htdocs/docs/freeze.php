@@ -39,31 +39,33 @@ events in the Event Queue finally get a chance to be executed, too.<br>
 Being repaint events, the two button events are executed quickly. So first the button text is changed to "Sleeping...", and immediately
 after to "Slept !", too quick for the eye to see.<br>
 Before that, during 10 seconds, the GUI was <b>frozen</b>.</p>
-<br><br>
-<pre>
+<br>
+<table width="100%" cellspacing="0" cellpadding="0">
+<tr><td width="60%">
+<pre><span class="code">
 public class FreezeExample extends JFrame
 {
    public static void main(String[] args)
-   {
+   {</span><span class="main">
       FreezeExample example = new FreezeExample();
-      example.setVisible(true);
+      example.setVisible(true);</span><span class="code">
    }
 
    public FreezeExample()
-   {
+   {</span><span class="main">
       super("Freeze Example");
 
       final JButton button = new JButton("Take a nap !");
-      button.addActionListener(new ActionListener()
+      button.addActionListener(new ActionListener()</span><span class="code">
       {
          public void actionPerformed(ActionEvent e)
-         {
+         {</span><span class="event">
             button.setText("Sleeping...");
             try {Thread.sleep(10000);}
             catch (Exception ignored) {}
-            button.setText("Slept !");
+            button.setText("Slept !");</span><span class="code">
          }
-      });
+      }</span><span class="main">);
 
       setDefaultCloseOperation(EXIT_ON_CLOSE);
 
@@ -77,10 +79,20 @@ public class FreezeExample extends JFrame
       Dimension size = getSize();
       int x = (screen.width - size.width) >> 1;
       int y = (screen.height - size.height) >> 1;
-      setLocation(x, y);
+      setLocation(x, y);</span><span class="code">
    }
-}
+}</span>
 </pre>
+</td>
+<td valign="top" align="left">
+<table class="legend" width="50%" cellspacing="0" cellpadding="0">
+<tr><td class="legend">Legend</td></tr>
+<tr><td class="legend-entry"><span class="main">Main Thread</span></td></tr>
+<tr><td class="legend-entry"><span class="event">Event Dispatch Thread</span></td></tr>
+</table>
+</td>
+</td></tr>
+</table>
 
 </td></tr>
 

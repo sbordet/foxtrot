@@ -71,56 +71,57 @@ making the code complex and obscure, especially with respect to the sequence ord
 </ul>
 </p>
 <p>Fortunately, <a href="foxtrot.php">synchronous solution</a> solve these issues.</p>
-<br><br>
-<pre>
+<table width="100%" cellspacing="0" cellpadding="0">
+<tr><td width="60%">
+<pre><span class="code">
 public class AsyncExample extends JFrame
 {
    public static void main(String[] args)
-   {
+   {</span><span class="main">
       AsyncExample example = new AsyncExample();
-      example.setVisible(true);
+      example.setVisible(true);</span><span class="code">
    }
 
    public AsyncExample()
-   {
+   {</span><span class="main">
       super("SwingWorker Example");
 
       final JButton button = new JButton("Take a nap !");
-      button.addActionListener(new ActionListener()
+      button.addActionListener(new ActionListener()</span><span class="code">
       {
          public void actionPerformed(ActionEvent e)
-         {
+         {</span><span class="event">
             button.setText("Sleeping...");
 
-            new SwingWorker()
+            new SwingWorker()</span><span class="code">
             {
                protected Object construct() throws Exception
-               {
+               {</span><span class="worker">
                   Thread.sleep(10000);
-                  return "Slept !";
+                  return "Slept !";</span><span class="code">
                }
                protected void finished()
                {
                   try
-                  {
+                  {</span><span class="event">
                      String text = (String)get();
-                     button.setText(text);
+                     button.setText(text);</span><span class="code">
                   }
                   catch (InterruptedException ignored) {}
                   catch (InvocationTargetException x)
-                  {
+                  {</span><span class="event">
                      // Do exception handling
                      Throwable t = x.getException();
                      if (t instanceof InterruptedException) ...
                      else if (t instanceof RuntimeException) ...
-                     else if (t instanceof Error) ...
+                     else if (t instanceof Error) ...</span><span class="code">
                   }
                }
-            }.start();
+            }</span><span class="event">.start();
 
-            somethingElse();
+            somethingElse();</span><span class="code">
          }
-      });
+      });</span><span class="main">
 
       setDefaultCloseOperation(EXIT_ON_CLOSE);
 
@@ -134,10 +135,22 @@ public class AsyncExample extends JFrame
       Dimension size = getSize();
       int x = (screen.width - size.width) >> 1;
       int y = (screen.height - size.height) >> 1;
-      setLocation(x, y);
+      setLocation(x, y);</span><span class="code">
    }
-}
+}</span>
 </pre>
+</td>
+<td valign="top" align="left">
+<table class="legend" width="50%" cellspacing="0" cellpadding="0">
+<tr><td class="legend">Legend</td></tr>
+<tr><td class="legend-entry"><span class="main">Main Thread</span></td></tr>
+<tr><td class="legend-entry"><span class="event">Event Dispatch Thread</span></td></tr>
+<tr><td class="legend-entry"><span class="worker">SwingWorker Thread</span></td></tr>
+</table>
+</td>
+
+</td></tr>
+</table>
 
 </td></tr>
 

@@ -66,45 +66,46 @@ Foxtrot framework.</p>
 <p>Marco Cravero had the first idea of exploring how dialogs work to find a better solution for using threads in Swing.<br>
 Simone Bordet implemented the Foxtrot API following this idea.<br>
 Luca Berra suggested the 'Foxtrot' name.</p>
-<br><br>
-<pre>
+<table width="100%" cellspacing="0" cellpadding="0">
+<tr><td width="60%">
+<pre><span class="code">
 public class FoxtrotExample extends JFrame
 {
    public static void main(String[] args)
-   {
+   {</span><span class="main">
       FoxtrotExample example = new FoxtrotExample();
-      example.setVisible(true);
+      example.setVisible(true);</span><span class="code">
    }
 
    public FoxtrotExample()
-   {
+   {</span><span class="main">
       super("Foxtrot Example");
 
       final JButton button = new JButton("Take a nap !");
-      button.addActionListener(new ActionListener()
+      button.addActionListener(new ActionListener()</span><span class="code">
       {
          public void actionPerformed(ActionEvent e)
-         {
-            button.setText("Sleeping...");
+         {</span><span class="event">
+            button.setText("Sleeping...");</span><span class="code">
 
             try
-            {
-               String text = (String)Worker.post(new Task()
+            {</span><span class="event">
+               String text = (String)Worker.post(new Task()</span><span class="code">
                {
                   public Object run() throws Exception
-                  {
+                  {</span><span class="foxtrot">
                      Thread.sleep(10000);
-                     return "Slept !";
+                     return "Slept !";</span><span class="code">
                   }
-               });
+               }</span><span class="event">);</span><span class="code">
             }
-            catch (Exception x) ...
+            catch (Exception x) ...</span><span class="event">
 
             button.setText(text);
 
-            somethingElse();
+            somethingElse();</span><span class="code">
          }
-      });
+      });</span><span class="main">
 
       setDefaultCloseOperation(EXIT_ON_CLOSE);
 
@@ -118,10 +119,22 @@ public class FoxtrotExample extends JFrame
       Dimension size = getSize();
       int x = (screen.width - size.width) >> 1;
       int y = (screen.height - size.height) >> 1;
-      setLocation(x, y);
+      setLocation(x, y);</span><span class="code">
    }
-}
+}</span>
 </pre>
+</td>
+<td valign="top" align="left">
+<table class="legend" width="50%" cellspacing="0" cellpadding="0">
+<tr><td class="legend">Legend</td></tr>
+<tr><td class="legend-entry"><span class="main">Main Thread</span></td></tr>
+<tr><td class="legend-entry"><span class="event">Event Dispatch Thread</span></td></tr>
+<tr><td class="legend-entry"><span class="foxtrot">Foxtrot Worker Thread</span></td></tr>
+</table>
+</td>
+
+</td></tr>
+</table>
 
 </td></tr>
 
