@@ -228,12 +228,12 @@ public class Machine
    }
 
    private void notify(MachineEvent e)
-   {
+   {</span><span class="event">
       for (Iterator i = m_listeners.iterator(); i.hasNext();)
       {
          Listener listener = (Listener)i.next();
          listener.stateChanged(e);
-      }
+      }</span><span class="code">
    }
 }
 </span></pre>
@@ -270,11 +270,11 @@ combo.addActionListener(new ActionListener()
             }
          }</span><span class="event">);</span><span class="code">
       }
-	  catch (InterruptedException x)
+      catch (InterruptedException x)
       {
          x.printStackTrace();
       }
-	  catch (RuntimeException x)
+      catch (RuntimeException x)
       {
          throw x;
       }
