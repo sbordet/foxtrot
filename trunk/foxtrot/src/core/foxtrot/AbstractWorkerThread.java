@@ -11,6 +11,7 @@ package foxtrot;
 import java.security.AccessController;
 import java.security.PrivilegedActionException;
 import java.security.PrivilegedExceptionAction;
+import java.io.InterruptedIOException;
 
 /**
  * Partial implementation of the WorkerThread interface.
@@ -45,7 +46,9 @@ public abstract class AbstractWorkerThread implements WorkerThread
       }
       catch (PrivilegedActionException x)
       {
-         task.setThrowable(x.getException());
+         Exception xx = x.getException();
+         task.setThrowable(xx);
+         if (xx instanceof InterruptedException || xx instanceof InterruptedIOException) Thread.currentThread().interrupt();
       }
       catch (Throwable x)
       {
