@@ -22,10 +22,11 @@ import javax.swing.SwingUtilities;
  */
 public abstract class AbstractWorkerThread implements WorkerThread
 {
-   private static final Runnable EMPTY_EVENT = new Runnable()
+   private static final Runnable TASK_COMPLETED_EVENT = new Runnable()
    {
       public final void run()
       {
+         if (Worker.debug) System.out.println("[AbstractWorkerThread] Task Completed Event " + this);
       }
    };
 
@@ -70,7 +71,8 @@ public abstract class AbstractWorkerThread implements WorkerThread
          // the AWT Event Queue is waiting in EventQueue.getNextEvent(),
          // posting this one will wake it up and allow the event pump to
          // finish its job and release control to the original pump
-         SwingUtilities.invokeLater(EMPTY_EVENT);
+         if (Worker.debug) System.out.println("[AbstractWorkerThread] Posting task completed event for task " + task);
+         SwingUtilities.invokeLater(TASK_COMPLETED_EVENT);
       }
    }
 }
