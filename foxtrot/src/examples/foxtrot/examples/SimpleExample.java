@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2002, Simone Bordet
+ * Copyright (c) 2002-2005, Simone Bordet
  * All rights reserved.
  *
  * This software is distributable under the BSD license.
@@ -30,7 +30,6 @@ import foxtrot.Worker;
  * For a comparison, look at the freezeSleep method and to the workerSleep method, and try to run the
  * example one time with one method, and one time with the other.
  *
- * @author <a href="mailto:biorn_steedom@users.sourceforge.net">Simone Bordet</a>
  * @version $Revision$
  */
 public class SimpleExample extends JFrame

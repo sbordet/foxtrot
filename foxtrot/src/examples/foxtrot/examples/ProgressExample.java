@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2002, Simone Bordet
+ * Copyright (c) 2002-2005, Simone Bordet
  * All rights reserved.
  *
  * This software is distributable under the BSD license.
@@ -33,7 +33,6 @@ import foxtrot.Worker;
  * for the progressive operation, but just use the Foxtrot API.
  * And, of course, with Foxtrot the GUI can be interrupted in any moment.
  *
- * @author <a href="mailto:biorn_steedom@users.sourceforge.net">Simone Bordet</a>
  * @version $Revision$
  */
 public class ProgressExample extends JFrame

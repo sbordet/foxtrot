@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2002, Simone Bordet
+ * Copyright (c) 2002-2005, Simone Bordet
  * All rights reserved.
  *
  * This software is distributable under the BSD license.
@@ -25,7 +25,6 @@ import foxtrot.Task;
  * Implementation of an EventPump that should work with JDK 1.2 and 1.3
  * and only uses the public API of the <code>java.awt.*</code> package.
  *
- * @author <a href="mailto:biorn_steedom@users.sourceforge.net">Simone Bordet</a>
  * @version $Revision$
  */
 public class JDK13QueueEventPump implements EventPump, EventFilterable

@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2003, Simone Bordet
+ * Copyright (c) 2003-2005, Simone Bordet
  * All rights reserved.
  *
  * This software is distributable under the BSD license.
@@ -69,7 +69,6 @@ import java.util.EventListener;
  * <pre>
  * button.addActionListener((ActionListener)EventListenerProxy.create(ActionListener.class, new ActionListener() {...}));
  * </pre>
- * @author <a href="mailto:biorn_steedom@users.sourceforge.net">Simone Bordet</a>
  * @version $Revision$
  */
 public class EventListenerProxy implements InvocationHandler

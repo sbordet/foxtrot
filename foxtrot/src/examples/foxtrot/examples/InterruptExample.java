@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2002, Simone Bordet
+ * Copyright (c) 2002-2005, Simone Bordet
  * All rights reserved.
  *
  * This software is distributable under the BSD license.
@@ -29,7 +29,6 @@ import foxtrot.Worker;
  * This implies that the Task must be collaborative, and check once in a while if it is interrupted
  * by another thread.
  *
- * @author <a href="mailto:biorn_steedom@users.sourceforge.net">Simone Bordet</a>
  * @version $Revision$
  */
 public class InterruptExample extends JFrame
