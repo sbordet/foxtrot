@@ -13,9 +13,10 @@ import java.security.PrivilegedAction;
 
 import javax.swing.SwingUtilities;
 
-import foxtrot.workers.DefaultWorkerThread;
-import foxtrot.pumps.SunJDK14ConditionalEventPump;
 import foxtrot.pumps.JDK13QueueEventPump;
+import foxtrot.pumps.SunJDK140ConditionalEventPump;
+import foxtrot.pumps.SunJDK141ConditionalEventPump;
+import foxtrot.workers.DefaultWorkerThread;
 
 /**
  * The class that execute time-consuming {@link Task}s and {@link Job}s. <br>
@@ -158,6 +159,7 @@ public class Worker
     */
    public static EventPump getEventPump()
    {
+      initializeEventPump();
       return eventPump;
    }
 
@@ -181,6 +183,7 @@ public class Worker
     */
    public static WorkerThread getWorkerThread()
    {
+      initializeWorkerThread();
       return workerThread;
    }
 
@@ -260,9 +263,13 @@ public class Worker
          }
       }
 
-      if (JREVersion.isJRE14())
+      if (JREVersion.isJRE141())
       {
-         eventPump = new SunJDK14ConditionalEventPump();
+         eventPump = new SunJDK141ConditionalEventPump();
+      }
+      else if (JREVersion.isJRE140())
+      {
+         eventPump = new SunJDK140ConditionalEventPump();
       }
       else if (JREVersion.isJRE13() || JREVersion.isJRE12())
       {
@@ -271,7 +278,7 @@ public class Worker
       else
       {
          // No JDK 1.1 support for now
-         throw new IllegalStateException("JDK 1.1 is not supported");
+         throw new Error("JDK 1.1 is not supported");
       }
 
       if (debug) System.out.println("[Worker] Initialized EventPump: " + eventPump);
