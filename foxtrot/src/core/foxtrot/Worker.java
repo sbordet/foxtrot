@@ -23,7 +23,7 @@ import java.security.PrivilegedExceptionAction;
 import javax.swing.SwingUtilities;
 
 /**
- * The class that execute time-consuming {@link Task}s. <p>
+ * The class that execute time-consuming {@link Task}s and {@link Job}s. <p>
  * It is normally used in event listeners that must execute time-consuming operations without
  * freezing the Swing GUI. <br>
  * Usage example (simplified from the Foxtrot examples):
@@ -47,9 +47,10 @@ import javax.swing.SwingUtilities;
  *       catch (Exception ignored) {}
  *    }
  * });
- * <pre>
+ * </pre>
  *
  * @see Task
+ * @see Job
  * @author <a href="mailto:biorn_steedom@users.sourceforge.net">Simone Bordet</a>
  * @version $Revision$
  */
@@ -86,7 +87,7 @@ public class Worker
 	private Worker() {}
 
 	/**
-	 * Enqueues the given task to be executed in the worker thread. <br>
+	 * Enqueues the given Task to be executed in the worker thread. <br>
 	 * If this method is called from the Event Dispatch Thread, it blocks until the task has been executed,
 	 * either by finishing normally or throwing an exception. <br>
 	 * If this method is called by the worker thread, and thus is called from another Task,
@@ -94,7 +95,8 @@ public class Worker
 	 * While executing Tasks, it dequeues AWT events from the AWT Event Queue; even in case of AWT events
 	 * that throw RuntimeExceptions or Errors, this method will not return until the first Task
 	 * (posted from the Event Dispatch Thread) is finished.
-	 * @throws IllegalStateException if is not called from the Event Dispatch Thread nor from the worker thread.
+	 * @throws IllegalStateException if is not called from the Event Dispatch Thread nor from another Task.
+	 * @see #post(Job job)
 	 */
 	public static Object post(Task task) throws Exception
 	{
@@ -126,6 +128,12 @@ public class Worker
 		return task.getResultOrThrow();
 	}
 
+   /**
+	* Enqueues the given Job to be executed in the worker thread. <br>
+	* This method behaves exactly like {@link #post(Task task)}, but it does not throw checked exceptions.
+	* @throws IllegalStateException if is not called from the Event Dispatch Thread nor from another Job.
+	* @see #post(Task task)
+	*/
 	public static Object post(Job job)
 	{
 		try
