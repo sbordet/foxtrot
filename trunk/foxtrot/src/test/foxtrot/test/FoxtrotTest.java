@@ -255,9 +255,9 @@ public class FoxtrotTest
 		button.doClick();
 	}
 
-	public void testRecursion(JFrame frame) throws Exception
+	public void testTaskQueueing(JFrame frame) throws Exception
 	{
-		final JButton button = createButton(frame, "Recursion");
+		final JButton button = createButton(frame, "Task Queueing");
 
 		button.addActionListener(new ActionListener()
 		{
@@ -295,9 +295,41 @@ public class FoxtrotTest
 		button.doClick();
 	}
 
+	public void testPostFromTask(JFrame frame) throws Exception
+	{
+		JButton button = createButton(frame, "Post from Task");
+
+		button.addActionListener(new ActionListener()
+		{
+			private int m_counter;
+			public void actionPerformed(ActionEvent e)
+			{
+				post(new Task()
+				{
+					public Object run() throws Exception
+					{
+						post(new Task()
+						{
+							public Object run() throws Exception
+							{
+								++m_counter;
+								return null;
+							}
+						});
+						return null;
+					}
+				});
+
+				if (m_counter != 1) throw new RuntimeException();
+			}
+		});
+
+		button.doClick();
+	}
+
 	public void testPostInInvokeLater(JFrame frame) throws Exception
 	{
-		final JButton button = createButton(frame, "Worker.post in invokeLater");
+		final JButton button = createButton(frame, "Post from invokeLater");
 
 		button.addActionListener(new ActionListener()
 		{
