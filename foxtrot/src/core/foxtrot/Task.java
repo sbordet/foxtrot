@@ -8,9 +8,6 @@
 
 package foxtrot;
 
-import java.security.AccessControlContext;
-import java.security.AccessController;
-
 /**
  * A time-consuming task to be executed in the Worker Thread. <p>
  * Users must implement the {@link #run} method with the time-consuming code, and not worry about
@@ -35,48 +32,28 @@ import java.security.AccessController;
 public abstract class Task
 {
 	private Object m_result;
-	private Throwable m_throwable;
+	private Exception m_exception;
 	private boolean m_completed;
-	private AccessControlContext m_securityContext;
-
-	/**
-	 * Creates a new Task
-	 */
-	protected Task()
-	{
-		m_securityContext = AccessController.getContext();
-	}
 
 	/**
 	 * The method to implement with time-consuming code.
-	 * It must NOT be synchronized or synchronize on this instance.
 	 */
 	public abstract Object run() throws Exception;
 
 	/**
-	 * Returns the result of this Task operation, as set in {@ #setResult}.
-	 * If an exception or an error is thrown by {@link #run}, it is rethrown here.
-	 * Synchronized since the variable is accessed from 2 threads.
-	 * Accessed by the AWT Event Dispatch Thread.
+	 * Synchronized since the variable is accessed from 2 threads
 	 * Package protected, used by Worker
 	 */
 	synchronized Object getResult() throws Exception
 	{
-		Throwable t = getThrowable();
-		if (t != null)
-		{
-			if (t instanceof Exception) throw (Exception)t;
-			else throw (Error)t;
-		}
+		Exception x = getException();
+		if (x != null) throw x;
 		return m_result;
 	}
 
 	/**
-	 * Sets the result of this Task operation, as returned by the {@link #run} method.
 	 * Synchronized since the variable is accessed from 2 threads
-	 * Accessed by the Foxtrot Worker Thread.
 	 * Package protected, used by Worker
-	 * @see #getResult
 	 */
 	synchronized void setResult(Object o)
 	{
@@ -84,58 +61,37 @@ public abstract class Task
 	}
 
 	/**
-	 * Returns the throwable as set in {@link #setThrowable}.
 	 * Synchronized since the variable is accessed from 2 threads
-	 * Accessed by the AWT Event Dispatch Thread.
+	 * Package protected, used by Worker
 	 */
-	private synchronized Throwable getThrowable()
+	synchronized void setException(Exception x)
 	{
-		return m_throwable;
+		m_exception = x;
 	}
 
 	/**
-	 * Sets the throwable eventually thrown by the {@link #run} method.
 	 * Synchronized since the variable is accessed from 2 threads
-	 * Accessed by the Foxtrot Worker Thread.
-	 * Package protected, used by Worker
-	 * @see #getThrowable
 	 */
-	synchronized void setThrowable(Throwable x)
+	private synchronized Exception getException()
 	{
-		m_throwable = x;
+		return m_exception;
 	}
 
 	/**
-	 * Returns if this Task is completed.
 	 * Synchronized since the variable is accessed from 2 threads
-	 * Accessed by the AWT Event Dispatch Thread.
 	 * Package protected, used by Worker
-	 * @see #completed
 	 */
-	public synchronized boolean isCompleted()
+	synchronized void setCompleted(boolean value)
+	{
+		m_completed = value;
+	}
+
+	/**
+	 * Synchronized since the variable is accessed from 2 threads
+	 * Package protected, used by Worker
+	 */
+	synchronized boolean isCompleted()
 	{
 		return m_completed;
-	}
-
-	/**
-	 * Marks this Task as completed.
-	 * Synchronized since the variable is accessed from 2 threads
-	 * Accessed by the Foxtrot Worker Thread.
-	 * Package protected, used by Worker
-	 * @see #isCompleted
-	 */
-	synchronized void completed()
-	{
-		m_completed = true;
-	}
-
-	/**
-	 * Returns the protection domain stack at the moment of instantiation of this Task
-	 * Accessed by the Foxtrot Worker Thread.
-	 * Package protected, used by Worker
-	 */
-	synchronized AccessControlContext getSecurityContext()
-	{
-		return m_securityContext;
 	}
 }

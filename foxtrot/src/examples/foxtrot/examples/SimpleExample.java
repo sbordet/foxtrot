@@ -8,18 +8,18 @@
 
 package foxtrot.examples;
 
-import java.awt.Container;
-import java.awt.Dimension;
-import java.awt.GridBagLayout;
-import java.awt.Toolkit;
-import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.ActionEvent;
+import java.awt.Container;
+import java.awt.GridBagLayout;
+import java.awt.Dimension;
+import java.awt.Toolkit;
 
-import javax.swing.JButton;
 import javax.swing.JFrame;
+import javax.swing.JButton;
 
-import foxtrot.Task;
 import foxtrot.Worker;
+import foxtrot.Task;
 
 /**
  * A very simple example that shows Swing limits. <br>
