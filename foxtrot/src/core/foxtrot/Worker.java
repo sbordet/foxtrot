@@ -16,7 +16,7 @@ import javax.swing.SwingUtilities;
 import foxtrot.pumps.JDK13QueueEventPump;
 import foxtrot.pumps.SunJDK140ConditionalEventPump;
 import foxtrot.pumps.SunJDK141ConditionalEventPump;
-import foxtrot.workers.DefaultWorkerThread;
+import foxtrot.workers.SingleWorkerThread;
 
 /**
  * The class that execute time-consuming {@link Task}s and {@link Job}s. <br>
@@ -216,7 +216,7 @@ public class Worker
 
       if (workerThreadClassName == null)
       {
-         workerThread = new DefaultWorkerThread();
+         workerThread = new SingleWorkerThread();
       }
       else
       {
@@ -228,7 +228,7 @@ public class Worker
          }
          catch (Throwable x)
          {
-            workerThread = new DefaultWorkerThread();
+            workerThread = new SingleWorkerThread();
          }
       }
 
