@@ -1,6 +1,8 @@
 Welcome to Foxtrot, the easy API for the Java(TM) Foundation
 Classes (JFC/Swing).
 
+INTRODUCTION
+
 Foxtrot is bundled in a compressed file, that contains 
 javadoc documentation, examples, libraries, tests and source code,
 readable both from Unix, Linux and Windows machines.
@@ -25,6 +27,18 @@ to this one (in Windows):
 
 > java -classpath foxtrot.jar;myapp.jar my.app.Main
 
+
+EXAMPLES
+
+To run the examples included in the distribution, use the following 
+command line:
+
+> java -cp lib\foxtrot.jar;lib\foxtrot-examples.jar foxtrot.examples.SimpleExample
+> java -cp lib\foxtrot.jar;lib\foxtrot-examples.jar foxtrot.examples.InterruptExample
+
+
+TESTS
+
 To run the tests included in the distribution, use the following 
 command line:
 
@@ -40,6 +54,8 @@ When the tests run, it's normal that stack traces are printed in the console;
 just look at the summary printed when the tests are completed to see if all 
 tests have passed.
 
+
+MORE INFORMATION
 
 Refer to the documentation on the web site (http://foxtrot.sourceforge.net) 
 for further details on how to use the Foxtrot API.
