@@ -113,6 +113,9 @@ See the terms of the BSD license in the documentation provided with this softwar
  			<fileset dir="${examples.src.dir}">
  				<patternset refid="src.files"/>
  			</fileset>
+ 			<fileset dir="${test.src.dir}">
+ 				<patternset refid="src.files"/>
+ 			</fileset>
 		</jar>
 	</target>
 
@@ -148,9 +151,10 @@ See the terms of the BSD license in the documentation provided with this softwar
 					 includes="README,LICENSE"/>
 		</copy>
 
-		<!-- The core, examples and source foxtrot jars -->
+		<!-- The core, examples, tests and source foxtrot jars -->
 		<copy file="${core.jar.file}" todir="${dist.release.dir}/lib"/>
 		<copy file="${examples.jar.file}" todir="${dist.release.dir}/lib"/>
+		<copy file="${test.jar.file}" todir="${dist.release.dir}/lib"/>
 		<copy file="${src.jar.file}" todir="${dist.release.dir}/lib"/>
 
 		<!-- The documentation -->
