@@ -49,10 +49,6 @@ public class SunJDK140ConditionalEventPump extends SunJDK14ConditionalEventPump
       try
       {
          LinkedList list = (LinkedList)listField.get(event);
-         // In JDK 1.4.1 SequencedEvent.getFirst() is static synchronized, which is
-         // a small bug: it will synchronized on an eventual subclass, while elsewhere
-         // in SequencedEvent there is explicit synchronization on SequencedEvent.class.
-         // Here I keep consistency with JDK 1.4.1, will see in 1.4.2 what happens.
          synchronized (sequencedEventClass)
          {
             if (list.getFirst() == event) return Boolean.TRUE;
