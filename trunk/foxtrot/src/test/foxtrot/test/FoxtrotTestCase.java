@@ -34,14 +34,11 @@ public class FoxtrotTestCase extends TestCase
     */
    protected void invokeTest(final Runnable run) throws Exception
    {
+      if (SwingUtilities.isEventDispatchThread()) fail("Tests cannot be invoked from the Event Dispatch Thread");
+
       final Object lock = new Object();
       final MutableInteger barrier = new MutableInteger(0);
-      final ThrowableHolder throwable = new ThrowableHolder();
-
-      synchronized (lock)
-      {
-         throwable.set(null);
-      }
+      final MutableHolder throwable = new MutableHolder(null);
 
       // This call returns immediately. It posts on the AWT Event Queue
       // a Runnable that is executed.
@@ -88,7 +85,6 @@ public class FoxtrotTestCase extends TestCase
                public void run()
                {
                   WorkerThread workerThread = Worker.getWorkerThread();
-                  if (!workerThread.isAlive()) workerThread.start();
                   workerThread.postTask(new Job()
                   {
                      public Object run()
@@ -121,7 +117,7 @@ public class FoxtrotTestCase extends TestCase
 
          while (barrier.get() > 0) lock.wait();
 
-         Throwable t = throwable.get();
+         Throwable t = (Throwable)throwable.get();
          if (t instanceof Error) throw (Error)t;
          if (t instanceof Exception) throw (Exception)t;
       }
@@ -184,20 +180,5 @@ public class FoxtrotTestCase extends TestCase
       {
       }
       return null;
-   }
-
-   private class ThrowableHolder
-   {
-      private Throwable throwable;
-
-      private Throwable get()
-      {
-         return throwable;
-      }
-
-      private void set(Throwable t)
-      {
-         throwable = t;
-      }
    }
 }
