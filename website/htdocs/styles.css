@@ -33,7 +33,7 @@ li           { padding-left: 10px }
 
 /* For the documentation */
 
-td.date      { font-size: 10pt; text-align: right; padding-bottom: 20px }
+td.date      { font-size: 10pt; text-align: center; padding: 10px 0px 20px 0px }
 td.documentation { font-size: 11pt; padding 10px 10px 0px 10px }
 div.toc      { font-size: 12pt; font-weight: bold; padding: 0px 0px 10px 0px }
 div.toc-chapt { font-size: 11pt; font-weight: bold; padding: 5px 0px 5px 10px }
