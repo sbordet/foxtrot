@@ -101,12 +101,13 @@ public abstract class SunJDK14ConditionalEventPump implements EventPump
          if (!"evaluate".equals(name)) throw new Error("Unknown " + conditionalClass.getName() + " method: " + name);
 
          // Now let's try to find a workaround for BUG #4531693 and related
-         AWTEvent nextEvent = waitForEvent();
-         // The EventDispatchThread has been interrupted, exit
-         if (nextEvent == null) return Boolean.FALSE;
-
+         // PENDING: There is a problem if I peek() the queue and no events are arrived yet.
+         // PENDING: In this case peek() returns null and events will be pumped;
+         // PENDING: but if then a non-first sequenced event arrives, it will be pumped and
+         // PENDING: bug #4531693 and will hang the application (in JDK 1.4.0 and 1.4.1; seems fixed in 1.4.2)
+         // PENDING: The case is VERY rare, and I could not find a good solution (see CVS revision 1.4).
+         AWTEvent nextEvent = getEventQueue().peekEvent();
          if (debug) System.out.println("[SunJDK14ConditionalEventPump] Next Event: " + nextEvent);
-
          if (sequencedEventClass.isInstance(nextEvent))
          {
             // Next event is a SequencedEvent: we must handle them carefully
@@ -127,40 +128,6 @@ public abstract class SunJDK14ConditionalEventPump implements EventPump
                return Toolkit.getDefaultToolkit().getSystemEventQueue();
             }
          });
-      }
-
-      /**
-       * Waits until an event is available on the EventQueue.
-       * This method uses the same synchronization mechanisms used by EventQueue to be notified when
-       * an event is posted on the EventQueue.
-       * Waiting for events is necessary in this case: a Task is posted and we would like to start
-       * pumping, but no events have been posted yet (peekEvent() returns null).
-       * If we really start pumping and the first events that arrives is a SequencedEvent that is
-       * not the first of the sequence, we risk to hang the application (bug #4531693 and related).
-       * Instead, we wait until something arrives, and then we apply the logic of
-       * {@link #canPumpSequencedEvent} to the event that is arrived.
-       */
-      private AWTEvent waitForEvent()
-      {
-         EventQueue queue = getEventQueue();
-         AWTEvent nextEvent = null;
-         synchronized (queue)
-         {
-            while ((nextEvent = queue.peekEvent()) == null)
-            {
-               if (debug) System.out.println("[SunJDK14ConditionalEventPump] Waiting for events...");
-               try
-               {
-                  queue.wait();
-               }
-               catch (InterruptedException x)
-               {
-                  Thread.currentThread().interrupt();
-                  return null;
-               }
-            }
-         }
-         return nextEvent;
       }
    }
 
@@ -259,8 +226,10 @@ public abstract class SunJDK14ConditionalEventPump implements EventPump
          {
             while (!task.isCompleted())
             {
+               if (debug) System.out.println("[SunJDK14ConditionalEventPump] Waiting for Task " + task + " to complete (GUI freeze)");
                task.wait();
             }
+            if (debug) System.out.println("[SunJDK14ConditionalEventPump] Task " + task + " is completed");
          }
       }
       catch (InterruptedException x)
