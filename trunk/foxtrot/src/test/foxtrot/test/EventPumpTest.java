@@ -71,7 +71,6 @@ public class EventPumpTest extends FoxtrotTestCase
     */
    private void testPumpEventsBlocks(final EventPump pump) throws Exception
    {
-      // We force this thread ("main") to block until the test is finished
       invokeTest(new Runnable()
       {
          public void run()
@@ -112,20 +111,18 @@ public class EventPumpTest extends FoxtrotTestCase
     */
    private void testPumpEventsDequeues(final EventPump pump) throws Exception
    {
-      // We force this thread ("main") to block until the test is finished
       invokeTest(new Runnable()
       {
          public void run()
          {
             final MutableInteger count = new MutableInteger(0);
+            final int value = 13;
 
-            // I enqueue an event, for now it waits since thread "main"
-            // does not dequeue it (I used invokeAndWait)
             SwingUtilities.invokeLater(new Runnable()
             {
                public void run()
                {
-                  count.set(count.get() + 1);
+                  count.set(value);
                }
             });
 
@@ -149,7 +146,7 @@ public class EventPumpTest extends FoxtrotTestCase
             // Now I start the event pump, the events above must be dequeued.
             pump.pumpEvents(task);
 
-            if (count.get() != 1) fail("Event pump does not dequeue events");
+            if (count.get() != value) fail("Event pump does not dequeue events");
          }
       });
    }
@@ -159,13 +156,10 @@ public class EventPumpTest extends FoxtrotTestCase
     */
    private void tesPumpEventsOnThrowException(final EventPump pump) throws Exception
    {
-      // We force this thread ("main") to block until the test is finished
       invokeTest(new Runnable()
       {
          public void run()
          {
-            // I enqueue an event, for now it waits since thread "main"
-            // does not dequeue it (I used invokeAndWait)
             SwingUtilities.invokeLater(new Runnable()
             {
                public void run()
@@ -182,11 +176,14 @@ public class EventPumpTest extends FoxtrotTestCase
                }
             };
 
+            final long delay = 3000;
+
             // I enqueue another event to stop the task
             SwingUtilities.invokeLater(new Runnable()
             {
                public void run()
                {
+                  sleep(delay);
                   setTaskCompleted(task);
                }
             });
@@ -194,7 +191,11 @@ public class EventPumpTest extends FoxtrotTestCase
             try
             {
                // Now I start the event pump, the events above must be dequeued.
+               long start = System.currentTimeMillis();
                pump.pumpEvents(task);
+               long stop = System.currentTimeMillis();
+               long elapsed = stop - start;
+               if (elapsed <= delay) fail("Blocking is not effective when events throw exceptions: expecting " + delay + ", blocked for only " + elapsed);
             }
             catch (RuntimeException x)
             {
@@ -209,13 +210,10 @@ public class EventPumpTest extends FoxtrotTestCase
     */
    private void tesPumpEventsOnThrowError(final EventPump pump) throws Exception
    {
-      // We force this thread ("main") to block until the test is finished
       invokeTest(new Runnable()
       {
          public void run()
          {
-            // I enqueue an event, for now it waits since thread "main"
-            // does not dequeue it (I used invokeAndWait)
             SwingUtilities.invokeLater(new Runnable()
             {
                public void run()
@@ -232,11 +230,14 @@ public class EventPumpTest extends FoxtrotTestCase
                }
             };
 
+            final long delay = 3000;
+
             // I enqueue another event to stop the task
             SwingUtilities.invokeLater(new Runnable()
             {
                public void run()
                {
+                  sleep(delay);
                   setTaskCompleted(task);
                }
             });
@@ -244,7 +245,11 @@ public class EventPumpTest extends FoxtrotTestCase
             try
             {
                // Now I start the event pump, the events above must be dequeued.
+               long start = System.currentTimeMillis();
                pump.pumpEvents(task);
+               long stop = System.currentTimeMillis();
+               long elapsed = stop - start;
+               if (elapsed <= delay) fail("Blocking is not effective when events throw errors: expecting " + delay + ", blocked for only " + elapsed);
             }
             catch (Error x)
             {
