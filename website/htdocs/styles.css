@@ -8,7 +8,7 @@ a:link       { color: #663399 }
 a:visited    { color: #003399 }
 a:active     { color: #339999 }
 
-h1           { color: #000080 }
+h1           { color: #000080; text-align: center }
 h2           { color: #000080; text-align: center }
 h3           { color: #000080 }
 h4           { color: #000080 }
@@ -29,7 +29,7 @@ td.content   { font-size: 11pt; padding: 10px 10px 0px 10px }
 
 td.news      { width: 15%; vertical-align: top; font-size: 11pt; padding: 10px 0px 0px 0px }
 
-li           { padding-left: 10px }
+li           { padding: 2px 0px 2px 10px }
 
 /* For the documentation */
 
