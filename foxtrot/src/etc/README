@@ -21,5 +21,5 @@ to this one:
 > java -Xbootclasspath/a:foxtrot.jar -classpath myapp.jar my.app.Main
 
 
-Refer to the documentation on the web site for further details on how 
-to use the Foxtrot API.
+Refer to the documentation on the web site (http://foxtrot.sourceforge.net) 
+for further details on how to use the Foxtrot API.
