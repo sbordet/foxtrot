@@ -16,6 +16,10 @@ import java.awt.Toolkit;
 import java.awt.ActiveEvent;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.security.AccessController;
+import java.security.PrivilegedAction;
+import java.security.PrivilegedExceptionAction;
+import java.security.PrivilegedActionException;
 
 import javax.swing.SwingUtilities;
 
@@ -55,13 +59,24 @@ public class Worker
 	private static Link m_current;
 	private static Thread m_thread;
 	private static Object m_lock = new Object();
-	private static EventQueue m_awtQueue = Toolkit.getDefaultToolkit().getSystemEventQueue();
+	private static EventQueue m_queue;
 
 	private static final boolean m_debug = false;
 
 	static
 	{
+		m_queue = (EventQueue)AccessController.doPrivileged(new PrivilegedAction()
+		{
+			public Object run()
+			{
+				return Toolkit.getDefaultToolkit().getSystemEventQueue();
+			}
+		});
+
 		m_thread = new Thread(new Runner(), "Foxtrot Worker Thread");
+		// Daemon, since if someone loads this class without using it,
+		// the JVM should shut down on main thread's termination
+		m_thread.setDaemon(true);
 		m_thread.start();
 		if (m_debug)
 		{
@@ -69,14 +84,10 @@ public class Worker
 		}
 	}
 
-	private static void interrupt()
-	{
-		if (m_debug)
-		{
-			System.out.println("Ending Foxtrot Worker");
-		}
-		m_thread.interrupt();
-	}
+	/**
+	 * Cannot be instantiated, use static methods only.
+	 */
+	private Worker() {}
 
 	/**
 	 * Enqueues the given task to be executed in the worker thread. <br>
@@ -88,14 +99,16 @@ public class Worker
 	{
 		if (!SwingUtilities.isEventDispatchThread())
 		{
-			throw new IllegalStateException("This method can be called only from AWT Thread");
+			throw new IllegalStateException("This method can be called only from the AWT Event Dispatch Thread");
 		}
 
 		addTask(task);
 
-		AWTEventDequeuer dequeuer = new AWTEventDequeuer(task);
-		// The following line blocks until the task has been executed
-		dequeuer.dequeue();
+		// Must create a new object every time, since from pumpEvents() I can pump an event that ends up calling
+		// again post, and thus coming here again.
+		EventPump pump = new EventPump(task);
+		// The following line blocks until the task has been executed, or it is interrupted
+		pump.pumpEvents();
 
 		return task.getResult();
 	}
@@ -108,7 +121,7 @@ public class Worker
 		{
 			if (hasTasks())
 			{
-				// Add the given task at the end of the queue
+				// Append the given task at the end of the queue
 				Link item = m_current;
 				while (item.m_next != null)
 				{
@@ -148,18 +161,27 @@ public class Worker
 				{
 					System.out.println("Waiting for tasks...");
 				}
+
 				m_lock.wait();
 			}
 
-			// Taking the current task and shifting to the next in the queue
-			Link item = m_current;
-			m_current = m_current.m_next;
-			Task t = item.m_task;
+			// Taking the current task
+			Task t = m_current.m_task;
+
 			if (m_debug)
 			{
 				System.out.println("Returning posted task:" + t);
 			}
+
 			return t;
+		}
+	}
+
+	private static void removeTask()
+	{
+		synchronized (m_lock)
+		{
+			m_current = m_current.m_next;
 		}
 	}
 
@@ -171,16 +193,53 @@ public class Worker
 		}
 	}
 
-	private static class AWTEventDequeuer
+	private static void stop()
 	{
+		if (m_debug)
+		{
+			System.out.println("Ending Foxtrot Worker");
+		}
+		m_thread.interrupt();
+	}
+
+	/**
+	 * The class that dequeues events from the EventQueue
+	 */
+	private static class EventPump
+	{
+		private static EventThrowableHandler m_handler;
+
+		static
+		{
+			// See remarks in java.awt.EventDispatchThread about this property
+            String handler = (String)AccessController.doPrivileged(new PrivilegedAction()
+			{
+				public Object run()
+				{
+					return System.getProperty("sun.awt.exception.handler");
+				}
+			});
+
+			if (handler != null && handler.length() > 0)
+			{
+				try
+				{
+					Object exceptionHandler = Thread.currentThread().getContextClassLoader().loadClass(handler).newInstance();
+					Method method = exceptionHandler.getClass().getMethod("handle", new Class[] {Throwable.class});
+					m_handler = new EventThrowableHandler(exceptionHandler, method);
+				}
+				catch (Throwable ignored) {}
+			}
+		}
+
 		private Task m_task;
 
-		private AWTEventDequeuer(Task t)
+		private EventPump(Task t)
 		{
 			m_task = t;
 		}
 
-		private void dequeue()
+		private void pumpEvents()
 		{
 			try
 			{
@@ -192,66 +251,112 @@ public class Worker
 				while (!m_task.isCompleted())
 				{
 					// get next AWT event
-					AWTEvent event = m_awtQueue.getNextEvent();
+					AWTEvent event = m_queue.getNextEvent();
 
 					if (m_debug)
 					{
-						System.out.println("Event dequeued from AWT:" + event);
+						System.out.println("Event dequeued from AWT Event Queue: " + this + " - " + event);
 					}
-
-					Object src = event.getSource();
 
 					try
 					{
-						// Dispatch the event
-						// In JDK 1.1 events posted using SwingUtilities.invokeLater are subclasses of AWTEvent
-						// with source a dummy subclass of Component
-						// In JDK 1.2 and superior events posted using SwingUtilities.invokeLater are subclasses
-						// of AWTEvent that implement ActiveEvent with source the Toolkit implementation
-						if (src instanceof Component)
-						{
-							Component c = (Component)src;
-							c.dispatchEvent(event);
-						}
-						else if (src instanceof MenuComponent)
-						{
-							MenuComponent mc = (MenuComponent)src;
-							mc.dispatchEvent(event);
-						}
-						else if (event instanceof ActiveEvent)
-						{
-							ActiveEvent e = (ActiveEvent)event;
-							e.dispatch();
-						}
-						else
-						{
-							System.err.println("Unable to dispatch event: " + event);
-						}
+						dispatch(event);
 					}
 					catch (Throwable x)
 					{
-						// JDK 1.1 just prints the stack trace, while jdk 1.3 (not sure for jdk 1.2)
-						// may plug in a handler for this exception, see EventDispatchThread; for now just print the stack
-						System.err.println("Exception occurred during event dispatching:");
-						x.printStackTrace();
+						handleThrowable(x);
 					}
 				}
 
 				if (m_debug)
 				{
-					System.out.println("Stop dequeueing events from AWT Event Queue");
+					System.out.println("Stop dequeueing events from AWT Event Queue: " + this);
 				}
 			}
 			catch (InterruptedException ignored)
 			{
-				/* Normally the AWT Event Queue is not interrupted */
+				// Normally the AWT Event Queue is not interrupted.
+				// Set again the interrupted flag in any case
+				Thread.currentThread().interrupt();
+			}
+		}
+
+		private void dispatch(AWTEvent event)
+		{
+			Object src = event.getSource();
+
+			// Dispatch the event
+			// In JDK 1.1 events posted using SwingUtilities.invokeLater are subclasses of AWTEvent
+			// with source a dummy subclass of Component
+			// In JDK 1.2 and superior events posted using SwingUtilities.invokeLater are subclasses
+			// of AWTEvent that implement ActiveEvent with source the Toolkit implementation
+			if (src instanceof Component)
+			{
+				Component c = (Component)src;
+				c.dispatchEvent(event);
+			}
+			else if (src instanceof MenuComponent)
+			{
+				MenuComponent mc = (MenuComponent)src;
+				mc.dispatchEvent(event);
+			}
+			else if (event instanceof ActiveEvent)
+			{
+				// ActiveEvent is JDK 1.1 is in package java.awt.peer, while in JDK 1.2 and superior
+				// is in package java.awt. Just change the import statement to compile against JDK 1.1
+				ActiveEvent e = (ActiveEvent)event;
+				e.dispatch();
+			}
+			else
+			{
+				System.err.println("Unable to dispatch event: " + event);
+			}
+		}
+
+		private void handleThrowable(Throwable x)
+		{
+			if (m_handler == null)
+			{
+				System.err.println("Exception occurred during event dispatching:");
+				x.printStackTrace();
+			}
+			else
+			{
+				m_handler.handle(x);
+			}
+		}
+	}
+
+	private static class EventThrowableHandler
+	{
+		private Object m_handler;
+		private Method m_method;
+
+		private EventThrowableHandler(Object handler, Method method)
+		{
+			m_handler = handler;
+			m_method = method;
+		}
+
+		private void handle(Throwable t)
+		{
+			try
+			{
+				m_method.invoke(m_handler, new Object[] {t});
+			}
+			catch (Throwable x)
+			{
+				if (m_debug) {x.printStackTrace();}
+
+				System.err.println("Exception occurred during event exception handling:");
+				t.printStackTrace();
 			}
 		}
 	}
 
 	private static class Runner implements Runnable
 	{
-		private static Runnable EMPTY_EVENT = new Runnable() {public void run() {}};
+		private static Runnable EMPTY_EVENT = new Runnable() {public final void run() {}};
 
 		public void run()
 		{
@@ -264,26 +369,46 @@ public class Worker
 			{
 				try
 				{
-					Task t = getTask();
+					final Task t = getTask();
+
 					if (m_debug)
 					{
 						System.out.println("Got posted task:" + t);
 					}
+
 					try
 					{
-						Object obj = t.run();
+						// Run the Task
+						Object obj = AccessController.doPrivileged(new PrivilegedExceptionAction()
+						{
+							public Object run() throws Exception
+							{
+								return t.run();
+							}
+						}, t.getSecurityContext());
+
 						t.setResult(obj);
 					}
-					catch (Exception x)
+					catch (PrivilegedActionException x)
 					{
-						t.setException(x);
+						t.setThrowable(x.getException());
+					}
+					catch (Throwable x)
+					{
+						t.setThrowable(x);
 					}
 
-					// Notify that the task completed
-					t.setCompleted(true);
+					synchronized (t)
+					{
+						// Mark the task as completed
+						t.completed();
+					}
+
+					// In any case, completed or interrupted, remove the task
+					removeTask();
 
 					// Needed in case that no events are posted on the AWT Event Queue:
-					// posting this one we exit from dequeue, that is waiting in
+					// posting this one we exit from pumpEvents(), that is waiting in
 					// EventQueue.getNextEvent
 					SwingUtilities.invokeLater(EMPTY_EVENT);
 				}
@@ -291,7 +416,7 @@ public class Worker
 				{
 					if (m_debug)
 					{
-						System.out.println("Foxtrot Worker interrupted");
+						System.out.println("Foxtrot Worker Thread interrupted, shutting down");
 					}
 					break;
 				}
