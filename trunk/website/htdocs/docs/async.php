@@ -23,7 +23,7 @@ delegated the worker thread to do 2 things:
 <li>Post an event to the Event Queue using SwingUtilities.invokeLater
 </ul>
 </p>
-<p>Take a look at the code below that uses the SwingWorker, based on the asynchronous solution.</p>
+<p>Take a look at the code below that uses the <b>SwingWorker</b>, based on the asynchronous solution.</p>
 <p>Let's concentrate on the button's listener: the first statement, as in the freeze example, changes
 the text of the button and thus posts a repaint event on the queue.<br>
 The next statement create a SwingWorker object and starts it. This operation is quick, and non blocking.
