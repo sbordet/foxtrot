@@ -14,7 +14,7 @@ See the terms of the BSD license in the documentation provided with this softwar
 
    <property name="name" value="foxtrot"/>
    <!-- REMEMBER: change also the manifest information -->
-   <property name="version" value="2.0-beta2"/>
+   <property name="version" value="2.0-beta3"/>
 
    <property name="src.dir" value="${basedir}/src"/>
    <property name="core.src.dir" value="${src.dir}/core"/>
@@ -190,6 +190,10 @@ See the terms of the BSD license in the documentation provided with this softwar
          <classpath>
             <fileset dir="${dist.lib.dir}">
                <include name="*.jar"/>
+            </fileset>
+            <fileset dir="${basedir}/build">
+               <include name="jaxp.jar"/>
+               <include name="crimson.jar"/>
             </fileset>
          </classpath>
       </junit>
