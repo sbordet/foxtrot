@@ -9,7 +9,7 @@
 package foxtrot;
 
 /**
- * {@link Worker} uses an implementation of this interface to run
+ * Implementations of this interface run
  * {@link Task}s in a thread that is not the Event Dispatch Thread. <br>
  * Implementations should extend {@link AbstractWorkerThread}.
  *
@@ -22,7 +22,7 @@ public interface WorkerThread
     * Starts this WorkerThread, responsible for running {@link Task}s (not in the
     * Event Dispatch Thread).
     * Applets can stop threads used by implementations of this WorkerThread in any moment,
-    * and {@link Worker} will call this method also to restart this WorkerThread
+    * and this method also can be used to restart this WorkerThread
     * if it results that it is not alive anymore.
     * @see #isAlive
     */
@@ -32,7 +32,7 @@ public interface WorkerThread
     * Returns whether this WorkerThread is alive. It is not enough to return
     * whether this WorkerThread has been started, because Applets can stop threads
     * used by implementations of this WorkerThread in any moment.
-    * If this WorkerThread is not alive, {@link Worker} will restart it.
+    * If this WorkerThread is not alive, it must be restarted.
     * @see #start
     */
    public boolean isAlive();
@@ -45,7 +45,7 @@ public interface WorkerThread
 
    /**
     * Posts a Task to be run by this WorkerThread in a thread that is not the
-    * Event Dispatch Thread. This method is called by {@link Worker} from the
+    * Event Dispatch Thread. This method must be called from the
     * Event Dispatch Thread and should return immediately.
     * @see #runTask
     */
