@@ -12,7 +12,8 @@ import java.lang.reflect.Method;
 
 import javax.swing.SwingUtilities;
 
-import foxtrot.ConditionalEventPump;
+import foxtrot.pumps.SunJDK14ConditionalEventPump;
+import foxtrot.pumps.JDK13QueueEventPump;
 import foxtrot.EventPump;
 import foxtrot.Task;
 
@@ -29,10 +30,26 @@ public class EventPumpTest extends FoxtrotTestCase
       super(s);
    }
 
-   public void testConditionalEventPump() throws Exception
+   public void testJDK13QueueEventPump() throws Exception
    {
-      ConditionalEventPump pump = new ConditionalEventPump();
+      if (isJRE13() && !isJRE14())
+      {
+         JDK13QueueEventPump pump = new JDK13QueueEventPump();
+         testEventPump(pump);
+      }
+   }
 
+   public void testSunJDK14ConditionalEventPump() throws Exception
+   {
+      if (isJRE14())
+      {
+         SunJDK14ConditionalEventPump pump = new SunJDK14ConditionalEventPump();
+         testEventPump(pump);
+      }
+   }
+
+   private void testEventPump(EventPump pump) throws Exception
+   {
       testPumpEventsBlocks(pump);
       testPumpEventsDequeues(pump);
       tesPumpEventsOnThrowException(pump);
@@ -230,9 +247,9 @@ public class EventPumpTest extends FoxtrotTestCase
    {
       try
       {
-         Method completed = Task.class.getDeclaredMethod("completed", new Class[0]);
+         Method completed = Task.class.getDeclaredMethod("setCompleted", new Class[] {boolean.class});
          completed.setAccessible(true);
-         completed.invoke(task, new Object[0]);
+         completed.invoke(task, new Object[]{Boolean.TRUE});
       }
       catch (Throwable x)
       {
