@@ -15,6 +15,8 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.security.AccessController;
+import java.security.PrivilegedAction;
 
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
@@ -419,6 +421,52 @@ public class FoxtrotTest
 
 	}
 
+	public void testExceptionHandler(JFrame frame) throws Exception
+	{
+		// This test must must be run alone to work, since I check for the handler
+		// at initialization time; if other tests used the Worker class, then
+		// initialization has already been performed with no handler.
+
+		final String property = "sun.awt.exception.handler";
+		final String cls = "foxtrot.test.FoxtrotTest$ExceptionHandler";
+		System.setProperty(property, cls);
+
+		JButton button = createButton(frame, "Exception Handler");
+
+		button.addActionListener(new ActionListener()
+		{
+			public void actionPerformed(ActionEvent e)
+			{
+				SwingUtilities.invokeLater(new Runnable()
+				{
+					public void run()
+					{
+						throw new RuntimeException();
+					}
+				});
+
+				try
+				{
+					Worker.post(new Task()
+					{
+						public Object run() throws Exception
+						{
+							Thread.sleep(1000);
+							return null;
+						}
+					});
+				}
+				catch (Throwable x) {throw new RuntimeException();}
+
+				// Check that the handler has been called
+				String value = System.getProperty(property);
+				if (!value.equals(RuntimeException.class.getName())) {throw new RuntimeException();}
+			}
+		});
+
+		button.doClick();
+	}
+
 	public void testSecurity(JFrame frame) throws Exception
 	{
 		// This test must be run under a security manager, and with the policy file present in the src/etc directory
@@ -457,5 +505,20 @@ public class FoxtrotTest
 		}
 		catch (RuntimeException x) {throw x;}
 		catch (Throwable x) {x.printStackTrace(); throw new RuntimeException();}
+	}
+
+	public static class ExceptionHandler
+	{
+		public void handle(Throwable t)
+		{
+			AccessController.doPrivileged(new PrivilegedAction()
+			{
+				public Object run()
+				{
+					System.setProperty("sun.awt.exception.handler", RuntimeException.class.getName());
+					return null;
+				}
+			});
+		}
 	}
 }
