@@ -83,7 +83,7 @@ public class Worker
 	 * Enqueues the given task to be executed in the worker thread. <br>
 	 * This method can be called only from the Event Dispatch Thread, and blocks until the task has been executed,
 	 * either by finishing normally or throwing an exception. <br>
-	 * Event in case of AWT events that throw RuntimeExceptions or Errors, this method will not return until
+	 * Even in case of AWT events that throw RuntimeExceptions or Errors, this method will not return until
 	 * the Task is finished.
 	 * @throws IllegalStateException if the method is not called from the Event Dispatch Thread
 	 */
