@@ -74,11 +74,8 @@ public class Worker
 		// Initialize here also the EventPump class
 		new EventPump(null).pumpEvents();
 
-		m_thread = new Thread(new Runner(), "Foxtrot Worker Thread");
-		// Daemon, since if someone loads this class without using it,
-		// the JVM should shut down on main thread's termination
-		m_thread.setDaemon(true);
-		m_thread.start();
+		start();
+
 		if (m_debug)
 		{
 			System.out.println("Foxtrot Worker initialized successfully");
@@ -103,6 +100,13 @@ public class Worker
 		if (!SwingUtilities.isEventDispatchThread())
 		{
 			throw new IllegalStateException("This method can be called only from the AWT Event Dispatch Thread");
+		}
+
+		// It is possible that the worker thread is stopped when an applet is destroyed.
+		// Here we restart it in case has been stopped.
+		if (!m_thread.isAlive())
+		{
+			start();
 		}
 
 		addTask(task);
@@ -194,6 +198,19 @@ public class Worker
 		{
 			return m_current != null;
 		}
+	}
+
+	private static void start()
+	{
+		if (m_debug)
+		{
+			System.out.println("Starting Foxtrot Worker");
+		}
+		m_thread = new Thread(new Runner(), "Foxtrot Worker Thread");
+		// Daemon, since if someone loads this class without using it,
+		// the JVM should shut down on main thread's termination
+		m_thread.setDaemon(true);
+		m_thread.start();
 	}
 
 	private static void stop()
