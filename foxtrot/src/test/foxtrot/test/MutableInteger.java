@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2002, Simone Bordet
+ * Copyright (c) 2002-2005, Simone Bordet
  * All rights reserved.
  *
  * This software is distributable under the BSD license.
@@ -11,7 +11,6 @@ package foxtrot.test;
 /**
  * A mutable Integer, useful for tests.
  *
- * @author <a href="mailto:biorn_steedom@users.sourceforge.net">Simone Bordet</a>
  * @version $Revision$
  */
 public class MutableInteger implements Comparable
