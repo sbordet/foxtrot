@@ -162,12 +162,13 @@ See the terms of the BSD license in the documentation provided with this softwar
 		<!-- Miscellaneous files -->
 		<copy todir="${dist.release.dir}">
 			<fileset dir="${etc.dir}"
-					 includes="README,LICENSE"/>
+					 includes="README,LICENSE,java.policy"/>
 		</copy>
 
 		<!-- The core, examples, tests and source foxtrot jars -->
 		<copy file="${core.jar.file}" todir="${dist.release.dir}/lib"/>
 		<copy file="${examples.jar.file}" todir="${dist.release.dir}/lib"/>
+		<copy file="${test.runner.jar.file}" todir="${dist.release.dir}/lib"/>
 		<copy file="${test.jar.file}" todir="${dist.release.dir}/lib"/>
 		<copy file="${src.jar.file}" todir="${dist.release.dir}/lib"/>
 
