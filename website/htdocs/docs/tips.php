@@ -31,7 +31,7 @@ not work as well when using threads.</p>
 your data. Suppose also that the user can change the content of a cell by editing it, but the operation to validate the
 new input takes time.<br>
 Using plain Swing programming, this code looks similar to this:</p>
-<pre>
+<pre><span class="code">
 public class MyModel extends AbstractTableModel
 {
    private Object[][] m_data;
@@ -44,11 +44,11 @@ public class MyModel extends AbstractTableModel
       }
    }
 }
-</pre>
+</span></pre>
 <p>If <code>isValid(Object value)</code> is fast, no problem; otherwise the user has the GUI frozen and no feedback on what
 is going on.<br>
 Thus you may decide to use Foxtrot, and you convert the old code to this:</p>
-<pre>
+<pre><span class="code">
 public class MyModel extends AbstractTableModel
 {
    private Object[][] m_data;
@@ -72,7 +72,7 @@ public class MyModel extends AbstractTableModel
       });
    }
 }
-</pre>
+</span></pre>
 <p>The above is just plain <b>wrong</b>.<br>
 It is wrong because the data member <code>m_data</code> is accessed from two threads: from the Foxtrot Worker Thread
 (since it is modified inside <code>Task.run()</code>) and from the AWT Event Dispatch Thread (since any repaint event
@@ -80,7 +80,7 @@ that occurs will call <code>getValueAt(int row, int col)</code>).</p>
 <p>Avoid the temptation to modify <em>anything</em> from inside <code>Task.run()</code>. It should just take data
 from outside, perform some heavy operation and <em>return the result of the operation</em>.<br>
 The pattern to follow in the implementation of <code>Task.run()</code> is <b>Compute and Return</b>, see example below.</p>
-<pre>
+<pre><span class="code">
 public class MyModel extends AbstractTableModel
 {
    private Object[][] m_data;
@@ -106,7 +106,7 @@ public class MyModel extends AbstractTableModel
       }
    }
 }
-</pre>
+</span></pre>
 <p>Note how <em>only</em> the heavy operation is isolated inside <code>Task.run()</code>, while modifications to the
 data member <code>m_data</code> now happen in the AWT Event Dispatch Thread, thus following the Swing Programming Rules
 and avoiding concurrent read/write access to it.</p>
@@ -118,7 +118,7 @@ When threads are used in such a Swing Application, you have to be careful about 
 listeners.</p>
 <p>Let's make an example: suppose you created a custom data structure that emits event when its state changes, and
 suppose that state change is triggered by JButtons. In plain Swing programming, the code may be similar to this:</p>
-<pre>
+<pre><span class="code">
 public class Machine
 {
    public void addListener(Listener l) {...}
@@ -164,12 +164,12 @@ button.addActionListener(new ActionListener()
       machine.start();
    }
 });
-</pre>
+</span></pre>
 <p>The <code>Machine</code> class is a JavaBean, and does not deal with Swing code.<br>
 While you implement <code>Machine.start()</code> you discover that the process of starting a Machine is a long one, and
 decide to not freeze the GUI after pressing the button.<br>
 With the Foxtrot API, a small change in the listener will do the job:</p>
-<pre>
+<pre><span class="code">
 button.addActionListener(new ActionListener()
 {
    public void actionPerformed(ActionEvent e)
@@ -184,7 +184,7 @@ button.addActionListener(new ActionListener()
       });
    }
 });
-</pre>
+</span></pre>
 <p>Unfortunately, the above is plain <b>wrong</b>.<br>
 It is wrong because now <code>Machine.start()</code> is called in the Foxtrot Worker Thread, and so is
 <code>Machine.notifyListeners()</code> and finally also any registered listener have the
@@ -193,7 +193,7 @@ In the example above, the <code>statusLabel</code>'s text is thus changed in the
 Swing Programming Rules.</p>
 <p>Below you can find one solution to this problem (my favorite), that fixes the <code>Machine.notifyListeners()</code>
 implementation using <code>SwingUtilities.invokeAndWait()</code>:</p>
-<pre>
+<pre><span class="code">
 public class Machine
 {
    ...
@@ -224,7 +224,7 @@ public class Machine
       }
    }
 }
-</pre>
+</span></pre>
 <p>The use of <code>SwingUtilities.invokeAndWait()</code> preserves the semantic of the <code>Machine.notifyListeners()</code>
 method, that returns when all the listeners have been notified. Using <code>SwingUtilities.invokeLater()</code> causes
 this method to return immediately, normally before listeners have been notified, breaking the semantic.</p>
@@ -237,7 +237,7 @@ disappears automatically, while in JComboBox it remains shown until all listener
 of the "JPopup shown problem" when using plain Swing programming (in this case the GUI is also frozen) and when using the
 Foxtrot API (this problem does not appear when using the SwingWorker).</p>
 <p>However this problem is easily solved by asking JComboBox to explicitely close the JPopup, as the example below shows:</p>
-<pre>
+<pre><span class="code">
 final JComboBox combo = new JComboBox(...);
 combo.addActionListener(new ActionListener()
 {
@@ -261,7 +261,7 @@ combo.addActionListener(new ActionListener()
       catch (Exception x) {}
    }
 });
-</pre>
+</span></pre>
 <p>This is the only small anomaly I've found so far using Swing with the Foxtrot API, and I tend to think it's more
 a Swing anomaly more than a Foxtrot's.</p>
 
