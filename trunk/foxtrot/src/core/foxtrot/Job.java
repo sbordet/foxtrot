@@ -39,7 +39,8 @@ public abstract class Job extends Task
 {
 	/**
 	 * The method to implement with time-consuming code.
-	 * It must NOT be synchronized or synchronize on this instance.
+    * It should NOT be synchronized or synchronize on this Job instance, otherwise the AWT Event Dispatch Thread
+    * cannot efficiently test when this Job is completed.
 	 * Overridden to remove the throws clause, so that users does not
 	 * have to catch unthrown exceptions.
 	 */
