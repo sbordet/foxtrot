@@ -50,6 +50,10 @@
 width="125" height="37" border="0" alt="SourceForge.net Logo"/></a>
 </p>
 
+<p align="center"><a href="http://www.java.net">
+<img src="images/javanet.gif" border="0"/></a>
+</p>
+
 <!-- Extreme Tracker -->
 <p align="center">
 <a target="_top" href="http://w.extreme-dm.com/?login=foxtrots">
