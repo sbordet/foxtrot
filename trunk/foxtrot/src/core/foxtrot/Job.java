@@ -8,8 +8,7 @@
 
 package foxtrot;
 
-import java.security.AccessControlContext;
-import java.security.AccessController;
+
 
 /**
  * A time-consuming task to be executed in the Worker Thread that does not throw checked exceptions. <p>
