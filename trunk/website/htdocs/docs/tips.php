@@ -37,11 +37,11 @@ public class MyModel extends AbstractTableModel
    private Object[][] m_data;
    ...
    public void setValueAt(Object value, int row, int column)
-   {
+   {</span><span class="event">
       if (isValid(value))
       {
          m_data[row][column] = value;
-      }
+      }</span><span class="code">
    }
 }
 </span></pre>
@@ -54,22 +54,22 @@ public class MyModel extends AbstractTableModel
    private Object[][] m_data;
    ...
    public void getValueAt(int row, int col)
-   {
-      return m_data[row][col];
+   {</span><span class="event">
+      return m_data[row][col];</span><span class="code">
    }
    public void setValueAt(final Object value, final int row, final int column)
-   {
-      Worker.post(new Task()
+   {</span><span class="event">
+      Worker.post(new Job()</span><span class="code">
       {
-         public Object run() throws Exception
-         {
+         public Object run()
+         {</span><span class="foxtrot">
             if (isValid(value))
             {
                m_data[row][column] = value;
             }
-            return null;
+            return null;</span><span class="code">
          }
-      });
+      }</span><span class="event">);</span><span class="code">
    }
 }
 </span></pre>
@@ -86,24 +86,24 @@ public class MyModel extends AbstractTableModel
    private Object[][] m_data;
    ...
    public void getValueAt(int row, int col)
-   {
-      return m_data[row][col];
+   {</span><span class="event">
+      return m_data[row][col];</span><span class="code">
    }
    public void setValueAt(final Object value, int row, int column)
-   {
-      Boolean isValid = (Boolean)Worker.post(new Task()
+   {</span><span class="event">
+      Boolean isValid = (Boolean)Worker.post(new Job()</span><span class="code">
       {
-         public Object run() throws Exception
-         {
+         public Object run()
+         {</span><span class="foxtrot">
             // Compute and Return
-            return isValid(value);
+            return isValid(value);</span><span class="code">
          }
-      });
+      }</span><span class="event">);
 
       if (isValid.booleanValue())
       {
          m_data[row][column] = value;
-      }
+      }</span><span class="code">
    }
 }
 </span></pre>
@@ -140,9 +140,9 @@ public class Machine
          listener.stateChanged(e);
       }
    }
-}
+}</span><span class="main">
 
-// Somewhere else in your application...
+// Somewhere else in your application...</span><span class="code">
 
 final Machine machine = new Machine();
 
@@ -151,8 +151,8 @@ final JLabel statusLabel = new JLabel();
 machine.addListener(new Listener()
 {
    public void stateChanged(MachineEvent e)
-   {
-      statusLabel.setText(e.getStatus());
+   {</span><span class="event">
+      statusLabel.setText(e.getStatus());</span><span class="code">
    }
 });
 
@@ -160,8 +160,8 @@ JButton button = new JButton("Start Machine");
 button.addActionListener(new ActionListener()
 {
    public void actionPerformed(ActionEvent e)
-   {
-      machine.start();
+   {</span><span class="event">
+      machine.start();</span><span class="code">
    }
 });
 </span></pre>
@@ -173,15 +173,15 @@ With the Foxtrot API, a small change in the listener will do the job:</p>
 button.addActionListener(new ActionListener()
 {
    public void actionPerformed(ActionEvent e)
-   {
-      Worker.post(new Task()
+   {</span><span class="event">
+      Worker.post(new Task()</span><span class="code">
       {
          pulic Object run() throws Exception
-         {
+         {</span><span class="foxtrot">
             machine.start();
-            return null;
+            return null;</span><span class="code">
          }
-      });
+      }</span><span class="event">);</span><span class="code">
    }
 });
 </span></pre>
@@ -200,16 +200,16 @@ public class Machine
    private void notifyListeners(final MachineEvent e)
    {
       if (SwingUtilities.isEventDispatchThread())
-      {
-         notify(e);
+      {</span><span class="event">
+         notify(e);</span><span class="code">
       }
       else
       {
          SwingUtilities.invokeAndWait(new Runnable()
          {
             public void run()
-            {
-               notify(e);
+            {</span><span class="event">
+               notify(e);</span><span class="code">
             }
          });
       }
@@ -244,19 +244,19 @@ combo.addActionListener(new ActionListener()
    public void actionPerformed(ActionEvent e)
    {
       try
-      {
+      {</span><span class="event">
           // Explicitely close the popup
          combo.setPopupVisible(false);
 
          // Heavy operation
-         Worker.post(new Task()
+         Worker.post(new Task()</span><span class="code">
          {
             public Object run() throws Exception
-            {
+            {</span><span class="foxtrot">
                Thread.sleep(5000);
-               return null;
+               return null;</span><span class="code">
             }
-         });
+         }</span><span class="event">);</span><span class="code">
       }
       catch (Exception x) {}
    }
