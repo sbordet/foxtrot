@@ -14,7 +14,7 @@ See the terms of the BSD license in the documentation provided with this softwar
 
    <property name="name" value="foxtrot"/>
    <!-- REMEMBER: change also the manifest information -->
-   <property name="version" value="2.0"/>
+   <property name="version" value="3.0.alpha.1"/>
 
    <property name="src.dir" value="${basedir}/src"/>
    <property name="core.src.dir" value="${src.dir}/core"/>
@@ -48,6 +48,7 @@ See the terms of the BSD license in the documentation provided with this softwar
       <include name="foxtrot/*.class"/>
       <include name="foxtrot/pumps/**/*.class"/>
       <include name="foxtrot/workers/**/*.class"/>
+      <include name="foxtrot/utils/**/*.class"/>
    </patternset>
 
    <patternset id="examples.classes">
