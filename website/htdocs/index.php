@@ -49,6 +49,26 @@
 <img src="http://sourceforge.net/sflogo.php?group_id=49197&type=4"
 width="125" height="37" border="0" alt="SourceForge.net Logo"/></a>
 </p>
+
+<!-- Extreme Tracker -->
+<p align="center">
+<a target="_top" href="http://w.extreme-dm.com/?login=foxtrots">
+<img name="im" src="http://w1.extreme-dm.com/i.gif" height="38"
+border="0" width="41" alt=""></a><script language="javascript"><!--
+an=navigator.appName;d=document;function
+pr(){d.write("<img src=\"http://w0.extreme-dm.com",
+"/0.gif?tag=foxtrots&j=y&srw="+srw+"&srb="+srb+"&",
+"rs="+r+"&l="+escape(d.referrer)+"\" height=1 ",
+"width=1>");}srb="na";srw="na";//-->
+</script><script language="javascript1.2"><!--
+s=screen;srw=s.width;an!="Netscape"?
+srb=s.colorDepth:srb=s.pixelDepth;//-->
+</script><script language="javascript"><!--
+r=41;d.images?r=d.im.width:z=0;pr();//-->
+</script><noscript><img height="1" width="1" alt=""
+src="http://w0.extreme-dm.com/0.gif?tag=foxtrots&j=n"></noscript>
+</p>
+
 </td></tr>
 </table>
 </td>
