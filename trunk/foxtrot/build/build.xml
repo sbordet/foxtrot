@@ -26,7 +26,9 @@ See the terms of the BSD license in the documentation provided with this softwar
 	<property name="examples.classes.dir" value="${classes.dir}/examples"/>
 	<property name="test.classes.dir" value="${classes.dir}/test"/>
 
-	<property name="etc.dir" value="${basedir}/src/etc"/>
+	<property name="etc.dir" value="${src.dir}/etc"/>
+
+	<property name="lib.dir" value="${basedir}/lib"/>
 
 	<property name="dist.dir" value="${basedir}/dist"/>
 	<property name="dist.lib.dir" value="${dist.dir}/lib"/>
@@ -36,13 +38,12 @@ See the terms of the BSD license in the documentation provided with this softwar
 
 	<property name="core.jar.file" value="${dist.lib.dir}/${name}.jar"/>
 	<property name="examples.jar.file" value="${dist.lib.dir}/${name}-examples.jar"/>
-	<property name="test.runner.jar.file" value="${dist.lib.dir}/${name}-test-runner.jar"/>
-	<property name="test.jar.file" value="${dist.lib.dir}/${name}-test.jar"/>
+	<property name="test.runner.jar.file" value="${dist.lib.dir}/${name}-tests-runner.jar"/>
+	<property name="test.jar.file" value="${dist.lib.dir}/${name}-tests.jar"/>
 	<property name="src.jar.file" value="${dist.lib.dir}/${name}-src.jar"/>
 
 	<patternset id="core.classes">
 		<include name="foxtrot/*.class"/>
-		<include name="java/awt/*.class"/>
 	</patternset>
 
 	<patternset id="examples.classes">
@@ -82,8 +83,13 @@ See the terms of the BSD license in the documentation provided with this softwar
 		<javac srcdir="${test.src.dir}"
 						 destdir="${test.classes.dir}"
 						 debug="on"
-						 deprecation="on"
-						 classpath="${core.classes.dir}">
+						 deprecation="on">
+         <classpath>
+            <pathelement location="${core.classes.dir}"/>
+            <fileset dir="${lib.dir}">
+               <include name="**/*.jar"/>
+            </fileset>
+         </classpath>
 		</javac>
 	</target>
 
