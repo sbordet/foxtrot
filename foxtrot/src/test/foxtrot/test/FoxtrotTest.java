@@ -34,78 +34,6 @@ import foxtrot.Worker;
  */
 public class FoxtrotTest
 {
-	public static void main(String[] args) throws Exception
-	{
-		final JFrame frame = new JFrame("Foxtrot Test");
-		Container pane = frame.getContentPane();
-		pane.setLayout(new BoxLayout(pane, BoxLayout.Y_AXIS));
-		frame.setSize(800, 600);
-		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		Dimension screen = Toolkit.getDefaultToolkit().getScreenSize();
-		Dimension size = frame.getSize();
-		int x = (screen.width - size.width) >> 1;
-		int y = (screen.height - size.height) >> 1;
-		frame.setLocation(x, y);
-		frame.setVisible(true);
-
-		final FoxtrotTest test = new FoxtrotTest();
-
-		SwingUtilities.invokeLater(new Runnable()
-		{
-			public void run()
-			{
-				System.out.println("Start Testing");
-				int count = 0;
-				int success = 0;
-//				Object[] arg = new Object[0];
-				Object[] arg = new Object[] {frame};
-				Method[] methods = test.getClass().getMethods();
-				for (int i = 0; i < methods.length; ++i)
-				{
-					Method method = methods[i];
-					String name = method.getName();
-					if (name.startsWith("test") &&
-						method.getReturnType() == Void.TYPE &&
-//						method.getParameterTypes().length == 0)
-						method.getParameterTypes().length == 1 &&
-						method.getParameterTypes()[0] == JFrame.class)
-					{
-						try
-						{
-							++count;
-							System.out.println("Executing Test '" + name + "'");
-							method.invoke(test, arg);
-							++success;
-							System.out.println("Test '" + name + "' SUCCESSFUL");
-						}
-						catch (IllegalAccessException x) {x.printStackTrace();}
-						catch (InvocationTargetException x)
-						{
-							Throwable t = x.getTargetException();
-							System.out.println("Test '" + name + "' FAILED !");
-							t.printStackTrace();
-						}
-					}
-				}
-
-				String result = "Testing Completed: " + count + " Tests - " + success + " successful - " + (count - success) + " failed";
-				JLabel label = new JLabel(result);
-				frame.getContentPane().add(label);
-				frame.getContentPane().validate();
-				System.out.println(result);
-			}
-		});
-	}
-
-	private JButton createButton(JFrame frame, String text)
-	{
-		JButton button = new JButton(text);
-		JPanel pane = (JPanel)frame.getContentPane();
-		pane.add(button);
-		pane.revalidate();
-		return button;
-	}
-
 	public void testThreads(JFrame frame) throws Exception
 	{
 		JButton button = createButton(frame, "Threads");
@@ -410,8 +338,9 @@ public class FoxtrotTest
 	public void testLoad(JFrame frame) throws Exception
 	{
 		// Run this test with a very small heap: with 2 mega of heap there are no out of memory errors
-		// (less than 2 mega is defaulted to 2 mega, it seems)
-		// java -Xms2m -Xmx2m -verbosegc
+		// (less than 2 mega is defaulted to 2 mega, it seems): java -Xms2m -Xmx2m -verbosegc
+		// Also, may be worth to add dummy expensive data members (new byte[1000000] for example) to the
+		// Worker.Link class and/or Task class.
 
 		JButton button = createButton(frame, "Load");
 
@@ -519,6 +448,15 @@ public class FoxtrotTest
 		});
 
 		button.doClick();
+	}
+
+	private JButton createButton(JFrame frame, String text)
+	{
+		JButton button = new JButton(text);
+		JPanel pane = (JPanel)frame.getContentPane();
+		pane.add(button);
+		pane.revalidate();
+		return button;
 	}
 
 	private Object post(Task task)

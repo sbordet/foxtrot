@@ -36,6 +36,7 @@ See the terms of the BSD license in the documentation provided with this softwar
 
 	<property name="core.jar.file" value="${dist.lib.dir}/${name}.jar"/>
 	<property name="examples.jar.file" value="${dist.lib.dir}/${name}-examples.jar"/>
+	<property name="test.runner.jar.file" value="${dist.lib.dir}/${name}-test-runner.jar"/>
 	<property name="test.jar.file" value="${dist.lib.dir}/${name}-test.jar"/>
 	<property name="src.jar.file" value="${dist.lib.dir}/${name}-src.jar"/>
 
@@ -50,6 +51,11 @@ See the terms of the BSD license in the documentation provided with this softwar
 
 	<patternset id="test.classes">
 		<include name="foxtrot/test/**/*.class"/>
+		<exclude name="foxtrot/test/TestRunner*.class"/>
+	</patternset>
+
+	<patternset id="test.runner.classes">
+		<include name="foxtrot/test/TestRunner*.class"/>
 	</patternset>
 
 	<patternset id="src.files">
@@ -104,6 +110,13 @@ See the terms of the BSD license in the documentation provided with this softwar
  				<patternset refid="test.classes"/>
  			</fileset>
  			<fileset dir="${etc.dir}" includes="java.policy"/>
+		</jar>
+
+		<jar jarfile="${test.runner.jar.file}"
+			 manifest="${etc.dir}/manifest.mf">
+ 			<fileset dir="${test.classes.dir}">
+ 				<patternset refid="test.runner.classes"/>
+ 			</fileset>
 		</jar>
 
 		<jar jarfile="${src.jar.file}"
