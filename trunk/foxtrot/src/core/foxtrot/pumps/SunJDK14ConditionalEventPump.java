@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2002, Simone Bordet
+ * Copyright (c) 2002-2005, Simone Bordet
  * All rights reserved.
  *
  * This software is distributable under the BSD license.
@@ -26,7 +26,6 @@ import foxtrot.Task;
  * This implementation of EventPump calls the package protected method
  * <code>java.awt.EventDispatchThread.pumpEvents(Conditional)</code> and can be used with Sun JDK 1.4+ only.
  *
- * @author <a href="mailto:biorn_steedom@users.sourceforge.net">Simone Bordet</a>
  * @version $Revision$
  */
 public abstract class SunJDK14ConditionalEventPump implements EventPump, EventFilterable

@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2002, Simone Bordet
+ * Copyright (c) 2002-2005, Simone Bordet
  * All rights reserved.
  *
  * This software is distributable under the BSD license.
@@ -53,7 +53,6 @@ package foxtrot.pumps;
  * Absolute care must be used when filtering AWT events, as your Swing application may not work properly
  * if AWT events are not dispatched properly.
  *
- * @author <a href="mailto:biorn_steedom@users.sourceforge.net">Simone Bordet</a>
  * @version $Revision$
  */
 public interface EventFilterable
