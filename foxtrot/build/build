@@ -1,0 +1,14 @@
+if [ -z "$JAVA_HOME" ]; then
+  echo "JAVA_HOME environment variable not defined"
+  exit
+fi
+
+CP=ant.jar;
+CP=$CP:optional.jar
+CP=$CP:jaxp.jar
+CP=$CP:crimson.jar
+CP=$CP:../lib/junit.jar
+CP=$CP:$JAVA_HOME/lib/tools.jar
+
+$JAVA_HOME/bin/java -cp $CP org.apache.tools.ant.Main $@
+
