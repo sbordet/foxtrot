@@ -26,7 +26,7 @@ import java.security.AccessController;
  * };
  * </pre>
  * Exceptions and Errors thrown by the <code>run()</code> method will be rethrown automatically by
- * {@link Worker#post Worker.post(Task task)}.
+ * {@link Worker#post(Task) Worker.post(Task task)}.
  *
  * @see Worker
  * @author <a href="mailto:biorn_steedom@users.sourceforge.net">Simone Bordet</a>
@@ -78,7 +78,7 @@ public abstract class Task
 	 * Package protected, used by Worker
 	 * @see #setResult
 	 * @see #getResultOrThrow
-	 */ 
+	 */
 	final synchronized Object getResult()
 	{
 		return m_result;

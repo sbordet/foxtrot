@@ -29,7 +29,7 @@ import java.security.AccessController;
  * };
  * </pre>
  * RuntimeExceptions or Errors thrown by the <code>run()</code> method will be rethrown automatically by
- * {@link Worker#post Worker.post(Job job)}.
+ * {@link Worker#post(Job) Worker.post(Job job)}.
  *
  * @see Worker
  * @author <a href="mailto:biorn_steedom@users.sourceforge.net">Simone Bordet</a>
