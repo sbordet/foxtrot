@@ -27,7 +27,7 @@ The user feels the application has hung.<br>
 When the time-consuming listener finishes, all pending events are processed, and if they are quick to execute (like
 repainting events) it appears they're are executed like a storm.</p>
 <p>Take a look at the following code.</p>
-<p>Let's concentrate on the button's listener (the actionPerformed() method): the first statement changes the text of the button. This
+<p>Let's concentrate on the button's listener (the <code>actionPerformed()</code> method): the first statement changes the text of the button. This
 causes the JButton to post a repaint event to the Event Queue, which is not be executed until the method finishes.<br>
 But the listener is waiting for 10 seconds, so what happens is that the button remains pressed, and its text doesn't
 change. After 10 seconds have passed, another button-text-change method is called, thus posting another repaint
@@ -39,7 +39,6 @@ events in the Event Queue finally get a chance to be executed, too.<br>
 Being repaint events, the two button events are executed quickly. So first the button text is changed to "Sleeping...", and immediately
 after to "Slept !", too quick for the eye to see.<br>
 Before that, during 10 seconds, the GUI was <b>frozen</b>.</p>
-<br>
 <table width="100%" cellspacing="0" cellpadding="0">
 <tr><td width="60%">
 <pre><span class="code">

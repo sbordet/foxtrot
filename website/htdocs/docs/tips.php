@@ -18,7 +18,7 @@ The examples are coded with the Foxtrot API, but are valid also for other soluti
 <ul>
 <li>Working correctly with Swing Models
 <li>Working correctly with Custom Event Emitters
-<li>Working correctly with JComboBox
+<li>Working correctly with <code>JComboBox</code>
 </ul>
 </p>
 
@@ -27,7 +27,7 @@ The examples are coded with the Foxtrot API, but are valid also for other soluti
 present. No matter if the chosen solution is asynchronous or synchronous (SwingWorker or Foxtrot), care must be taken
 to interact with Swing Models, since code working well against a plain Swing solution (ie without use of threads), may
 not work as well when using threads.</p>
-<p>Let's make an example: suppose you have a JTable, and you use as a model a subclass of AbstractTableModel that you feeded with
+<p>Let's make an example: suppose you have a <code>JTable</code>, and you use as a model a subclass of <code>AbstractTableModel</code> that you feeded with
 your data. Suppose also that the user can change the content of a cell by editing it, but the operation to validate the
 new input takes time.<br>
 Using plain Swing programming, this code looks similar to this:</p>
@@ -129,10 +129,12 @@ state change, following the well-known <b>Subject-Observer</b> pattern.<br>
 When threads are used in such a Swing Application, you have to be careful about which thread will actually notify the
 listeners.</p>
 <p>Let's make an example: suppose you created a custom data structure that emits event when its state changes, and
-suppose that state change is triggered by JButtons. In plain Swing programming, the code may be similar to this:</p>
+suppose that state change is triggered by <code>JButton</code>s. In plain Swing programming, the code may be similar to this:</p>
 <pre><span class="code">
 public class Machine
 {
+   private ArrayList m_listeners;
+
    public void addListener(Listener l) {...}
    public void removeListener(Listener l) {...}
 
@@ -241,14 +243,14 @@ public class Machine
 method, that returns when all the listeners have been notified. Using <code>SwingUtilities.invokeLater()</code> causes
 this method to return immediately, normally before listeners have been notified, breaking the semantic.</p>
 
-<h3>Working correctly with JComboBox</h3>
-<p>JComboBox shows a non-usual behavior with respect to item selection when compared, for example, with JMenu: both show
-a JPopup with a list of items to be selected by the user, but after selecting an item in JMenu the JPopup
-disappears automatically, while in JComboBox it remains shown until all listeners are processed.</p>
-<p>Swing Applications that contain JComboBoxes that have to perform heavy operations when an item is selected will suffer
-of the "JPopup shown problem" when using plain Swing programming (in this case the GUI is also frozen) and when using the
+<h3>Working correctly with <code>JComboBox</code></h3>
+<p><code>JComboBox</code> shows a non-usual behavior with respect to item selection when compared, for example, with <code>JMenu</code>: both show
+a <code>JPopup</code> with a list of items to be selected by the user, but after selecting an item in <code>JMenu</code> the <code>JPopup</code>
+disappears immediately, while in <code>JComboBox</code> it remains shown until all listeners are processed.</p>
+<p>Swing Applications that contain <code>JComboBox</code>es that have to perform heavy operations when an item is selected will suffer
+of the "<code>JPopup</code> shown problem" when using plain Swing programming (in this case the GUI is also frozen) and when using the
 Foxtrot API (this problem does not appear when using the SwingWorker).</p>
-<p>However this problem is easily solved by asking JComboBox to explicitely close the JPopup, as the example below shows:</p>
+<p>However this problem is easily solved by asking <code>JComboBox</code> to explicitely close the <code>JPopup</code>, as the example below shows:</p>
 <pre><span class="code">
 final JComboBox combo = new JComboBox(...);
 combo.addActionListener(new ActionListener()
