@@ -277,8 +277,7 @@ public class Worker
       }
       else
       {
-         // No JDK 1.1 support for now
-         throw new Error("JDK 1.1 is not supported");
+         throw new Error("The current JRE is not supported");
       }
 
       if (debug) System.out.println("[Worker] Initialized EventPump: " + eventPump);
