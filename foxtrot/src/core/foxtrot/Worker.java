@@ -12,6 +12,7 @@ import java.awt.EventQueue;
 import java.awt.FoxtrotConditional;
 import java.awt.Toolkit;
 import java.lang.reflect.Method;
+import java.lang.reflect.InvocationTargetException;
 import java.security.AccessController;
 import java.security.PrivilegedActionException;
 import java.security.PrivilegedExceptionAction;
@@ -208,6 +209,11 @@ public class Worker
 				m_pumpMethod.setAccessible(true);
 			}
 			catch (Exception x) {x.printStackTrace();}
+
+			// See remarks for use of this property in java.awt.EventDispatchThread
+			String property = "sun.awt.exception.handler";
+			String handler = System.getProperty(property);
+			if (handler == null) {System.setProperty(property, AWTThrowableHandler.class.getName());}
 		}
 
 		private Task m_task;
@@ -230,7 +236,26 @@ public class Worker
 				// This call blocks until the task is completed
 				m_pumpMethod.invoke(Thread.currentThread(), new Object[] {new FoxtrotConditional(m_task)});
 			}
-			catch (Throwable x)	{x.printStackTrace();}
+			catch (InvocationTargetException x)
+			{
+				Throwable t = x.getTargetException();
+				System.err.println("Exception occurred during event dispatching:");
+				t.printStackTrace();
+
+				System.err.println("Foxtrot - WARNING: uncaught exception during event dispatching, Task is still running !");
+
+				// Rethrow. This will exit from Worker.post with a runtime exception or an error, and
+				// the original event pump will take care of it. Beware that the Task will continue to run
+				// It should never happen: the contract of the Worker.post method is strong: don't return
+				// until the Task has finished. We will use awt exception handler to enforce this contract.
+				if (t instanceof RuntimeException) {throw (RuntimeException)t;}
+				else {throw (Error)t;}
+			}
+			catch (Throwable x)
+			{
+				x.printStackTrace();
+				System.err.println("Foxtrot - WARNING: uncaught exception in Foxtrot code, Task is still running !");
+			}
 			finally
 			{
 				if (m_debug)
@@ -238,6 +263,15 @@ public class Worker
 					System.out.println("Stop dequeueing events from AWT Event Queue: " + this);
 				}
 			}
+		}
+	}
+
+	public static class AWTThrowableHandler
+	{
+		public void handle(Throwable t)
+		{
+			System.err.println("Exception occurred during event dispatching:");
+			t.printStackTrace();
 		}
 	}
 
