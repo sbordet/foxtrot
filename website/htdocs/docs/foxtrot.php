@@ -14,48 +14,53 @@
 <h2>Foxtrot: synchronous solution</h2>
 <p>The <b>Foxtrot</b> framework is based on a different approach than asynchronous solutions. While a worker thread is still
 used to execute time-consuming tasks, SwingUtilities.invokeLater() is not used.<br>
-The main problem of the asynchronous solution is that it lets the listener returns immediately. This is done to allow the
-Event Dispatch Thread to dequeue the next event and to process it.<br>
-Foxtrot instead, blocks the Event Dispatch Thread <em>inside</em> the listener, but tells the Event Dispatch Thread to
-do a job that it knows very well: dequeuing events from the Event Queue and processing them.</p>
+The main problem of the asynchronous solution is that it lets the listener return immediately. This is done to allow the
+Event Dispatch Thread to dequeue the next event and process it.<br>
+In contrast, Foxtrot lets the Event Dispatch Thread enter but not return from the listener method, instead rerouting the
+Event Dispatch Thread to continue dequeuing events from the Event Queue and processing them. Once the worker thread
+has finished, the Event Dispatch Thread is rerouted again, returning from the listener method.</p>
 <p>This approach is similar to the one used to display modal dialogs in AWT or Swing; unfortunately all classes that allow
-dialogs to block the Event Dispatch Thread inside a listener while continuing to dequeue and to process events are private
+dialogs to reroute the Event Dispatch Thread inside a listener to continue dequeueing and processing events are private
 to package java.awt. However, AWT and Swing architects left enough room to achieve exactly the same behavior, just with
 a little more coding necessary in the Foxtrot implementation.</p>
-<p>The main idea behind the synchronous solution is to block inside the time-consuming listener, after having
-delegated the worker thread to execute the time-consuming code, but telling the Event Dispatch Thread to continue to
-dequeue events from the Event Queue and to process them.</p>
+<p>The main idea behind the synchronous solution is to prevent the Event
+Dispatch Thread from returning from the time-consuming listener, while
+having the worker thread executing the time consuming code, and the
+Event Dispatch Thread continuing dequeuing and processing events from
+the Event Queue. As soon as the worker thread is finished, the Event
+Dispatch Thread will return from the listener method. That's why
+this solution is synchronous.</p>
 <p>Take a look at the code below that uses the Foxtrot API.</p>
-<p>Let's concentrate on the button's listener: the first statement, as in the freeze example, changes
-the text of the button and thus posts a repaint event on the queue.<br>
-The next statement uses the Foxtrot API to create a Task and to post it to the worker queue, using the Worker class.
+<p>Let's concentrate on the button's listener (the actionPerformed() method): the first statement, as in the freeze example, changes
+the text of the button and thus posts a repaint event to the queue.<br>
+The next statement uses the Foxtrot API to create a Task and post it to the worker queue, using the Worker class.
 The Worker.post() method is blocking and must be called from the Event Dispatch Thread. <br>
-The Worker class starts a single worker thread (when initialized) to execute time-consuming tasks,
-and has a single worker queue where time-consuming tasks are enqueued before being executed.<br>
-When a Task is posted, the worker thread executes the code contained in Task.run() and contemporarly the Event Dispatch
-Thread is told to dequeue events from the Event Queue. In the Event Queue it finds the repaint event posted by the
+When initialized, the Worker class starts a single worker thread to execute time-consuming tasks,
+and has a single worker queue where time-consuming tasks are queued before being executed.<br>
+When a Task is posted, the worker thread executes the code contained in Task.run() and the Event Dispatch Thread is told to
+contemporarly dequeue events from the Event Queue. On the Event Queue it finds the repaint event posted by the
 first setText(), and processes it.<br>
 The Worker.post() method does not return until the time-consuming task is finished.
 When the time-consuming task is finished, the Worker class tells the Event Dispatch Thread to stop dequeueing events
-from the Event Queue, and allows the Worker.post() method to return. When the Worker.post() method returns, the listener calls
-the second setText() and returns, allowing the Event Dispatch Thread to do its job in the normal way.<br>
-This is why we called this solution synchronous: the event listener does not return, and the code the
-listener is supposed to execute is run synchronously.</p>
+from the Event Queue, and to return from the Worker.post() method. When the Worker.post() method returns, the second setText() is called
+and the listener returns, allowing the Event Dispatch Thread to do its job in the normal way.<br>
+This is why we call this solution synchronous: the event listener does not return while the code in the time-consuming task is run
+by the worker thread.</p>
 <p>Let's compare this solution with the asynchronous ones, to see how it resolves their drawbacks:
 <ul>
-<li>Simple exception handling: exceptions can be caught and rethrown by the listener. No need of chained if-else
-statements. The only drawback is that the Worker.post() method requires to always catch Exception.
+<li>Simple exception handling: exceptions can be caught and rethrown within the listener. No need for chained if-else
+statements. The only drawback is that the listener is required to always catch Exception from the Worker.post() method.
 <li>Note the symmetry: the two setText() are both inside the listener.
-<li>No get() method: whether you expect a result or not, eventual exceptions will be rethrown.
-<li>The code after the time-consuming task is independent of the time-consuming task itself. This allow refactoring of
+<li>No get() method, whether you expect a result or not. If there are exceptions, they will be rethrown.
+<li>The code after the time-consuming task is independent of the time-consuming task itself. This allows refactoring of
 Worker.post() calls, and it is possible to execute different code after Worker.post() depending on the place from where we
 want to execute the time-consuming task.
 <li>Code written after Worker.post() is always executed afterwards. This greatly improve code readability and semplicity.
 No worries about code executed after Worker.post().
-<li>No nesting of Worker.post() is necessary, just 2 consecutive Worker.post() calls
+<li>No nesting of Worker.post() is necessary, just 2 consecutive Worker.post() calls.
 </ul>
 </p>
-<p>We have heavily used Foxtrot in a large Swing application, and the code greatly improved from the use of the
+<p>We have used Foxtrot heavily in a large Swing application, and the code benefited greatly from the use of the
 Foxtrot framework.</p>
 <h3>Acknowledgements</h3>
 <p>Marco Cravero had the first idea of exploring how dialogs work to find a better solution for using threads in Swing.<br>
