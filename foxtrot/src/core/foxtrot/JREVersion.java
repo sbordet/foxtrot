@@ -9,33 +9,33 @@
 package foxtrot;
 
 /**
- * Helper class that returns which is the current JDK version
+ * Helper class that returns which is the current JRE version
  *
  * @author <a href="mailto:biorn_steedom@users.sourceforge.net">Simone Bordet</a>
  * @version $Revision$
  */
-class JDKVersion
+class JREVersion
 {
-   private static Boolean jdk14;
-   private static Boolean jdk13;
-   private static Boolean jdk12;
+   private static Boolean jre14;
+   private static Boolean jre13;
+   private static Boolean jre12;
 
-   static boolean isJDK14()
+   static boolean isJRE14()
    {
-      if (jdk14 == null) jdk14 = canLoadClass("java.nio.ByteBuffer");
-      return jdk14.booleanValue();
+      if (jre14 == null) jre14 = canLoadClass("java.nio.ByteBuffer");
+      return jre14.booleanValue();
    }
 
-   static boolean isJDK13()
+   static boolean isJRE13()
    {
-      if (jdk13 == null) jdk13 = canLoadClass("java.lang.reflect.Proxy");
-      return jdk13.booleanValue();
+      if (jre13 == null) jre13 = canLoadClass("java.lang.reflect.Proxy");
+      return jre13.booleanValue();
    }
 
-   static boolean isJDK12()
+   static boolean isJRE12()
    {
-      if (jdk12 == null) jdk12 = canLoadClass("java.util.Collection");
-      return jdk12.booleanValue();
+      if (jre12 == null) jre12 = canLoadClass("java.util.Collection");
+      return jre12.booleanValue();
    }
 
    private static Boolean canLoadClass(String className)
