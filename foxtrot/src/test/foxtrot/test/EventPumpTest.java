@@ -12,10 +12,11 @@ import java.lang.reflect.Method;
 
 import javax.swing.SwingUtilities;
 
-import foxtrot.pumps.SunJDK14ConditionalEventPump;
-import foxtrot.pumps.JDK13QueueEventPump;
 import foxtrot.EventPump;
 import foxtrot.Task;
+import foxtrot.pumps.JDK13QueueEventPump;
+import foxtrot.pumps.SunJDK140ConditionalEventPump;
+import foxtrot.pumps.SunJDK141ConditionalEventPump;
 
 /**
  * Tests for EventPumps.
@@ -32,18 +33,27 @@ public class EventPumpTest extends FoxtrotTestCase
 
    public void testJDK13QueueEventPump() throws Exception
    {
-      if (isJRE13() && !isJRE14())
+      if (!isJRE14())
       {
          JDK13QueueEventPump pump = new JDK13QueueEventPump();
          testEventPump(pump);
       }
    }
 
-   public void testSunJDK14ConditionalEventPump() throws Exception
+   public void testSunJDK140ConditionalEventPump() throws Exception
    {
-      if (isJRE14())
+      if (isJRE140() && !isJRE141())
       {
-         SunJDK14ConditionalEventPump pump = new SunJDK14ConditionalEventPump();
+         SunJDK140ConditionalEventPump pump = new SunJDK140ConditionalEventPump();
+         testEventPump(pump);
+      }
+   }
+
+   public void testSunJDK141ConditionalEventPump() throws Exception
+   {
+      if (!isJRE140() && isJRE141())
+      {
+         SunJDK141ConditionalEventPump pump = new SunJDK141ConditionalEventPump();
          testEventPump(pump);
       }
    }
@@ -91,7 +101,8 @@ public class EventPumpTest extends FoxtrotTestCase
             pump.pumpEvents(task);
             long stop = System.currentTimeMillis();
 
-            if (stop - start <= delay) fail();
+            long elapsed = stop - start;
+            if (elapsed <= delay) fail("Blocking is not effective: expecting " + delay + ", blocked for only " + elapsed);
          }
       });
    }
@@ -138,7 +149,7 @@ public class EventPumpTest extends FoxtrotTestCase
             // Now I start the event pump, the events above must be dequeued.
             pump.pumpEvents(task);
 
-            if (count.get() != 1) fail();
+            if (count.get() != 1) fail("Event pump does not dequeue events");
          }
       });
    }
@@ -187,7 +198,7 @@ public class EventPumpTest extends FoxtrotTestCase
             }
             catch (RuntimeException x)
             {
-               fail();
+               fail("Event pump must not throw runtime exceptions thrown by events");
             }
          }
       });
@@ -237,7 +248,7 @@ public class EventPumpTest extends FoxtrotTestCase
             }
             catch (Error x)
             {
-               fail();
+               fail("Event pump must not throw errors thrown by events");
             }
          }
       });
@@ -250,6 +261,15 @@ public class EventPumpTest extends FoxtrotTestCase
          Method completed = Task.class.getDeclaredMethod("setCompleted", new Class[] {boolean.class});
          completed.setAccessible(true);
          completed.invoke(task, new Object[]{Boolean.TRUE});
+
+         // In case no other events are posted to the event queue, here we wake it up,
+         // see AbstractWorkerThread.runTask (in the finally block)
+         SwingUtilities.invokeLater(new Runnable()
+         {
+            public void run()
+            {
+            }
+         });
       }
       catch (Throwable x)
       {
