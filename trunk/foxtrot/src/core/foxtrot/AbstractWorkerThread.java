@@ -9,10 +9,8 @@
 package foxtrot;
 
 import java.security.AccessController;
-import java.security.PrivilegedExceptionAction;
 import java.security.PrivilegedActionException;
-
-import javax.swing.SwingUtilities;
+import java.security.PrivilegedExceptionAction;
 
 /**
  * Partial implementation of the WorkerThread interface.
@@ -22,14 +20,6 @@ import javax.swing.SwingUtilities;
  */
 public abstract class AbstractWorkerThread implements WorkerThread
 {
-   private static final Runnable TASK_COMPLETED_EVENT = new Runnable()
-   {
-      public final void run()
-      {
-         if (Worker.debug) System.out.println("[AbstractWorkerThread] Task Completed Event " + this);
-      }
-   };
-
    /**
     * Creates a new instance of this AbstractWorkerThread, called by subclasses.
     */
@@ -66,13 +56,8 @@ public abstract class AbstractWorkerThread implements WorkerThread
          // Mark the task as completed
          task.setCompleted(true);
 
-         // Needed in case that no events are posted on the AWT Event Queue
-         // via the normal mechanisms (mouse movements, key typing, etc):
-         // the AWT Event Queue is waiting in EventQueue.getNextEvent(),
-         // posting this one will wake it up and allow the event pump to
-         // finish its job and release control to the original pump
-         if (Worker.debug) System.out.println("[AbstractWorkerThread] Posting task completed event for task " + task);
-         SwingUtilities.invokeLater(TASK_COMPLETED_EVENT);
+         if (Worker.debug) System.out.println("[AbstractWorkerThread] Completing run for task " + task);
+         task.postRun();
       }
    }
 }
