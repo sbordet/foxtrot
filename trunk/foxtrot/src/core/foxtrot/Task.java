@@ -12,7 +12,7 @@ import java.security.AccessControlContext;
 import java.security.AccessController;
 
 /**
- * A time-consuming task to be executed in the Worker Thread that may throw checked exceptions. <p>
+ * A time-consuming task to be executed in the Worker Thread that may throw checked exceptions. <br>
  * Users must implement the {@link #run} method with the time-consuming code, and not worry about
  * exceptions, for example:
  * <pre>
@@ -49,15 +49,16 @@ public abstract class Task
 
    /**
     * The method to implement with time-consuming code.
-    * It must NOT be synchronized or synchronize on this instance.
+    * It should NOT be synchronized or synchronize on this Task instance, otherwise the AWT Event Dispatch Thread
+    * cannot efficiently test when this Task is completed.
     */
    public abstract Object run() throws Exception;
 
    /**
     * Returns the result of this Task operation, as set by {@link #setResult}.
     * If an exception or an error is thrown by {@link #run}, it is rethrown here.
-    * Synchronized since the variable is accessed from 2 threads.
-    * Accessed by the AWT Event Dispatch Thread.
+    * Synchronized since the variables are accessed from 2 threads
+    * Accessed from the AWT Event Dispatch Thread.
     * Package protected, used by Worker
     * @see #setResult
     * @see #setThrowable
@@ -78,7 +79,7 @@ public abstract class Task
    /**
     * Returns the result of this Task operation, as set by {@link #setResult}.
     * Synchronized since the variable is accessed from 2 threads
-    * Accessed by the AWT Event Dispatch Thread.
+    * Accessed from the AWT Event Dispatch Thread.
     * @see #getResultOrThrow
     */
    private final synchronized Object getResult()
@@ -89,7 +90,7 @@ public abstract class Task
    /**
     * Sets the result of this Task operation, as returned by the {@link #run} method.
     * Synchronized since the variable is accessed from 2 threads
-    * Accessed by the Foxtrot Worker Thread.
+    * Accessed from the worker thread.
     * Package protected, used by {@link AbstractWorkerThread}
     * @see #getResultOrThrow
     * @see #getResult
@@ -102,8 +103,7 @@ public abstract class Task
    /**
     * Returns the throwable as set by {@link #setThrowable}.
     * Synchronized since the variable is accessed from 2 threads
-    * Accessed by the AWT Event Dispatch Thread.
-    * @see #setThrowable
+    * Accessed from the AWT Event Dispatch Thread.
     */
    final synchronized Throwable getThrowable()
    {
@@ -113,7 +113,7 @@ public abstract class Task
    /**
     * Sets the throwable eventually thrown by the {@link #run} method.
     * Synchronized since the variable is accessed from 2 threads
-    * Accessed by the Foxtrot Worker Thread.
+    * Accessed from the worker thread.
     * Package protected, used by {@link AbstractWorkerThread}
     * @see #getThrowable
     */
@@ -123,31 +123,32 @@ public abstract class Task
    }
 
    /**
-    * Returns if this Task is completed.
+    * Returns whether the execution of this Task has been completed or not.
     */
    public final synchronized boolean isCompleted()
    {
-// Synchronized since the variable is accessed from 2 threads
-// Accessed by the AWT Event Dispatch Thread.
+      // Synchronized since the variable is accessed from 2 threads
+      // Accessed from the AWT Event Dispatch Thread.
       return completed;
    }
 
    /**
     * Sets the completion status of this Task.
     * Synchronized since the variable is accessed from 2 threads.
-    * Accessed by the Foxtrot Worker Thread and the AWT Event Dispatch Thread.
+    * Accessed from the worker thread and from the AWT Event Dispatch Thread.
     * Package protected, used by {@link AbstractWorkerThread}
     * @see #isCompleted
     */
    final synchronized void setCompleted(boolean value)
    {
       completed = value;
+      if (value) notifyAll();
    }
 
    /**
     * Returns the protection domain stack at the moment of instantiation of this Task.
     * Synchronized since the variable is accessed from 2 threads
-    * Accessed by the Foxtrot Worker Thread.
+    * Accessed from the worker thread.
     * Package protected, used by {@link AbstractWorkerThread}
     * @see #Task
     */
@@ -159,7 +160,7 @@ public abstract class Task
    /**
     * Resets the internal status of this Task, that can be therefore be reused.
     * Synchronized since the variables are accessed from 2 threads
-    * Accessed by the AWT Event Dispatch Thread.
+    * Accessed from the AWT Event Dispatch Thread.
     * Package protected, used by Worker
     * @see #isCompleted
     */
