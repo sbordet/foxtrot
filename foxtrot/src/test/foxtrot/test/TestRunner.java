@@ -27,7 +27,7 @@ public class TestRunner
 		// The context classloader must be set before the EventDispatchThread is initialized,
 		// otherwise it will be difficult to change it later due to security constraints.
 		File core = new File("lib/foxtrot.jar");
-		File tests = new File("lib/foxtrot-test.jar");
+		File tests = new File("lib/foxtrot-tests.jar");
 //		URLClassLoader coreLoader = new URLClassLoader(new URL[] {core.toURL()}, TestRunner.class.getClassLoader());
 //		URLClassLoader testsLoader = new URLClassLoader(new URL[] {tests.toURL()}, coreLoader);
 		URLClassLoader testsLoader = new URLClassLoader(new URL[] {core.toURL(), tests.toURL()}, TestRunner.class.getClassLoader());
