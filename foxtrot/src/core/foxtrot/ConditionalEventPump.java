@@ -107,7 +107,7 @@ public class ConditionalEventPump implements EventPump
          {
             return task.isCompleted() ? Boolean.FALSE : Boolean.TRUE;
          }
-         throw new Error("Unknown java.awt.Conditional method: " + name);
+         throw new Error("Unknown " + conditionalClass.getName() + " method: " + name);
       }
    }
 
@@ -142,12 +142,12 @@ public class ConditionalEventPump implements EventPump
 
       if (Worker.debug) System.out.println("EventPump " + this + " pumping events for task: " + task);
 
-      // A null task is passed for initialization of this class.
+      // A null task may be passed for initialization of this class.
       if (task == null) return;
 
       try
       {
-         if (Worker.debug) System.out.println("EventPump " + this + " starts dequeueing events from standard AWT Event Queue");
+         if (Worker.debug) System.out.println("EventPump " + this + " starts dequeueing events from standard AWT Event Queue for Task " + task);
          // Invoke java.awt.EventDispatchThread.pumpEvents(new Conditional(task));
          // which will block until the task is completed
          Object conditional = Proxy.newProxyInstance(conditionalClass.getClassLoader(), new Class[]{conditionalClass}, new Conditional(task));
@@ -179,7 +179,7 @@ public class ConditionalEventPump implements EventPump
       }
       finally
       {
-         if (Worker.debug) System.out.println("Event pump " + this + " stops dequeueing events from standard AWT Event Queue");
+         if (Worker.debug) System.out.println("Event pump " + this + " stops dequeueing events from standard AWT Event Queue for Task " + task);
       }
    }
 }
