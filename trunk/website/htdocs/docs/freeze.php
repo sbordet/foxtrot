@@ -90,7 +90,6 @@ public class FreezeExample extends JFrame
 <tr><td class="legend-entry"><span class="main">Main Thread</span></td></tr>
 <tr><td class="legend-entry"><span class="event">Event Dispatch Thread</span></td></tr>
 </table>
-</td>
 </td></tr>
 </table>
 

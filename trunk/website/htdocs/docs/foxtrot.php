@@ -131,8 +131,6 @@ public class FoxtrotExample extends JFrame
 <tr><td class="legend-entry"><span class="event">Event Dispatch Thread</span></td></tr>
 <tr><td class="legend-entry"><span class="foxtrot">Foxtrot Worker Thread</span></td></tr>
 </table>
-</td>
-
 </td></tr>
 </table>
 
