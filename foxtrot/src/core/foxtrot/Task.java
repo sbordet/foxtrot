@@ -173,6 +173,10 @@ public abstract class Task
       setCompleted(false);
    }
 
+   /**
+    * Callback invoked from the worker thread to perform some operation just after the Task
+    * has been {@link #isCompleted completed}.
+    */
    void postRun()
    {
       // Needed in case that no events are posted on the AWT Event Queue
