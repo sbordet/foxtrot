@@ -464,13 +464,8 @@ public class FoxtrotTest
 				{
 					public Object run()
 					{
-						try
-						{
-							Thread.sleep(1000);
-						}
-						catch (InterruptedException e1)
-						{
-						}
+						try {Thread.sleep(1000);}
+						catch (InterruptedException x) {}
 						return null;
 					}
 				});
