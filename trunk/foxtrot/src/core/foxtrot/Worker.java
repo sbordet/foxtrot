@@ -13,8 +13,12 @@ import java.security.PrivilegedAction;
 
 import javax.swing.SwingUtilities;
 
+import foxtrot.workers.DefaultWorkerThread;
+import foxtrot.pumps.SunJDK14ConditionalEventPump;
+import foxtrot.pumps.JDK13QueueEventPump;
+
 /**
- * The class that execute time-consuming {@link Task}s and {@link Job}s. <p>
+ * The class that execute time-consuming {@link Task}s and {@link Job}s. <br>
  * It is normally used in event listeners that must execute time-consuming operations without
  * freezing the Swing GUI. <br>
  * Usage example (simplified from the Foxtrot examples):
@@ -46,8 +50,6 @@ import javax.swing.SwingUtilities;
  * <code>foxtrot.worker.thread</code>, respectively, to a full qualified name of a class
  * implementing, respectively, the above interfaces.
  *
- * @see Task
- * @see Job
  * @author <a href="mailto:biorn_steedom@users.sourceforge.net">Simone Bordet</a>
  * @version $Revision$
  */
@@ -69,7 +71,7 @@ public class Worker
     * Enqueues the given Task to be executed in the worker thread. <br>
     * If this method is called from the Event Dispatch Thread, it blocks until the task has been executed,
     * either by finishing normally or throwing an exception. <br>
-    * If this method is called by the worker thread, and thus is called from another Task,
+    * If this method is called from another Task,
     * it executes the new Task immediately and then returns the control to the calling Task. <br>
     * While executing Tasks, it dequeues AWT events from the AWT Event Queue; even in case of AWT events
     * that throw RuntimeExceptions or Errors, this method will not return until the first Task
@@ -85,7 +87,7 @@ public class Worker
       boolean isEventThread = SwingUtilities.isEventDispatchThread();
       if (!isEventThread && !workerThread.isWorkerThread())
       {
-         throw new IllegalStateException("This method can be called only from the AWT Event Dispatch Thread or from the another Task");
+         throw new IllegalStateException("Worker.post() can be called only from the AWT Event Dispatch Thread or from another Task");
       }
 
       // It is possible that the worker thread is stopped when an applet is destroyed.
@@ -97,7 +99,7 @@ public class Worker
       {
          workerThread.postTask(task);
 
-         // The following line blocks until the task has been executed, or it is interrupted
+         // The following line blocks until the task has been executed
          eventPump.pumpEvents(task);
       }
       else
@@ -119,7 +121,7 @@ public class Worker
     * Enqueues the given Job to be executed in the worker thread. <br>
     * This method behaves exactly like {@link #post(Task task)}, but it does not throw checked exceptions.
     * @throws IllegalStateException if is not called from the Event Dispatch Thread nor from another Job or Task.
-    * @see #post(Task task)
+    * @see #post(Task)
     */
    public static Object post(Job job)
    {
@@ -136,7 +138,7 @@ public class Worker
          // If it happens, it's a bug
          if (debug)
          {
-            System.err.println("[Foxtrot] ERROR: checked exception thrown by a Job");
+            System.err.println("[Worker] PANIC: checked exception thrown by a Job !");
             x.printStackTrace();
          }
 
@@ -152,6 +154,7 @@ public class Worker
 
    /**
     * Returns the EventPump used to pump events from the AWT Event Queue.
+    * @see #setEventPump
     */
    public static EventPump getEventPump()
    {
@@ -162,6 +165,8 @@ public class Worker
     * Sets the EventPump to be used to pump events from the AWT Event Queue. <br>
     * After calling this method, subsequent invocation of {@link #post(Task)}
     * or {@link #post(Job)} will use the newly installed EventPump.
+    * @see #getEventPump
+    * @throws IllegalArgumentException If eventPump is null
     */
    public static void setEventPump(EventPump eventPump)
    {
@@ -172,6 +177,7 @@ public class Worker
    /**
     * Returns the WorkerThread used to run {@link Task}s or {@link Job}s in a thread
     * that is not the Event Dispatch Thread.
+    * @see #setWorkerThread
     */
    public static WorkerThread getWorkerThread()
    {
@@ -183,6 +189,8 @@ public class Worker
     * that is not the Event Dispatch Thread. <br>
     * After calling this method, subsequent invocation of {@link #post(Task)}
     * or {@link #post(Job)} will use the newly installed WorkerThread.
+    * @see #getWorkerThread
+    * @throws IllegalArgumentException If workerThread is null
     */
    public static void setWorkerThread(WorkerThread workerThread)
    {
@@ -205,7 +213,7 @@ public class Worker
 
       if (workerThreadClassName == null)
       {
-         workerThread = new SingleWorkerThread();
+         workerThread = new DefaultWorkerThread();
       }
       else
       {
@@ -217,9 +225,11 @@ public class Worker
          }
          catch (Throwable x)
          {
-            workerThread = new SingleWorkerThread();
+            workerThread = new DefaultWorkerThread();
          }
       }
+
+      if (debug) System.out.println("[Worker] Initialized WorkerThread: " + workerThread);
    }
 
    private static void initializeEventPump()
@@ -250,19 +260,20 @@ public class Worker
          }
       }
 
-      if (JDKVersion.isJDK14() || JDKVersion.isJDK13())
+      if (JREVersion.isJRE14())
       {
-         eventPump = new ConditionalEventPump();
+         eventPump = new SunJDK14ConditionalEventPump();
       }
-      else if (JDKVersion.isJDK12())
+      else if (JREVersion.isJRE13() || JREVersion.isJRE12())
       {
-         // Not sure it will work.
-         eventPump = new ConditionalEventPump();
+         eventPump = new JDK13QueueEventPump();
       }
       else
       {
          // No JDK 1.1 support for now
          throw new IllegalStateException("JDK 1.1 is not supported");
       }
+
+      if (debug) System.out.println("[Worker] Initialized EventPump: " + eventPump);
    }
 }
