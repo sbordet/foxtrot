@@ -31,6 +31,8 @@ not work as well when using threads.</p>
 your data. Suppose also that the user can change the content of a cell by editing it, but the operation to validate the
 new input takes time.<br>
 Using plain Swing programming, this code looks similar to this:</p>
+<table width="100%" cellspacing="0" cellpadding="0">
+<tr><td width="60%">
 <pre><span class="code">
 public class MyModel extends AbstractTableModel
 {
@@ -45,6 +47,16 @@ public class MyModel extends AbstractTableModel
    }
 }
 </span></pre>
+</td>
+<td valign="top" align="left">
+<table class="legend" width="50%" cellspacing="0" cellpadding="0">
+<tr><td class="legend">Legend</td></tr>
+<tr><td class="legend-entry"><span class="main">Main Thread</span></td></tr>
+<tr><td class="legend-entry"><span class="event">Event Dispatch Thread</span></td></tr>
+<tr><td class="legend-entry"><span class="foxtrot">Foxtrot Worker Thread</span></td></tr>
+</table>
+</td></tr>
+</table>
 <p>If <code>isValid(Object value)</code> is fast, no problem; otherwise the user has the GUI frozen and no feedback on what
 is going on.<br>
 Thus you may decide to use Foxtrot, and you convert the old code to this:</p>
@@ -75,11 +87,11 @@ public class MyModel extends AbstractTableModel
 </span></pre>
 <p>The above is just plain <b>wrong</b>.<br>
 It is wrong because the data member <code>m_data</code> is accessed from two threads: from the Foxtrot Worker Thread
-(since it is modified inside <code>Task.run()</code>) and from the AWT Event Dispatch Thread (since any repaint event
+(since it is modified inside <code>Job.run()</code>) and from the AWT Event Dispatch Thread (since any repaint event
 that occurs will call <code>getValueAt(int row, int col)</code>).</p>
-<p>Avoid the temptation to modify <em>anything</em> from inside <code>Task.run()</code>. It should just take data
+<p>Avoid the temptation to modify <em>anything</em> from inside <code>Job.run()</code>. It should just take data
 from outside, perform some heavy operation and <em>return the result of the operation</em>.<br>
-The pattern to follow in the implementation of <code>Task.run()</code> is <b>Compute and Return</b>, see example below.</p>
+The pattern to follow in the implementation of <code>Job.run()</code> is <b>Compute and Return</b>, see example below.</p>
 <pre><span class="code">
 public class MyModel extends AbstractTableModel
 {
@@ -107,7 +119,7 @@ public class MyModel extends AbstractTableModel
    }
 }
 </span></pre>
-<p>Note how <em>only</em> the heavy operation is isolated inside <code>Task.run()</code>, while modifications to the
+<p>Note how <em>only</em> the heavy operation is isolated inside <code>Job.run()</code>, while modifications to the
 data member <code>m_data</code> now happen in the AWT Event Dispatch Thread, thus following the Swing Programming Rules
 and avoiding concurrent read/write access to it.</p>
 
@@ -174,9 +186,9 @@ button.addActionListener(new ActionListener()
 {
    public void actionPerformed(ActionEvent e)
    {</span><span class="event">
-      Worker.post(new Task()</span><span class="code">
+      Worker.post(new Job()</span><span class="code">
       {
-         pulic Object run() throws Exception
+         pulic Object run()
          {</span><span class="foxtrot">
             machine.start();
             return null;</span><span class="code">
@@ -251,14 +263,22 @@ combo.addActionListener(new ActionListener()
          // Heavy operation
          Worker.post(new Task()</span><span class="code">
          {
-            public Object run() throws Exception
+            public Object run() throws InterruptedException
             {</span><span class="foxtrot">
                Thread.sleep(5000);
                return null;</span><span class="code">
             }
          }</span><span class="event">);</span><span class="code">
       }
-      catch (Exception x) {}
+	  catch (InterruptedException x)
+      {
+         x.printStackTrace();
+      }
+	  catch (RuntimeException x)
+      {
+         throw x;
+      }
+      catch (Exception ignored) {}
    }
 });
 </span></pre>
