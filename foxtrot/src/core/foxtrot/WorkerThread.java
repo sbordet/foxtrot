@@ -11,8 +11,7 @@ package foxtrot;
 /**
  * {@link Worker} uses an implementation of this interface to run
  * {@link Task}s in a thread that is not the Event Dispatch Thread. <br>
- * Implementations are required to provide a parameterless public constructor
- * or to extend {@link AbstractWorkerThread}
+ * Implementations should extend {@link AbstractWorkerThread}.
  *
  * @author <a href="mailto:biorn_steedom@users.sourceforge.net">Simone Bordet</a>
  * @version $Revision$
@@ -47,7 +46,7 @@ public interface WorkerThread
    /**
     * Posts a Task to be run by this WorkerThread in a thread that is not the
     * Event Dispatch Thread. This method is called by {@link Worker} from the
-    * Event Dispatch Thread.
+    * Event Dispatch Thread and should return immediately.
     * @see #runTask
     */
    public void postTask(Task task);
