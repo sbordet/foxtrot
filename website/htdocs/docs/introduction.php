@@ -17,7 +17,7 @@
 Foundation Classes (JFC/Swing).</p>
 <p>It is compatible with the J2SE<sup><font="-2">TM</font></sup>, and has been tested with version 1.3.x and 1.4.x.</p>
 <p>The jar containing the Foxtrot core classes is called foxtrot.jar, and should be included in the classpath. <br>
-Foxtrot version 1.2 does not require to be in the boot classpath (previous versions did), and it is thus compatible
+Foxtrot version 1.2 does not require to be in the boot classpath anymore (previous versions did), and it is thus compatible
 with the Java Web Start<sup><font="-2">TM</font></sup> technology.<br>
 <p>Below you can find an example of how to set the foxtrot core classes in the classpath.</p>
 <p>Let's suppose that your Swing application is contained in my-swing.jar, that the main class is called
