@@ -37,7 +37,7 @@
 
 <div class="menu-title">Documentation</div>
 <div class="menu-entry">
-<a href="docs/index.php">Foxtrot User's Guide</a>
+<a href="docs/toc.php">Foxtrot User's Guide</a>
 </div>
 
 <div class="menu-title">Download</div>
