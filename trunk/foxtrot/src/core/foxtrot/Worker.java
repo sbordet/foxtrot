@@ -9,11 +9,13 @@
 package foxtrot;
 
 import java.awt.EventQueue;
-import java.awt.FoxtrotConditional;
 import java.awt.Toolkit;
-import java.lang.reflect.Method;
+import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+import java.lang.reflect.Proxy;
 import java.security.AccessController;
+import java.security.PrivilegedAction;
 import java.security.PrivilegedActionException;
 import java.security.PrivilegedExceptionAction;
 
@@ -61,7 +63,16 @@ public class Worker
 
 	static
 	{
-		m_queue = Toolkit.getDefaultToolkit().getSystemEventQueue();
+		m_queue = (EventQueue)AccessController.doPrivileged(new PrivilegedAction()
+		{
+			public Object run()
+			{
+				return Toolkit.getDefaultToolkit().getSystemEventQueue();
+			}
+		});
+
+		// Initialize here also the EventPump class
+		new EventPump(null);
 
 		m_thread = new Thread(new Runner(), "Foxtrot Worker Thread");
 		// Daemon, since if someone loads this class without using it,
@@ -200,22 +211,47 @@ public class Worker
 	private static class EventPump
 	{
 		private static Method m_pumpMethod;
+		private static Class m_conditionalClass;
 
 		static
 		{
 			try
 			{
-				Class dispatchThreadClass = ClassLoader.getSystemClassLoader().loadClass("java.awt.EventDispatchThread");
-				Class conditionalClass = ClassLoader.getSystemClassLoader().loadClass("java.awt.Conditional");
-				m_pumpMethod = dispatchThreadClass.getDeclaredMethod("pumpEvents", new Class[] {conditionalClass});
-				m_pumpMethod.setAccessible(true);
+				final Class dispatchThreadClass = ClassLoader.getSystemClassLoader().loadClass("java.awt.EventDispatchThread");
+				m_conditionalClass = ClassLoader.getSystemClassLoader().loadClass("java.awt.Conditional");
+				try
+				{
+					m_pumpMethod = (Method)AccessController.doPrivileged(new PrivilegedExceptionAction()
+					{
+						public Object run() throws NoSuchMethodException
+						{
+							Method method = dispatchThreadClass.getDeclaredMethod("pumpEvents", new Class[] {m_conditionalClass});
+							method.setAccessible(true);
+							return method;
+						}
+					});
+				}
+				catch (PrivilegedActionException x)
+				{
+					throw x.getException();
+				}
 			}
-			catch (Exception x) {x.printStackTrace();}
+			catch (Exception x)
+			{
+				x.printStackTrace();
+			}
 
 			// See remarks for use of this property in java.awt.EventDispatchThread
-			String property = "sun.awt.exception.handler";
-			String handler = System.getProperty(property);
-			if (handler == null) {System.setProperty(property, AWTThrowableHandler.class.getName());}
+			final String property = "sun.awt.exception.handler";
+			AccessController.doPrivileged(new PrivilegedAction()
+			{
+				public Object run()
+				{
+					String handler = System.getProperty(property);
+					if (handler == null) {System.setProperty(property, AWTThrowableHandler.class.getName());}
+					return null;
+				}
+			});
 		}
 
 		private Task m_task;
@@ -236,7 +272,8 @@ public class Worker
 
 				// Invoke EventDispatchThread.pumpEvents(new FoxtrotConditional(m_task));
 				// This call blocks until the task is completed
-				m_pumpMethod.invoke(Thread.currentThread(), new Object[] {new FoxtrotConditional(m_task)});
+				Object conditional = Proxy.newProxyInstance(null, new Class[] {m_conditionalClass}, new FoxtrotConditional(m_task));
+				m_pumpMethod.invoke(Thread.currentThread(), new Object[] {conditional});
 			}
 			catch (InvocationTargetException x)
 			{
@@ -265,6 +302,23 @@ public class Worker
 					System.out.println("Stop dequeueing events from AWT Event Queue: " + this);
 				}
 			}
+		}
+	}
+
+	private static class FoxtrotConditional implements InvocationHandler
+	{
+		private Task m_task;
+
+		private FoxtrotConditional(Task task) {m_task = task;}
+
+		public Object invoke(Object proxy, Method method, Object[] args) throws Throwable
+		{
+			String name = method.getName();
+			if ("evaluate".equals(name))
+			{
+				return m_task.isCompleted() ? Boolean.FALSE : Boolean.TRUE;
+			}
+			throw new Error("Unknown java.awt.Conditional method: " + name);
 		}
 	}
 
