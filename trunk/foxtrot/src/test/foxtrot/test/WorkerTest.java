@@ -11,6 +11,7 @@ package foxtrot.test;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
+import java.util.Arrays;
 
 import javax.swing.JButton;
 import javax.swing.JDialog;
@@ -27,9 +28,9 @@ import foxtrot.Worker;
  * @author <a href="mailto:biorn_steedom@users.sourceforge.net">Simone Bordet</a>
  * @version $Revision$
  */
-public class FoxtrotTest extends FoxtrotTestCase
+public class WorkerTest extends FoxtrotTestCase
 {
-   public FoxtrotTest(String s)
+   public WorkerTest(String s)
    {
       super(s);
    }
@@ -204,7 +205,7 @@ public class FoxtrotTest extends FoxtrotTestCase
 
             // Must check that really elapsed all the time
             long elapsed = end - start;
-            if (elapsed < sleep) fail("Worker.post() does not block in case of AWT exception");
+            if (elapsed < sleep) fail("Worker.post() does not block in case of AWT exception: expected " + sleep + ", waited " + elapsed);
          }
       });
    }
@@ -575,11 +576,12 @@ public class FoxtrotTest extends FoxtrotTestCase
 
    private static class FatJob extends Job
    {
-      // An heavy data member to explode the heap
+      // A heavy data member to explode the heap
       private byte[] fatty = new byte[1024 * 1024];
 
       public Object run()
       {
+         Arrays.fill(fatty, (byte)31);
          return null;
       }
    }
