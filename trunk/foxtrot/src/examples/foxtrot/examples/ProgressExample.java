@@ -1,24 +1,29 @@
 package foxtrot.examples;
 
-import java.awt.event.ActionListener;
-import java.awt.event.ActionEvent;
-import java.awt.Container;
 import java.awt.BorderLayout;
-import java.awt.Toolkit;
+import java.awt.Container;
 import java.awt.Dimension;
-import java.awt.GridBagLayout;
+import java.awt.Toolkit;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.util.ArrayList;
 
-import javax.swing.JFrame;
+import javax.swing.DefaultComboBoxModel;
 import javax.swing.JButton;
+import javax.swing.JFrame;
+import javax.swing.JPanel;
 import javax.swing.JProgressBar;
 import javax.swing.SwingUtilities;
-import javax.swing.JPanel;
+import javax.swing.border.EmptyBorder;
 
-import foxtrot.Worker;
 import foxtrot.Job;
+import foxtrot.Worker;
 
 /**
+ * An example of how to use progress indication with Foxtrot.
+ * The main advantage is that there is no more need to create a separate thread
+ * for the progressive operation, but just use the Foxtrot API.
+ * And, of course, with Foxtrot the GUI can be interrupted in any moment.
  *
  * @version $Revision$
  */
@@ -44,7 +49,8 @@ public class ProgressExample extends JFrame
 		{
 			public void actionPerformed(ActionEvent e)
 			{
-				onButtonClick();
+				if (running) onCancelClicked();
+				else onRunClicked();
 			}
 		});
 
@@ -54,13 +60,17 @@ public class ProgressExample extends JFrame
 		setDefaultCloseOperation(EXIT_ON_CLOSE);
 
 		Container c = getContentPane();
-		c.setLayout(new GridBagLayout());
+		c.setLayout(new BorderLayout(0,0));
+
+		JPanel main = new JPanel(new BorderLayout(0, 0));
+		main.setBorder(new EmptyBorder(35,35,35,35));
+		c.add(main, BorderLayout.CENTER);
 
 		JPanel p = new JPanel(new BorderLayout(20,20));
 		p.add(bar, BorderLayout.NORTH);
 		p.add(button, BorderLayout.SOUTH);
 
-		c.add(p);
+		main.add(p);
 
 		setSize(300,200);
 
@@ -71,61 +81,45 @@ public class ProgressExample extends JFrame
 		setLocation(x, y);
 	}
 
-	private void onButtonClick()
+	private void onRunClicked()
 	{
-		if (!running)
+		// We are running
+		running = true;
+
+		// We just started, set the task as not interrupted, to
+		// clear any eventual previous status
+		setTaskInterrupted(false);
+
+		// We will execute a long operation, change the text signaling
+		// that the user can interrupt the operation
+		button.setText("Cancel");
+
+		// getData() will block until the heavy operation is finished
+		// and the AWT-Swing events will be dequeued and processed
+		ArrayList list = getData();
+
+		// Restore the button's text
+		button.setText("Run Task !");
+
+		// We're not running anymore
+		running = false;
+
+		// getData() finished or was interrupted ?
+		// If was interrupted we get back a null list
+		if (list != null)
 		{
-			running = true;
-
-			// We just started, set the task as not interrupted, to
-			// clear any eventual previous status
-			setTaskInterrupted(false);
-
-			// We will execute a long operation, change the text signaling
-			// that the user can interrupt the operation
-			button.setText("Cancel");
-
-			// getData() will block until the heavy operation is finished
-			// and the AWT-Swing events will be dequeued and processed
-			ArrayList list = getData();
-
-			// getData() finished or was interrupted ?
-			// If was interrupted we get back a null list
-			if (list == null)
-			{
-				// Task was interrupted, return quietly, we already cleaned up
-				return;
-			}
-			else
-			{
-				// Task completed successfully, do whatever useful with the list
-				// For example, populate a JComboBox
-				// The reader will finish this part :)
-				javax.swing.DefaultComboBoxModel model = new javax.swing.DefaultComboBoxModel(list.toArray());
-
-				// Restore anyway the button's text
-				button.setText("Run Task !");
-
-				// Restore anyway the interrupt status for another call
-				setTaskInterrupted(false);
-
-				// We're not running anymore
-				running = false;
-			}
+			// Task completed successfully, do whatever useful with the list
+			// For example, populate a JComboBox
+			// The reader will finish this part :)
+			DefaultComboBoxModel model = new DefaultComboBoxModel(list.toArray());
 		}
-		else
-		{
-			// Here if we want to interrupt the Task
+	}
 
-			// Restore the button text to the previous value
-			button.setText("Run Task !");
+	private void onCancelClicked()
+	{
+		// Here if we want to interrupt the Task
 
-			// Interrupt the task
-			setTaskInterrupted(true);
-
-			// We've been interrupted
-			running = false;
-		}
+		setTaskInterrupted(true);
 	}
 
 	private ArrayList getData()
@@ -138,8 +132,8 @@ public class ProgressExample extends JFrame
 				StringBuffer buffer = new StringBuffer();
 
 				// A repetitive operation that updates a progress bar.
-				int max = 100;
-				for (int i = 0; i < max; ++i)
+				int max = 20;
+				for (int i = 1; i <= max; ++i)
 				{
 					// Simulate a heavy operation to retrieve data
 					try	{Thread.sleep(250);}
