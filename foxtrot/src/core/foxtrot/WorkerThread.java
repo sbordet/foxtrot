@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2002, Simone Bordet
+ * Copyright (c) 2002-2005, Simone Bordet
  * All rights reserved.
  *
  * This software is distributable under the BSD license.
@@ -13,7 +13,6 @@ package foxtrot;
  * {@link Task}s in a thread that is not the Event Dispatch Thread. <br>
  * Implementations should extend {@link AbstractWorkerThread}.
  *
- * @author <a href="mailto:biorn_steedom@users.sourceforge.net">Simone Bordet</a>
  * @version $Revision$
  */
 public interface WorkerThread

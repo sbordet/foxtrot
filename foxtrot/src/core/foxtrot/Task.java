@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2002, Simone Bordet
+ * Copyright (c) 2002-2005, Simone Bordet
  * All rights reserved.
  *
  * This software is distributable under the BSD license.
@@ -31,7 +31,6 @@ import javax.swing.SwingUtilities;
  * {@link Worker#post(Task) Worker.post(Task task)}.
  *
  * @see Worker
- * @author <a href="mailto:biorn_steedom@users.sourceforge.net">Simone Bordet</a>
  * @version $Revision$
  */
 public abstract class Task
@@ -65,7 +64,7 @@ public abstract class Task
     * @see #setResult
     * @see #setThrowable
     */
-   final synchronized Object getResultOrThrow() throws Exception
+   protected final synchronized Object getResultOrThrow() throws Exception
    {
       Throwable t = getThrowable();
       if (t != null)

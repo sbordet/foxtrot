@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2002, Simone Bordet
+ * Copyright (c) 2002-2005, Simone Bordet
  * All rights reserved.
  *
  * This software is distributable under the BSD license.
@@ -16,7 +16,6 @@ import java.io.InterruptedIOException;
 /**
  * Partial implementation of the WorkerThread interface.
  *
- * @author <a href="mailto:biorn_steedom@users.sourceforge.net">Simone Bordet</a>
  * @version $Revision$
  */
 public abstract class AbstractWorkerThread implements WorkerThread
