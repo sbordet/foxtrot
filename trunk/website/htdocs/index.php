@@ -6,7 +6,7 @@
 <link rel="stylesheet" href="styles.css">
 <title>Foxtrot - Easy API for JFC/Swing</title>
 <meta name="description" content="Foxtrot - Easy API for JFC/Swing">
-<meta name="keywords" content="Foxtrot,Swing,Simone Bordet,AWT,Threads,Swing threads,SwingWorker,SwingUtilities,SwingUtilities.invokeLater,invokeLater">
+<meta name="keywords" content="Foxtrot,Swing,Threads,Swing Threads,SwingWorker,Worker,SwingUtilities,SwingUtilities.invokeLater,invokeLater,AWT,Simone Bordet">
 </head>
 
 <body>
@@ -37,7 +37,7 @@
 
 <div class="menu-title">Documentation</div>
 <div class="menu-entry">
-<a href="docs/index.html">Foxtrot User's Guide</a>
+<a href="docs/index.php">Foxtrot User's Guide</a>
 </div>
 
 <div class="menu-title">Download</div>
