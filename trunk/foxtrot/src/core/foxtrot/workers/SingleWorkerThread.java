@@ -78,6 +78,9 @@ public class SingleWorkerThread extends AbstractWorkerThread implements Runnable
     */
    public void postTask(Task t)
    {
+      // It is possible that the worker thread is stopped when an applet is destroyed.
+      // Here we restart it in case has been stopped.
+      // Useful also if the WorkerThread has been replaced but not started by the user
       if (!isAlive()) start();
 
       // Synchronized since the variable current is accessed from two threads.
