@@ -1,4 +1,4 @@
-body         { color: #000080; background-color: #FFFFCC; font-family: Verdana, Arial, Helvetica; background-image: url('images/cnvbkgnd.jpg') }
+body         { color: navy; background-color: #FFFFCC; font-family: Verdana, Arial, Helvetica; background-image: url('images/cnvbkgnd.jpg') }
 
 ul           { list-style-image: url('images/acnvbul1.gif') }
 ul ul        { list-style-image: url('images/acnvbul2.gif') }
@@ -8,20 +8,20 @@ a:link       { color: #663399 }
 a:visited    { color: #003399 }
 a:active     { color: #339999 }
 
-h1           { color: #000080; text-align: center }
-h2           { color: #000080; text-align: center }
-h3           { color: #000080 }
-h4           { color: #000080 }
-h5           { color: #000080 }
-h6           { color: #000080 }
+h1           { color: navy; text-align: center }
+h2           { color: navy; text-align: center }
+h3           { color: navy }
+h4           { color: navy }
+h5           { color: navy }
+h6           { color: navy }
 
 td.header-logo { }
 td.header-text { text-align: center; padding-bottom: 15px }
 
 td.menu      { width: 15%; vertical-align: top }
 
-table.menu-header { margin-top: 30px; border: solid 1px #000080 }
-td.menu-header { background-color: #000080; color: #FFFFCC; text-align: center }
+table.menu-header { margin-top: 30px; border: solid 1px navy }
+td.menu-header { background-color: navy; color: #FFFFCC; text-align: center }
 div.menu-title { font-size: 11pt; font-weight: bold; padding: 5px 5px 5px 5px; background: url('')}
 div.menu-entry { font-size: 10pt; padding-left: 20px }
 
@@ -40,3 +40,15 @@ div.toc-chapt { font-size: 11pt; font-weight: bold; padding: 5px 0px 5px 10px }
 div.toc-sect { font-size: 10pt; padding: 0px 0px 0px 40px }
 img.nav-btn-en { border: solid 1px #003399 }
 img.nav-btn-dis { border: solid 1px #339999 }
+
+/* For the code */
+
+span.code { color: black }
+span.main { color: navy }
+span.event { color: #00BF00 }
+span.worker {color: red }
+span.foxtrot {color: #FF9000 }
+
+table.legend { margin-top: 15px; border: solid 1px navy }
+td.legend { background-color: navy; color: #FFFFCC; text-align: center }
+td.legend-entry { font-size: 10pt; padding: 5px 0px 5px 10px }
