@@ -20,7 +20,7 @@ td.header-text { text-align: center; padding-bottom: 15px }
 
 td.menu      { width: 15%; vertical-align: top }
 
-table.menu-header { margin-top: 30px; border-style: solid; border-width: 1px; border-color: #000080 }
+table.menu-header { margin-top: 30px; border: solid 1px #000080 }
 td.menu-header { background-color: #000080; color: #FFFFCC; text-align: center }
 div.menu-title { font-size: 11pt; font-weight: bold; padding: 5px 5px 5px 5px; background: url('')}
 div.menu-entry { font-size: 10pt; padding-left: 20px }
@@ -30,3 +30,13 @@ td.content   { font-size: 11pt; padding: 10px 10px 0px 10px }
 td.news      { width: 15%; vertical-align: top; font-size: 11pt; padding: 10px 0px 0px 0px }
 
 li           { padding-left: 10px }
+
+/* For the documentation */
+
+td.date      { font-size: 10pt; text-align: right; padding-bottom: 20px }
+td.documentation { font-size: 11pt; padding 10px 10px 0px 10px }
+div.toc      { font-size: 12pt; font-weight: bold; padding: 0px 0px 10px 0px }
+div.toc-chapt { font-size: 11pt; font-weight: bold; padding: 5px 0px 5px 10px }
+div.toc-sect { font-size: 10pt; padding: 0px 0px 0px 40px }
+img.nav-btn-en { border: solid 1px #003399 }
+img.nav-btn-dis { border: solid 1px #339999 }
