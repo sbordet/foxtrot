@@ -96,29 +96,28 @@ See the terms of the BSD license in the documentation provided with this softwar
       <mkdir dir="${dist.lib.dir}"/>
 
       <jar jarfile="${core.jar.file}"
-         manifest="${etc.dir}/manifest.mf">
+         manifest="${etc.dir}/MANIFEST.MF">
          <fileset dir="${core.classes.dir}">
             <patternset refid="core.classes"/>
          </fileset>
       </jar>
 
       <jar jarfile="${examples.jar.file}"
-         manifest="${etc.dir}/manifest.mf">
+         manifest="${etc.dir}/MANIFEST.MF">
          <fileset dir="${examples.classes.dir}">
             <patternset refid="examples.classes"/>
          </fileset>
       </jar>
 
       <jar jarfile="${test.jar.file}"
-         manifest="${etc.dir}/manifest.mf">
+         manifest="${etc.dir}/MANIFEST.MF">
          <fileset dir="${test.classes.dir}">
             <patternset refid="test.classes"/>
          </fileset>
-         <!--fileset dir="${etc.dir}" includes="java.policy"/-->
       </jar>
 
       <jar jarfile="${src.jar.file}"
-         manifest="${etc.dir}/manifest.mf">
+         manifest="${etc.dir}/MANIFEST.MF">
          <fileset dir="${core.src.dir}">
             <patternset refid="src.files"/>
          </fileset>
