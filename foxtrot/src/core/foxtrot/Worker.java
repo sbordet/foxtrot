@@ -72,7 +72,7 @@ public class Worker
 		});
 
 		// Initialize here also the EventPump class
-		new EventPump(null);
+		new EventPump(null).pumpEvents();
 
 		m_thread = new Thread(new Runner(), "Foxtrot Worker Thread");
 		// Daemon, since if someone loads this class without using it,
@@ -217,41 +217,42 @@ public class Worker
 		{
 			try
 			{
-				final Class dispatchThreadClass = ClassLoader.getSystemClassLoader().loadClass("java.awt.EventDispatchThread");
-				m_conditionalClass = ClassLoader.getSystemClassLoader().loadClass("java.awt.Conditional");
-				try
+				// See remarks for use of this property in java.awt.EventDispatchThread
+				final String property = "sun.awt.exception.handler";
+
+				AccessController.doPrivileged(new PrivilegedExceptionAction()
 				{
-					m_pumpMethod = (Method)AccessController.doPrivileged(new PrivilegedExceptionAction()
+					public Object run() throws ClassNotFoundException, NoSuchMethodException
 					{
-						public Object run() throws NoSuchMethodException
+						ClassLoader classloader = ClassLoader.getSystemClassLoader();
+						Class dispatchThreadClass = classloader.loadClass("java.awt.EventDispatchThread");
+						m_conditionalClass = classloader.loadClass("java.awt.Conditional");
+						m_pumpMethod = dispatchThreadClass.getDeclaredMethod("pumpEvents", new Class[] {m_conditionalClass});
+						m_pumpMethod.setAccessible(true);
+
+						String handler = System.getProperty(property);
+						if (handler == null)
 						{
-							Method method = dispatchThreadClass.getDeclaredMethod("pumpEvents", new Class[] {m_conditionalClass});
-							method.setAccessible(true);
-							return method;
+							System.setProperty(property, AWTThrowableHandler.class.getName());
+							if (m_debug) System.out.println("AWT Throwable Handler installed successfully");
 						}
-					});
-				}
-				catch (PrivilegedActionException x)
-				{
-					throw x.getException();
-				}
+
+						return null;
+					}
+				});
+			}
+			catch (PrivilegedActionException x)
+			{
+				x.getException().printStackTrace();
+			}
+			catch (RuntimeException x)
+			{
+				throw x;
 			}
 			catch (Exception x)
 			{
 				x.printStackTrace();
 			}
-
-			// See remarks for use of this property in java.awt.EventDispatchThread
-			final String property = "sun.awt.exception.handler";
-			AccessController.doPrivileged(new PrivilegedAction()
-			{
-				public Object run()
-				{
-					String handler = System.getProperty(property);
-					if (handler == null) {System.setProperty(property, AWTThrowableHandler.class.getName());}
-					return null;
-				}
-			});
 		}
 
 		private Task m_task;
@@ -263,6 +264,12 @@ public class Worker
 
 		private void pumpEvents()
 		{
+			if (m_task == null)
+			{
+				// It happens only at initialization time
+				return;
+			}
+
 			try
 			{
 				if (m_debug)
@@ -286,7 +293,7 @@ public class Worker
 				// Rethrow. This will exit from Worker.post with a runtime exception or an error, and
 				// the original event pump will take care of it. Beware that the Task will continue to run
 				// It should never happen: the contract of the Worker.post method is strong: don't return
-				// until the Task has finished. We will use awt exception handler to enforce this contract.
+				// until the Task has finished. We use awt exception handler to enforce this contract.
 				if (t instanceof RuntimeException) {throw (RuntimeException)t;}
 				else {throw (Error)t;}
 			}
