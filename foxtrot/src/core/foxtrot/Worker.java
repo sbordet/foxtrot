@@ -8,21 +8,13 @@
 
 package foxtrot;
 
-import java.awt.AWTEvent;
-import java.awt.Component;
 import java.awt.EventQueue;
-import java.awt.MenuComponent;
-import java.awt.Toolkit;
-import java.awt.ActiveEvent;
 import java.awt.FoxtrotConditional;
-import java.lang.reflect.InvocationTargetException;
+import java.awt.Toolkit;
 import java.lang.reflect.Method;
 import java.security.AccessController;
-import java.security.PrivilegedAction;
-import java.security.PrivilegedExceptionAction;
 import java.security.PrivilegedActionException;
-import java.net.URLClassLoader;
-import java.net.URL;
+import java.security.PrivilegedExceptionAction;
 
 import javax.swing.SwingUtilities;
 
@@ -64,7 +56,7 @@ public class Worker
 	private static Object m_lock = new Object();
 	private static EventQueue m_queue;
 
-	private static final boolean m_debug = true;
+	private static final boolean m_debug = false;
 
 	static
 	{

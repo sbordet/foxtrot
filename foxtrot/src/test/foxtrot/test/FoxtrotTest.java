@@ -8,30 +8,23 @@
 
 package foxtrot.test;
 
+import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.Toolkit;
-import java.awt.Robot;
-import java.awt.GridBagLayout;
-import java.awt.Container;
-import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
-import java.awt.event.WindowAdapter;
-import java.awt.event.WindowEvent;
-import java.lang.reflect.Method;
+import java.awt.event.ActionListener;
 import java.lang.reflect.InvocationTargetException;
-import java.io.File;
-import java.io.FileInputStream;
+import java.lang.reflect.Method;
 
-import javax.swing.JFrame;
-import javax.swing.JButton;
-import javax.swing.SwingUtilities;
-import javax.swing.JPanel;
-import javax.swing.JLabel;
 import javax.swing.BoxLayout;
-import javax.swing.Box;
+import javax.swing.JButton;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.SwingUtilities;
 
-import foxtrot.Worker;
 import foxtrot.Task;
+import foxtrot.Worker;
 
 /**
  * Tests for the Foxtrot framework
