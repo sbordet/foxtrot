@@ -47,6 +47,8 @@ public interface WorkerThread
     * Posts a Task to be run by this WorkerThread in a thread that is not the
     * Event Dispatch Thread. This method must be called from the
     * Event Dispatch Thread and should return immediately.
+    * Implementations should check if this WorkerThread {@link #isAlive} to guarantee
+    * that the posted Task will be executed by this WorkerThread.
     * @see #runTask
     */
    public void postTask(Task task);
