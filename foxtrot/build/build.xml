@@ -36,8 +36,8 @@ See the terms of the BSD license in the documentation provided with this softwar
    <property name="dist.docs.api.dir" value="${dist.docs.dir}/api"/>
    <property name="dist.release.dir" value="${dist.dir}/${name}-${version}"/>
    <property name="dist.test.dir" value="${dist.dir}/test"/>
-   <property name="dist.test.xml.dir" value="${dist.test.dir}/xml"/>
-   <property name="dist.test.html.dir" value="${dist.test.dir}/html"/>
+   <property name="dist.test.xml.dir" value="${dist.test.dir}/xml/${java.version}"/>
+   <property name="dist.test.html.dir" value="${dist.test.dir}/html/${java.version}"/>
 
    <property name="core.jar.file" value="${dist.lib.dir}/${name}.jar"/>
    <property name="examples.jar.file" value="${dist.lib.dir}/${name}-examples.jar"/>
@@ -163,10 +163,26 @@ See the terms of the BSD license in the documentation provided with this softwar
    </target>
 
    <target name="tests" depends="main">
+      <junit printsummary="withOutAndErr" fork="yes" timeout="300000" dir="${basedir}" showoutput="yes">
+         <formatter type="plain" usefile="false"/>
+         <batchtest fork="yes">
+            <fileset dir="${test.src.dir}">
+               <include name="foxtrot/test/**/*Test.java"/>
+            </fileset>
+         </batchtest>
+         <classpath>
+            <fileset dir="${dist.lib.dir}">
+               <include name="*.jar"/>
+            </fileset>
+         </classpath>
+      </junit>
+   </target>
+
+   <target name="tests-report" depends="main">
       <mkdir dir="${dist.test.xml.dir}"/>
       <mkdir dir="${dist.test.html.dir}"/>
       <junit printsummary="withOutAndErr" fork="yes" timeout="300000" dir="${basedir}" showoutput="yes">
-         <formatter type="plain" usefile="false"/>
+         <formatter type="xml"/>
          <batchtest fork="yes" todir="${dist.test.xml.dir}">
             <fileset dir="${test.src.dir}">
                <include name="foxtrot/test/**/*Test.java"/>
@@ -178,6 +194,13 @@ See the terms of the BSD license in the documentation provided with this softwar
             </fileset>
          </classpath>
       </junit>
+
+      <junitreport todir="${dist.test.xml.dir}">
+         <fileset dir="${dist.test.xml.dir}">
+            <include name="TEST-*.xml"/>
+         </fileset>
+         <report format="frames" todir="${dist.test.html.dir}"/>
+      </junitreport>
    </target>
 
    <!--
