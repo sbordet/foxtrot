@@ -71,6 +71,14 @@ public abstract class Task
 		return getResult();
 	}
 
+	/**
+	 * Returns the result of this Task operation
+	 * Synchronized since the variable is accessed from 2 threads
+	 * Accessed by the AWT Event Dispatch Thread.
+	 * Package protected, used by Worker
+	 * @see #setResult
+	 * @see #getResultOrThrow
+	 */ 
 	final synchronized Object getResult()
 	{
 		return m_result;
@@ -94,7 +102,7 @@ public abstract class Task
 	 * Synchronized since the variable is accessed from 2 threads
 	 * Accessed by the AWT Event Dispatch Thread.
 	 */
-	synchronized Throwable getThrowable()
+	final synchronized Throwable getThrowable()
 	{
 		return m_throwable;
 	}
@@ -116,7 +124,7 @@ public abstract class Task
 	 * Synchronized since the variable is accessed from 2 threads
 	 * Accessed by the AWT Event Dispatch Thread.
 	 */
-	public synchronized boolean isCompleted()
+	public final synchronized boolean isCompleted()
 	{
 		return m_completed;
 	}
