@@ -20,7 +20,7 @@
 <tr><td class="header-text" colspan="3">Foxtrot - Easy API for JFC/Swing - Documentation</td></tr>
 <tr><td colspan="3">
 <div align="center">
-<img src="images/acnvrule.gif"/>
+<img src="../images/acnvrule.gif"/>
 </div>
 </td></tr>
 
