@@ -323,7 +323,9 @@ public class FoxtrotTest extends FoxtrotTestCase
             sum *= 1000;
 
             long epsilon = 100;
-            if ((end - start) > sum + epsilon) fail();
+            long elapsed = end - start;
+            if (elapsed > sum + epsilon) fail();
+            if (elapsed < sum - epsilon) fail();
          }
       });
    }
