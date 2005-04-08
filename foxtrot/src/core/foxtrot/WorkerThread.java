@@ -10,7 +10,7 @@ package foxtrot;
 
 /**
  * Implementations of this interface run
- * {@link Task}s in a thread that is not the Event Dispatch Thread. <br>
+ * {@link Task}s in a thread that is not the Event Dispatch Thread. <br />
  * Implementations should extend {@link AbstractWorkerThread}.
  *
  * @version $Revision$
@@ -54,7 +54,8 @@ public interface WorkerThread
 
    /**
     * Runs the given Task. This method must be called by a thread that is not the
-    * Event Dispatch Thread.
+    * Event Dispatch Thread, and must execute the task in the same thread of the
+    * caller, synchronously.
     * @see #postTask
     */
    public void runTask(Task task);
