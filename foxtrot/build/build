@@ -4,9 +4,8 @@ if [ -z "$JAVA_HOME" ]; then
 fi
 
 CP=ant.jar;
-CP=$CP:optional.jar
-CP=$CP:jaxp.jar
-CP=$CP:crimson.jar
+CP=$CP:ant-launcher.jar
+CP=$CP:ant-junit.jar
 CP=$CP:../lib/junit.jar
 CP=$CP:$JAVA_HOME/lib/tools.jar
 
