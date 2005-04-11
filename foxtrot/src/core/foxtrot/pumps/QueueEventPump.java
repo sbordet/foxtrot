@@ -24,10 +24,9 @@ import foxtrot.Task;
 /**
  * Implementation of an EventPump that should work with JDK 1.2 and 1.3
  * and only uses the public API of the <code>java.awt.*</code> package.
- *
  * @version $Revision$
  */
-public class JDK13QueueEventPump implements EventPump, EventFilterable
+public class QueueEventPump implements EventPump, EventFilterable
 {
    private static final boolean debug = false;
 
@@ -49,7 +48,7 @@ public class JDK13QueueEventPump implements EventPump, EventFilterable
 
       EventQueue queue = getEventQueue();
 
-      if (debug) System.out.println("[JDK13QueueEventPump] Start pumping events - Pump is " + this + " - Task is " + task);
+      if (debug) System.out.println("[QueueEventPump] Start pumping events - Pump is " + this + " - Task is " + task);
 
       while (!task.isCompleted())
       {
@@ -57,11 +56,11 @@ public class JDK13QueueEventPump implements EventPump, EventFilterable
          {
             AWTEvent event = queue.getNextEvent();
 
-            if (debug) System.out.println("[JDK13QueueEventPump] AWT Event: " + event);
+            if (debug) System.out.println("[QueueEventPump] Next Event: " + event);
 
             if (filter != null && !filter.accept(event))
             {
-               if (debug) System.out.println("[JDK13QueueEventPump] AWT Event: " + event + " filtered out by filter " + filter);
+               if (debug) System.out.println("[QueueEventPump] Filtered out AWT Event: " + event + " by filter " + filter);
                continue;
             }
 
@@ -82,7 +81,7 @@ public class JDK13QueueEventPump implements EventPump, EventFilterable
          }
       }
 
-      if (debug) System.out.println("[JDK13QueueEventPump] Stop pumping events - Pump is " + this + " - Task is " + task);
+      if (debug) System.out.println("[QueueEventPump] Stop pumping events - Pump is " + this + " - Task is " + task);
    }
 
    /**
@@ -90,7 +89,7 @@ public class JDK13QueueEventPump implements EventPump, EventFilterable
     * @param queue The system EventQueue
     * @param event The event to dispatch
     */
-   protected void dispatchEvent(EventQueue queue, AWTEvent event)
+   private void dispatchEvent(EventQueue queue, AWTEvent event)
    {
       Object source = event.getSource();
 
@@ -101,7 +100,7 @@ public class JDK13QueueEventPump implements EventPump, EventFilterable
       else if (source instanceof MenuComponent)
          ((MenuComponent)source).dispatchEvent(event);
       else
-         System.err.println("[JDK13QueueEventPump] Unable to dispatch event " + event);
+         System.err.println("[QueueEventPump] Unable to dispatch event " + event);
    }
 
    /**
@@ -109,7 +108,7 @@ public class JDK13QueueEventPump implements EventPump, EventFilterable
     * If the system property <code>sun.awt.exception.handler</code> is defined,
     * that handler will be used, otherwise it simply logs on <code>System.err</code>.
     */
-   protected void handleThrowable(Throwable x)
+   private void handleThrowable(Throwable x)
    {
       String handlerName = (String)AccessController.doPrivileged(new PrivilegedAction()
       {
@@ -130,12 +129,12 @@ public class JDK13QueueEventPump implements EventPump, EventFilterable
          }
          catch (Throwable ignored)
          {
-            System.err.println("[JDK13QueueEventPump] Exception occurred while invoking AWT exception handler: " + ignored);
+            System.err.println("[QueueEventPump] Exception occurred while invoking AWT exception handler: " + ignored);
             // Fall through
          }
       }
 
-      System.err.println("[JDK13QueueEventPump] Exception occurred during event dispatching:");
+      System.err.println("[QueueEventPump] Exception occurred during event dispatching:");
       x.printStackTrace();
    }
 

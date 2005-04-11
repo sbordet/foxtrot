@@ -15,12 +15,15 @@ import java.security.PrivilegedExceptionAction;
 import java.util.LinkedList;
 
 /**
- * Specialized class for Sun's JDK 1.4.0
- *
+ * Specialized ConditionalEventPump for Sun's JDK 1.4.0.
+ * @deprecated This class implements a workaround for bug #4531693 that has been fixed
+ * in JDK 1.4.2 and backported to 1.4.1. Therefore it is recommended to upgrade to those
+ * fixed JDK versions, as the bug not only affects Foxtrot but also the usage of dialogs.
  * @version $Revision$
  */
 public class SunJDK140ConditionalEventPump extends SunJDK14ConditionalEventPump
 {
+   private static Class sequencedEventClass;
    private static Field listField;
 
    static
@@ -31,6 +34,8 @@ public class SunJDK140ConditionalEventPump extends SunJDK14ConditionalEventPump
          {
             public Object run() throws Exception
             {
+               ClassLoader loader = ClassLoader.getSystemClassLoader();
+               sequencedEventClass = loader.loadClass("java.awt.SequencedEvent");
                listField = sequencedEventClass.getDeclaredField("list");
                listField.setAccessible(true);
                return null;
@@ -39,23 +44,24 @@ public class SunJDK140ConditionalEventPump extends SunJDK14ConditionalEventPump
       }
       catch (Throwable x)
       {
+         if (debug) x.printStackTrace();
          throw new Error(x.toString());
       }
    }
 
-   protected Boolean canPumpSequencedEvent(AWTEvent event)
+   protected boolean canPumpEvent(AWTEvent event)
    {
       try
       {
          LinkedList list = (LinkedList)listField.get(event);
          synchronized (sequencedEventClass)
          {
-            if (list.getFirst() == event) return Boolean.TRUE;
+            if (list.getFirst() == event) return true;
          }
       }
       catch (Exception x)
       {
       }
-      return Boolean.FALSE;
+      return false;
    }
 }
