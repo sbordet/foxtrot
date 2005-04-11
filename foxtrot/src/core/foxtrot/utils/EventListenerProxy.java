@@ -53,14 +53,13 @@ import java.util.EventListener;
  *    }
  * }));
  * </pre>
- * <br>
  * Without using EventListenerProxy, when a user clicks on the apply button and immediately
- * after on the cancel button, it happens that apply's button listener is executed; in there
+ * after on the cancel button, it happens that apply's button listener is executed; in there,
  * usage of Foxtrot's Worker will dequeue and execute the event associated to the cancel
  * button click, that will - for example - dispose the dialog <strong>before</strong> the
- * apply operation is finished. <br>
+ * apply operation is finished. <br />
  * When using EventListenerProxy instead, the second event - the cancel button click - will
- * not be executed: the event will be processed without invoking the wrapped listener. <br>
+ * not be executed: the event will be processed without invoking the wrapped listener. <br />
  * The overhead in the code is to change plain listeners:
  * <pre>
  * button.addActionListener(new ActionListener() {...});
