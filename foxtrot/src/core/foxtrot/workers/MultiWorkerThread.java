@@ -15,23 +15,21 @@ import foxtrot.Task;
 
 /**
  * Full implementation of {@link foxtrot.WorkerThread} that uses one or more threads to run
- * {@link foxtrot.Task}s subclasses. <br>
- * Tasks execution is parallelized: two tasks posted at the same time are executed in parallel.
+ * {@link foxtrot.Task}s subclasses. <br />
+ * Tasks execution is parallelized: two tasks posted at the same time are executed in parallel
+ * by two different threads.
  * This is done by using a mechanism similar to a classic web server threading: one thread
  * waits for incoming tasks and a new thread is spawned to run the task.
  * This ensures that the {@link #postTask} method returns immediately in any case.
- *
  * @version $Revision$
  */
 public class MultiWorkerThread extends SingleWorkerThread
 {
-   private static int sequence = 0;
-
    private final List runners = new LinkedList();
 
    protected String getThreadName()
    {
-      return "Foxtrot Multi Worker Thread";
+      return "Foxtrot Multi Worker Thread Runner #" + nextSequence();
    }
 
    protected void run(final Task task)
@@ -44,7 +42,7 @@ public class MultiWorkerThread extends SingleWorkerThread
          {
             try
             {
-               synchronized (runners)
+               synchronized (MultiWorkerThread.this)
                {
                   runners.add(Thread.currentThread());
                }
@@ -53,13 +51,13 @@ public class MultiWorkerThread extends SingleWorkerThread
             }
             finally
             {
-               synchronized (runners)
+               synchronized (MultiWorkerThread.this)
                {
                   runners.remove(Thread.currentThread());
                }
             }
          }
-      }, getThreadName() + " Runner #" + nextSequence());
+      }, getThreadName());
       thread.setDaemon(true);
       thread.start();
       if (debug) System.out.println("Started WorkerThread " + thread);
@@ -67,14 +65,17 @@ public class MultiWorkerThread extends SingleWorkerThread
 
    public boolean isWorkerThread()
    {
-      synchronized (runners)
+      synchronized (this)
       {
          return runners.contains(Thread.currentThread());
       }
    }
-   
-   private static synchronized int nextSequence()
+
+   boolean hasPendingTasks()
    {
-      return ++sequence;
+      synchronized (this)
+      {
+         return super.hasPendingTasks() || runners.size() > 0;
+      }
    }
 }
