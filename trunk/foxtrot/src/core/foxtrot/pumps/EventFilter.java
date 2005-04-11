@@ -19,8 +19,11 @@ public interface EventFilter
 {
    /**
     * Callback called by {@link foxtrot.EventPump EventPump}s to filter the given AWT event.
+    * Implementations should return true if the event should be dispatched, false otherwise.
+    * Beware that installing an EventFilter in one of the synchronous Foxtrot workers, and
+    * returning always false from {@link #accept(AWTEvent)} makes the posts to the worker
+    * hang.
     * @param event The event to filter
-    * @return True if the event should be dispatched, false otherwise
     */
    public boolean accept(AWTEvent event);
 }

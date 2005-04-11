@@ -12,7 +12,7 @@ package foxtrot.pumps;
  * {@link foxtrot.EventPump EventPumps} that implement this interface have the possibility
  * to filter AWT events before they are dispatched.
  * It is possible to retrieve the current EventPump used by {@link foxtrot.Worker Worker} and
- * test if implements this interface; if so, a custom EventFilter may be provided. <br>
+ * test if implements this interface; if so, a custom EventFilter may be provided. <br />
  * Example usage:
  * <pre>
  * EventPump pump = Worker.getEventPump();
@@ -52,7 +52,6 @@ package foxtrot.pumps;
  *
  * Absolute care must be used when filtering AWT events, as your Swing application may not work properly
  * if AWT events are not dispatched properly.
- *
  * @version $Revision$
  */
 public interface EventFilterable
@@ -62,6 +61,7 @@ public interface EventFilterable
     * @see #getEventFilter
     */
    public void setEventFilter(EventFilter filter);
+
    /**
     * Returns the EventFilter
     * @see #setEventFilter

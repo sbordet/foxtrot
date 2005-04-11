@@ -14,12 +14,15 @@ import java.security.AccessController;
 import java.security.PrivilegedExceptionAction;
 
 /**
- * Specialized class for Sun's JDK 1.4.1
- *
+ * Specialized ConditionalEventPump for Sun's JDK 1.4.1.
+ * @deprecated This class implements a workaround for bug #4531693 that has been fixed
+ * in JDK 1.4.2 and backported to 1.4.1. Therefore it is recommended to upgrade to those
+ * fixed JDK versions, as the bug not only affects Foxtrot but also the usage of dialogs.
  * @version $Revision$
  */
 public class SunJDK141ConditionalEventPump extends SunJDK14ConditionalEventPump
 {
+   private static Class sequencedEventClass;
    private static Method getFirstMethod;
 
    static
@@ -30,6 +33,8 @@ public class SunJDK141ConditionalEventPump extends SunJDK14ConditionalEventPump
          {
             public Object run() throws Exception
             {
+               ClassLoader loader = ClassLoader.getSystemClassLoader();
+               sequencedEventClass = loader.loadClass("java.awt.SequencedEvent");
                getFirstMethod = sequencedEventClass.getDeclaredMethod("getFirst", new Class[0]);
                getFirstMethod.setAccessible(true);
                return null;
@@ -38,20 +43,21 @@ public class SunJDK141ConditionalEventPump extends SunJDK14ConditionalEventPump
       }
       catch (Throwable x)
       {
+         if (debug) x.printStackTrace();
          throw new Error(x.toString());
       }
    }
 
-   protected Boolean canPumpSequencedEvent(AWTEvent event)
+   protected boolean canPumpEvent(AWTEvent event)
    {
       try
       {
          Object first = getFirstMethod.invoke(event, null);
-         if (first == event) return Boolean.TRUE;
+         if (first == event) return true;
       }
       catch (Exception ignored)
       {
       }
-      return Boolean.FALSE;
+      return false;
    }
 }
