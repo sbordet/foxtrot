@@ -13,17 +13,18 @@ import foxtrot.Task;
 
 /**
  * Full implementation of {@link foxtrot.WorkerThread} that uses a single worker thread to run
- * {@link foxtrot.Task}s subclasses. <br>
+ * {@link foxtrot.Task}s subclasses. <br />
  * Tasks execution is serialized: tasks are enqueued and executed one after the other.
- *
  * @version $Revision$
  */
 public class SingleWorkerThread extends AbstractWorkerThread implements Runnable
 {
+   private static int sequence = 0;
    static final boolean debug = false;
 
    private Thread thread;
    private Link current;
+   private boolean pending;
 
    public void start()
    {
@@ -43,7 +44,12 @@ public class SingleWorkerThread extends AbstractWorkerThread implements Runnable
     */
    protected String getThreadName()
    {
-      return "Foxtrot Single Worker Thread";
+      return "Foxtrot Single Worker Thread #" + nextSequence();
+   }
+
+   static synchronized int nextSequence()
+   {
+      return ++sequence;
    }
 
    /**
@@ -120,10 +126,10 @@ public class SingleWorkerThread extends AbstractWorkerThread implements Runnable
          while (!hasTasks())
          {
             if (debug) System.out.println("[SingleWorkerThread] Task queue empty, waiting for tasks");
-
+            pending = false;
             wait();
          }
-
+         pending = true;
          // Taking the current task, removing it from the queue
          Task t = current.task;
          current = current.next;
@@ -136,6 +142,14 @@ public class SingleWorkerThread extends AbstractWorkerThread implements Runnable
       synchronized (this)
       {
          return current != null;
+      }
+   }
+
+   boolean hasPendingTasks()
+   {
+      synchronized (this)
+      {
+         return pending;
       }
    }
 
