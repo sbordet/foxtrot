@@ -23,8 +23,6 @@ import foxtrot.Task;
 import foxtrot.Worker;
 
 /**
- * Tests for the basic Foxtrot functionality.
- *
  * @version $Revision$
  */
 public class WorkerTest extends FoxtrotTestCase
@@ -36,7 +34,7 @@ public class WorkerTest extends FoxtrotTestCase
 
    public void testThreads() throws Exception
    {
-      invokeTest(new Runnable()
+      invokeTest(Worker.getWorkerThread(), new Runnable()
       {
          public void run()
          {
@@ -54,12 +52,12 @@ public class WorkerTest extends FoxtrotTestCase
                }
             });
          }
-      });
+      }, null);
    }
 
    public void testBlocking() throws Exception
    {
-      invokeTest(new Runnable()
+      invokeTest(Worker.getWorkerThread(), new Runnable()
       {
          public void run()
          {
@@ -81,12 +79,12 @@ public class WorkerTest extends FoxtrotTestCase
 
             if (elapsed < sleep) fail("Worker.post() does not block");
          }
-      });
+      }, null);
    }
 
    public void testDequeuing() throws Exception
    {
-      invokeTest(new Runnable()
+      invokeTest(Worker.getWorkerThread(), new Runnable()
       {
          public void run()
          {
@@ -119,12 +117,12 @@ public class WorkerTest extends FoxtrotTestCase
             // Check that the event posted with invokeLater has been dequeued
             if (check.get() != 1) fail("Event has not been dequeued");
          }
-      });
+      }, null);
    }
 
    public void testTaskException() throws Exception
    {
-      invokeTest(new Runnable()
+      invokeTest(Worker.getWorkerThread(), new Runnable()
       {
          public void run()
          {
@@ -146,12 +144,12 @@ public class WorkerTest extends FoxtrotTestCase
                fail();
             }
          }
-      });
+      }, null);
    }
 
    public void testTaskError() throws Exception
    {
-      invokeTest(new Runnable()
+      invokeTest(Worker.getWorkerThread(), new Runnable()
       {
          public void run()
          {
@@ -173,12 +171,12 @@ public class WorkerTest extends FoxtrotTestCase
                fail();
             }
          }
-      });
+      }, null);
    }
 
    public void testAWTException() throws Exception
    {
-      invokeTest(new Runnable()
+      invokeTest(Worker.getWorkerThread(), new Runnable()
       {
          public void run()
          {
@@ -206,12 +204,12 @@ public class WorkerTest extends FoxtrotTestCase
             long elapsed = end - start;
             if (elapsed < sleep) fail("Worker.post() does not block in case of AWT exception: expected " + sleep + ", waited " + elapsed);
          }
-      });
+      }, null);
    }
 
    public void testAWTError() throws Exception
    {
-      invokeTest(new Runnable()
+      invokeTest(Worker.getWorkerThread(), new Runnable()
       {
          public void run()
          {
@@ -239,12 +237,12 @@ public class WorkerTest extends FoxtrotTestCase
             long elapsed = end - start;
             if (elapsed < sleep) fail("Worker.post() does not block in case of AWT error: expected " + sleep + ", waited " + elapsed);
          }
-      });
+      }, null);
    }
 
    public void testPostFromTask() throws Exception
    {
-      invokeTest(new Runnable()
+      invokeTest(Worker.getWorkerThread(), new Runnable()
       {
          public void run()
          {
@@ -278,12 +276,12 @@ public class WorkerTest extends FoxtrotTestCase
 
             if (counter.get() != 3) fail();
          }
-      });
+      }, null);
    }
 
    public void testTaskReuse() throws Exception
    {
-      invokeTest(new Runnable()
+      invokeTest(Worker.getWorkerThread(), new Runnable()
       {
          public void run()
          {
@@ -306,12 +304,12 @@ public class WorkerTest extends FoxtrotTestCase
 
             if (count.get() != times) fail("Task is not reused");
          }
-      });
+      }, null);
    }
 
    public void testPostFromInvokeLater() throws Exception
    {
-      invokeTest(new Runnable()
+      invokeTest(Worker.getWorkerThread(), new Runnable()
       {
          public void run()
          {
@@ -334,7 +332,7 @@ public class WorkerTest extends FoxtrotTestCase
             if (elapsed > sum + epsilon) fail("Elapsed time is: " + elapsed + ", expected time is: " + sum);
             if (elapsed < sum - epsilon) fail("Elapsed time is: " + elapsed + ", expected time is: " + sum);
          }
-      });
+      }, null);
    }
 
    private void postFromInvokeLater(final MutableInteger counter, final int maxDeep)
@@ -387,7 +385,7 @@ public class WorkerTest extends FoxtrotTestCase
 
    public void testTaskQueueing() throws Exception
    {
-      invokeTest(new Runnable()
+      invokeTest(Worker.getWorkerThread(), new Runnable()
       {
          public void run()
          {
@@ -433,12 +431,12 @@ public class WorkerTest extends FoxtrotTestCase
 
             assertEquals(count, counter.get());
          }
-      });
+      }, null);
    }
 
    public void testPerformance() throws Exception
    {
-      invokeTest(new Runnable()
+      invokeTest(Worker.getWorkerThread(), new Runnable()
       {
          public void run()
          {
@@ -491,12 +489,12 @@ public class WorkerTest extends FoxtrotTestCase
             int perthousand = 1;
             if ((workerElapsed - plainElapsed) * 1000 > plainElapsed * perthousand) fail();
          }
-      });
+      }, null);
    }
 
    public void testPumpSequencedEvents() throws Exception
    {
-      invokeTest(new Runnable()
+      invokeTest(Worker.getWorkerThread(), new Runnable()
       {
          public void run()
          {
@@ -533,12 +531,12 @@ public class WorkerTest extends FoxtrotTestCase
             // Verify that the event has been pumped
             if (pumped.get() != 1) fail();
          }
-      });
+      }, null);
    }
 
    public void testMemoryLeaks() throws Exception
    {
-      invokeTest(new Runnable()
+      invokeTest(Worker.getWorkerThread(), new Runnable()
       {
          public void run()
          {
@@ -570,7 +568,7 @@ public class WorkerTest extends FoxtrotTestCase
 
             if (j < times) fail();
          }
-      });
+      }, null);
    }
 
    private static class FatJob extends Job

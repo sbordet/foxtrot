@@ -1,10 +1,17 @@
+/**
+ * Copyright (c) 2002-2005, Simone Bordet
+ * All rights reserved.
+ *
+ * This software is distributable under the BSD license.
+ * See the terms of the BSD license in the documentation provided with this software.
+ */
+
 package foxtrot.test;
 
 import foxtrot.workers.MultiWorkerThread;
 import foxtrot.Job;
 
 /**
- *
  * @version $Revision$
  */
 public class MultiWorkerThreadTest extends FoxtrotTestCase
@@ -16,19 +23,19 @@ public class MultiWorkerThreadTest extends FoxtrotTestCase
 
    public void testThreads() throws Exception
    {
-      invokeTest(new Runnable()
+      final MutableHolder thread = new MutableHolder(null);
+      final MultiWorkerThread worker = new MultiWorkerThread()
       {
          public void run()
          {
-            final MutableHolder thread = new MutableHolder(null);
-            MultiWorkerThread worker = new MultiWorkerThread()
-            {
-               public void run()
-               {
-                  thread.set(Thread.currentThread());
-                  super.run();
-               }
-            };
+            thread.set(Thread.currentThread());
+            super.run();
+         }
+      };
+      invokeTest(worker, new Runnable()
+      {
+         public void run()
+         {
             worker.start();
 
             final MutableHolder runner = new MutableHolder(null);
@@ -44,20 +51,17 @@ public class MultiWorkerThreadTest extends FoxtrotTestCase
             sleep(1000);
 
             if (thread.get() == runner.get()) fail();
-            String threadName = ((Thread)thread.get()).getName();
-            String runnerName = ((Thread)runner.get()).getName();
-            if (!runnerName.startsWith(threadName) || runnerName.equals(threadName)) fail();
          }
-      });
+      }, null);
    }
 
    public void testLongBeforeShort() throws Exception
    {
-      invokeTest(new Runnable()
+      final MultiWorkerThread worker = new MultiWorkerThread();
+      invokeTest(worker, new Runnable()
       {
          public void run()
          {
-            MultiWorkerThread worker = new MultiWorkerThread();
             worker.start();
 
             // A long Task followed by a short one.
@@ -97,6 +101,6 @@ public class MultiWorkerThreadTest extends FoxtrotTestCase
             sleep(longDelay);
             if (longer.get() != 2) fail();
          }
-      });
+      }, null);
    }
 }
