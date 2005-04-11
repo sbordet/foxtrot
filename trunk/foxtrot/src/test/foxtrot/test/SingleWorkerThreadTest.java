@@ -1,10 +1,17 @@
+/**
+ * Copyright (c) 2002-2005, Simone Bordet
+ * All rights reserved.
+ *
+ * This software is distributable under the BSD license.
+ * See the terms of the BSD license in the documentation provided with this software.
+ */
+
 package foxtrot.test;
 
 import foxtrot.workers.SingleWorkerThread;
 import foxtrot.Task;
 
 /**
- *
  * @version $Revision$
  */
 public class SingleWorkerThreadTest extends FoxtrotTestCase
@@ -24,7 +31,7 @@ public class SingleWorkerThreadTest extends FoxtrotTestCase
 
    public void testStart() throws Exception
    {
-      invokeTest(new Runnable()
+      invokeTest(null, new Runnable()
       {
          public void run()
          {
@@ -33,12 +40,12 @@ public class SingleWorkerThreadTest extends FoxtrotTestCase
             worker.start();
             if (!worker.isAlive()) fail();
          }
-      });
+      }, null);
    }
 
    public void testStop() throws Exception
    {
-      invokeTest(new Runnable()
+      invokeTest(null, new Runnable()
       {
          public void run()
          {
@@ -47,12 +54,12 @@ public class SingleWorkerThreadTest extends FoxtrotTestCase
             worker.stop();
             if (worker.isAlive()) fail();
          }
-      });
+      }, null);
    }
 
    public void testStartStopStart() throws Exception
    {
-      invokeTest(new Runnable()
+      invokeTest(null, new Runnable()
       {
          public void run()
          {
@@ -62,24 +69,24 @@ public class SingleWorkerThreadTest extends FoxtrotTestCase
             worker.start();
             if (!worker.isAlive()) fail();
          }
-      });
+      }, null);
    }
 
    public void testStopBeforeStart() throws Exception
    {
-      invokeTest(new Runnable()
+      invokeTest(null, new Runnable()
       {
          public void run()
          {
             TestSingleWorkerThread worker = new TestSingleWorkerThread();
             worker.stop();
          }
-      });
+      }, null);
    }
 
    public void testStartStart() throws Exception
    {
-      invokeTest(new Runnable()
+      invokeTest(null, new Runnable()
       {
          public void run()
          {
@@ -99,16 +106,16 @@ public class SingleWorkerThreadTest extends FoxtrotTestCase
             sleep(500);
             if (foxtrot != thread.get()) fail();
          }
-      });
+      }, null);
    }
 
    public void testNoStartAllowsPost() throws Exception
    {
-      invokeTest(new Runnable()
+      final TestSingleWorkerThread worker = new TestSingleWorkerThread();
+      invokeTest(worker, new Runnable()
       {
          public void run()
          {
-            TestSingleWorkerThread worker = new TestSingleWorkerThread();
             final MutableInteger pass = new MutableInteger(0);
             worker.postTask(new Task()
             {
@@ -121,16 +128,16 @@ public class SingleWorkerThreadTest extends FoxtrotTestCase
             sleep(500);
             if (pass.get() != 1) fail();
          }
-      });
+      }, null);
    }
 
    public void testPost() throws Exception
    {
-      invokeTest(new Runnable()
+      final TestSingleWorkerThread worker = new TestSingleWorkerThread();
+      invokeTest(worker, new Runnable()
       {
          public void run()
          {
-            TestSingleWorkerThread worker = new TestSingleWorkerThread();
             worker.start();
             final MutableInteger pass = new MutableInteger(0);
             worker.postTask(new Task()
@@ -144,16 +151,16 @@ public class SingleWorkerThreadTest extends FoxtrotTestCase
             sleep(500);
             if (pass.get() != 1) fail();
          }
-      });
+      }, null);
    }
 
    public void testManyPosts() throws Exception
    {
-      invokeTest(new Runnable()
+      final TestSingleWorkerThread worker = new TestSingleWorkerThread();
+      invokeTest(worker, new Runnable()
       {
          public void run()
          {
-            TestSingleWorkerThread worker = new TestSingleWorkerThread();
             worker.start();
             worker.postTask(new Task()
             {
@@ -183,16 +190,16 @@ public class SingleWorkerThreadTest extends FoxtrotTestCase
             sleep(1000);
             if (pass.get() != 2) fail();
          }
-      });
+      }, null);
    }
 
    public void testTaskIsExecutedAfterIgnoredInterruptInTask() throws Exception
    {
-      invokeTest(new Runnable()
+      final TestSingleWorkerThread worker = new TestSingleWorkerThread();
+      invokeTest(worker, new Runnable()
       {
          public void run()
          {
-            TestSingleWorkerThread worker = new TestSingleWorkerThread();
             final MutableHolder thread = new MutableHolder(null);
             final MutableInteger pass = new MutableInteger(0);
             worker.postTask(new Task()
@@ -238,16 +245,16 @@ public class SingleWorkerThreadTest extends FoxtrotTestCase
             if (thread.get() != foxtrot) fail();
             if (pass.get() != 2) fail();
          }
-      });
+      }, null);
    }
 
    public void testTaskIsExecutedAfterNotIgnoredInterruptInTask() throws Exception
    {
-      invokeTest(new Runnable()
+      final TestSingleWorkerThread worker = new TestSingleWorkerThread();
+      invokeTest(worker, new Runnable()
       {
          public void run()
          {
-            TestSingleWorkerThread worker = new TestSingleWorkerThread();
             final MutableHolder thread = new MutableHolder(null);
             final MutableInteger pass = new MutableInteger(0);
             worker.postTask(new Task()
@@ -294,16 +301,16 @@ public class SingleWorkerThreadTest extends FoxtrotTestCase
             if (thread.get() == foxtrot) fail();
             if (pass.get() != 2) fail();
          }
-      });
+      }, null);
    }
 
    public void testTaskIsExecutedAfterInterruptInTask() throws Exception
    {
-      invokeTest(new Runnable()
+      final TestSingleWorkerThread worker = new TestSingleWorkerThread();
+      invokeTest(worker, new Runnable()
       {
          public void run()
          {
-            TestSingleWorkerThread worker = new TestSingleWorkerThread();
             final MutableHolder thread = new MutableHolder(null);
             final MutableInteger pass = new MutableInteger(0);
             worker.postTask(new Task()
@@ -338,16 +345,16 @@ public class SingleWorkerThreadTest extends FoxtrotTestCase
             if (thread.get() == foxtrot) fail();
             if (pass.get() != 1) fail();
          }
-      });
+      }, null);
    }
 
    public void testPendingTasksAreExecutedAfterRestart() throws Exception
    {
-      invokeTest(new Runnable()
+      final TestSingleWorkerThread worker = new TestSingleWorkerThread();
+      invokeTest(worker, new Runnable()
       {
          public void run()
          {
-            TestSingleWorkerThread worker = new TestSingleWorkerThread();
             worker.start();
             worker.postTask(new Task()
             {
@@ -375,6 +382,6 @@ public class SingleWorkerThreadTest extends FoxtrotTestCase
             sleep(500);
             if (pass.get() != 1) fail();
          }
-      });
+      }, null);
    }
 }

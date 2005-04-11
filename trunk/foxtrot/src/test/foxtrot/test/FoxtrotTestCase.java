@@ -8,12 +8,13 @@
 
 package foxtrot.test;
 
+import java.lang.reflect.Method;
+
 import javax.swing.SwingUtilities;
 
 import junit.framework.TestCase;
-import foxtrot.Worker;
-import foxtrot.Job;
 import foxtrot.WorkerThread;
+import foxtrot.workers.SingleWorkerThread;
 
 /**
  * Base class for Foxtrot tests
@@ -22,6 +23,8 @@ import foxtrot.WorkerThread;
  */
 public class FoxtrotTestCase extends TestCase
 {
+   protected boolean debug = false;
+
    protected FoxtrotTestCase(String s)
    {
       super(s);
@@ -33,7 +36,7 @@ public class FoxtrotTestCase extends TestCase
     * This is necessary since tests are run in the "main" thread by JUnit and instead
     * we have to start them from the AWT Event Dispatch Thread.
     */
-   protected void invokeTest(final Runnable run) throws Exception
+   protected void invokeTest(final WorkerThread workerThread, final Runnable test, final Runnable callback) throws Exception
    {
       if (SwingUtilities.isEventDispatchThread()) fail("Tests cannot be invoked from the Event Dispatch Thread");
 
@@ -64,10 +67,11 @@ public class FoxtrotTestCase extends TestCase
                }
             }
 
+            if (debug) System.out.println("Running test " + this);
             // Run the test and collect exception thrown
             try
             {
-               run.run();
+               test.run();
             }
             catch (Throwable x)
             {
@@ -77,33 +81,33 @@ public class FoxtrotTestCase extends TestCase
                }
             }
 
-            // Here the test should be finished.
+            if (debug) System.out.println("Test method completed, waiting for test completion for " + this);
+            // Here the test method has returned.
             // However, there may be tasks pending in both the WorkerThread queue
             // and in EventQueue, so here I guarantee that those pending will be
             // executed before starting the next test
+            try
+            {
+               while (hasPendingTasks(workerThread))
+               {
+                  if (debug) System.out.println("Pending tasks for test " + this);
+                  sleep(100);
+               }
+            }
+            catch (Exception x)
+            {
+               throwable.set(x);
+            }
+            if (debug) System.out.println("No more tasks running for test " + this);
             SwingUtilities.invokeLater(new Runnable()
             {
                public void run()
                {
-                  WorkerThread workerThread = Worker.getWorkerThread();
-                  workerThread.postTask(new Job()
+                  synchronized (lock)
                   {
-                     public Object run()
-                     {
-                        SwingUtilities.invokeLater(new Runnable()
-                        {
-                           public void run()
-                           {
-                              synchronized (lock)
-                              {
-                                 barrier.set(0);
-                                 lock.notifyAll();
-                              }
-                           }
-                        });
-                        return null;
-                     }
-                  });
+                     barrier.set(0);
+                     lock.notifyAll();
+                  }
                }
             });
          }
@@ -111,16 +115,33 @@ public class FoxtrotTestCase extends TestCase
 
       // The call above returns immediately.
       // Here we wait for the test to be finished.
+      if (debug) System.out.println("Test " + this + " launched");
       synchronized (lock)
       {
          barrier.set(1);
          lock.notifyAll();
 
          while (barrier.get() > 0) lock.wait();
+      }
 
-         Throwable t = (Throwable)throwable.get();
-         if (t instanceof Error) throw (Error)t;
-         if (t instanceof Exception) throw (Exception)t;
+      if (debug) System.out.println("Test " + this + " consumed all AWT events");
+
+      try
+      {
+         // Here the test is really finished
+         if (callback != null) callback.run();
+
+         synchronized (lock)
+         {
+            Throwable t = (Throwable)throwable.get();
+            if (t instanceof Error) throw (Error)t;
+            if (t instanceof Exception) throw (Exception)t;
+         }
+      }
+      finally
+      {
+         if (debug) System.out.println("Test " + this + " completed");
+         if (debug) System.out.println();
       }
    }
 
@@ -140,36 +161,6 @@ public class FoxtrotTestCase extends TestCase
       return loadClass("java.awt.SequencedEvent") != null;
    }
 
-   protected boolean isJRE140()
-   {
-      Class cls = loadClass("java.awt.SequencedEvent");
-      if (cls == null) return false;
-      try
-      {
-         cls.getDeclaredMethod("getFirst", null);
-         return false;
-      }
-      catch (NoSuchMethodException x)
-      {
-      }
-      return true;
-   }
-
-   protected boolean isJRE141()
-   {
-      Class cls = loadClass("java.awt.SequencedEvent");
-      if (cls == null) return false;
-      try
-      {
-         cls.getDeclaredMethod("getFirst", null);
-         return true;
-      }
-      catch (NoSuchMethodException x)
-      {
-      }
-      return false;
-   }
-
    private Class loadClass(String className)
    {
       // We ask directly to the boot classloader
@@ -181,5 +172,18 @@ public class FoxtrotTestCase extends TestCase
       {
       }
       return null;
+   }
+
+   private boolean hasPendingTasks(WorkerThread workerThread) throws Exception
+   {
+      if (workerThread == null) return false;
+      if (workerThread instanceof SingleWorkerThread)
+      {
+         Method hasPendingTasks = SingleWorkerThread.class.getDeclaredMethod("hasPendingTasks", null);
+         hasPendingTasks.setAccessible(true);
+         Boolean result = (Boolean)hasPendingTasks.invoke(workerThread, null);
+         return result.booleanValue();
+      }
+      throw new IllegalArgumentException("Invalid WorkerThread " + workerThread);
    }
 }

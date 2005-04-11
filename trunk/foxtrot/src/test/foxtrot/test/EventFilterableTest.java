@@ -19,7 +19,6 @@ import foxtrot.pumps.EventFilter;
 import foxtrot.pumps.EventFilterable;
 
 /**
- *
  * @version $Revision$
  */
 public class EventFilterableTest extends FoxtrotTestCase
@@ -31,7 +30,7 @@ public class EventFilterableTest extends FoxtrotTestCase
 
    public void testEventNotFiltered() throws Exception
    {
-       invokeTest(new Runnable()
+       invokeTest(Worker.getWorkerThread(), new Runnable()
        {
           public void run()
           {
@@ -96,12 +95,12 @@ public class EventFilterableTest extends FoxtrotTestCase
              // Should not have been called again
              if (check.get() != null) fail();
           }
-       });
+       }, null);
    }
 
    public void testEventFiltered() throws Exception
    {
-       invokeTest(new Runnable()
+       invokeTest(Worker.getWorkerThread(), new Runnable()
        {
           public void run()
           {
@@ -128,8 +127,9 @@ public class EventFilterableTest extends FoxtrotTestCase
                    {
                       public boolean accept(AWTEvent event)
                       {
+                         boolean result = check.get() != null;
                          check.set(Boolean.FALSE);
-                         return false;
+                         return result;
                       }
                    });
                 }
@@ -166,6 +166,6 @@ public class EventFilterableTest extends FoxtrotTestCase
              // Should not have been called again
              if (check.get() != null) fail();
           }
-       });
+       }, null);
    }
 }

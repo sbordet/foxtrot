@@ -9,8 +9,6 @@
 package foxtrot.test;
 
 /**
- * A mutable Integer, useful for tests.
- *
  * @version $Revision$
  */
 public class MutableInteger implements Comparable

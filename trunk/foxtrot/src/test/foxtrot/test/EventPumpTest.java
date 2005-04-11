@@ -14,13 +14,10 @@ import javax.swing.SwingUtilities;
 
 import foxtrot.EventPump;
 import foxtrot.Task;
-import foxtrot.pumps.JDK13QueueEventPump;
-import foxtrot.pumps.SunJDK140ConditionalEventPump;
-import foxtrot.pumps.SunJDK141ConditionalEventPump;
+import foxtrot.pumps.QueueEventPump;
+import foxtrot.pumps.SunJDK14ConditionalEventPump;
 
 /**
- * Tests for EventPumps.
- *
  * @version $Revision$
  */
 public class EventPumpTest extends FoxtrotTestCase
@@ -34,25 +31,16 @@ public class EventPumpTest extends FoxtrotTestCase
    {
       if (!isJRE14())
       {
-         JDK13QueueEventPump pump = new JDK13QueueEventPump();
+         QueueEventPump pump = new QueueEventPump();
          testEventPump(pump);
       }
    }
 
-   public void testSunJDK140ConditionalEventPump() throws Exception
+   public void testSunJDK14ConditionalEventPump() throws Exception
    {
-      if (isJRE140() && !isJRE141())
+      if (isJRE14())
       {
-         SunJDK140ConditionalEventPump pump = new SunJDK140ConditionalEventPump();
-         testEventPump(pump);
-      }
-   }
-
-   public void testSunJDK141ConditionalEventPump() throws Exception
-   {
-      if (!isJRE140() && isJRE141())
-      {
-         SunJDK141ConditionalEventPump pump = new SunJDK141ConditionalEventPump();
+         SunJDK14ConditionalEventPump pump = new SunJDK14ConditionalEventPump();
          testEventPump(pump);
       }
    }
@@ -70,7 +58,7 @@ public class EventPumpTest extends FoxtrotTestCase
     */
    private void testPumpEventsBlocks(final EventPump pump) throws Exception
    {
-      invokeTest(new Runnable()
+      invokeTest(null, new Runnable()
       {
          public void run()
          {
@@ -102,7 +90,7 @@ public class EventPumpTest extends FoxtrotTestCase
             long elapsed = stop - start;
             if (elapsed <= delay) fail("Blocking is not effective: expecting " + delay + ", blocked for only " + elapsed);
          }
-      });
+      }, null);
    }
 
    /**
@@ -110,7 +98,7 @@ public class EventPumpTest extends FoxtrotTestCase
     */
    private void testPumpEventsDequeues(final EventPump pump) throws Exception
    {
-      invokeTest(new Runnable()
+      invokeTest(null, new Runnable()
       {
          public void run()
          {
@@ -147,7 +135,7 @@ public class EventPumpTest extends FoxtrotTestCase
 
             if (count.get() != value) fail("Event pump does not dequeue events");
          }
-      });
+      }, null);
    }
 
    /**
@@ -155,7 +143,7 @@ public class EventPumpTest extends FoxtrotTestCase
     */
    private void tesPumpEventsOnThrowException(final EventPump pump) throws Exception
    {
-      invokeTest(new Runnable()
+      invokeTest(null, new Runnable()
       {
          public void run()
          {
@@ -201,7 +189,7 @@ public class EventPumpTest extends FoxtrotTestCase
                fail("Event pump must not throw runtime exceptions thrown by events");
             }
          }
-      });
+      }, null);
    }
 
    /**
@@ -209,7 +197,7 @@ public class EventPumpTest extends FoxtrotTestCase
     */
    private void tesPumpEventsOnThrowError(final EventPump pump) throws Exception
    {
-      invokeTest(new Runnable()
+      invokeTest(null, new Runnable()
       {
          public void run()
          {
@@ -255,7 +243,7 @@ public class EventPumpTest extends FoxtrotTestCase
                fail("Event pump must not throw errors thrown by events");
             }
          }
-      });
+      }, null);
    }
 
    private void setTaskCompleted(Task task)
