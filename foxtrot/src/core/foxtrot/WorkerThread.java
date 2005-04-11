@@ -12,7 +12,6 @@ package foxtrot;
  * Implementations of this interface run
  * {@link Task}s in a thread that is not the Event Dispatch Thread. <br />
  * Implementations should extend {@link AbstractWorkerThread}.
- *
  * @version $Revision$
  */
 public interface WorkerThread

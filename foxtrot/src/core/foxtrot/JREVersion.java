@@ -13,16 +13,19 @@ import java.security.PrivilegedAction;
 
 /**
  * Helper class that returns which is the current JRE version
- *
  * @version $Revision$
  */
 class JREVersion
 {
    private static Boolean jre141;
    private static Boolean jre140;
+   private static Boolean jre14;
    private static Boolean jre13;
    private static Boolean jre12;
 
+   /**
+    * @deprecated
+    */
    static boolean isJRE141()
    {
       if (jre141 == null)
@@ -34,6 +37,9 @@ class JREVersion
       return jre141.booleanValue();
    }
 
+   /**
+    * @deprecated
+    */
    static boolean isJRE140()
    {
       if (jre140 == null)
@@ -43,6 +49,12 @@ class JREVersion
          else jre140 = hasGetFirst(cls).booleanValue() ? Boolean.FALSE : Boolean.TRUE;
       }
       return jre140.booleanValue();
+   }
+
+   static boolean isJRE14()
+   {
+      if (jre14 == null) jre14 = loadClass("java.util.logging.Logger") == null ? Boolean.FALSE : Boolean.TRUE;
+      return jre14.booleanValue();
    }
 
    static boolean isJRE13()
