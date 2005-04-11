@@ -15,7 +15,6 @@ import java.io.InterruptedIOException;
 
 /**
  * Partial implementation of the WorkerThread interface.
- *
  * @version $Revision$
  */
 public abstract class AbstractWorkerThread implements WorkerThread
@@ -29,7 +28,7 @@ public abstract class AbstractWorkerThread implements WorkerThread
 
    public void runTask(final Task task)
    {
-      if (Worker.debug) System.out.println("[AbstractWorkerThread] Executing task " + task);
+      if (AbstractWorker.debug) System.out.println("[AbstractWorkerThread] Executing task " + task);
 
       try
       {
@@ -58,7 +57,7 @@ public abstract class AbstractWorkerThread implements WorkerThread
          // Mark the task as completed
          task.setCompleted(true);
 
-         if (Worker.debug) System.out.println("[AbstractWorkerThread] Completing run for task " + task);
+         if (AbstractWorker.debug) System.out.println("[AbstractWorkerThread] Completing run for task " + task);
          task.postRun();
       }
    }

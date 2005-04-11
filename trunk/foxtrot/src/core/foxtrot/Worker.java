@@ -36,14 +36,12 @@ import foxtrot.workers.SingleWorkerThread;
  *    }
  * });
  * </pre>
- *
  * While normally not necessary, it is possible to customize the two core components of this
- * class, the {@link EventPump} and the {@link WorkerThread} via the corrispondent setter 
+ * class, the {@link EventPump} and the {@link WorkerThread} via the corrispondent setter
  * methods. <br />
  * This class uses by default a WorkerThread that enqueues Tasks; Tasks will be executed one
- * after the other. This is the behavior needed by most applications that want to rely on a 
+ * after the other. This is the behavior needed by most applications that want to rely on a
  * synchronous model. For an alternative behavior, see {@link ConcurrentWorker}
- *
  * @version $Revision$
  */
 public class Worker extends AbstractSyncWorker
@@ -88,7 +86,7 @@ public class Worker extends AbstractSyncWorker
    /**
     * Returns the EventPump used to pump events from the AWT Event Queue. <br />
     * If no calls to {@link #setEventPump} have been made a default pump is returned;
-    * this default pump is obtained by instantiating the suitable pump for the 
+    * this default pump is obtained by instantiating the suitable pump for the
     * Java version that is running the code.
     * @see #setEventPump
     */
@@ -114,12 +112,12 @@ public class Worker extends AbstractSyncWorker
    /**
     * Enqueues the given Task to be executed by the WorkerThread, while dequeueing
     * AWT events. <br />
-    * If this method is called from the Event Dispatch Thread, it blocks until the task 
+    * If this method is called from the Event Dispatch Thread, it blocks until the task
     * has been executed, either by finishing normally or throwing an exception. <br />
-    * If this method is called from a worker thread, it executes the new Task 
+    * If this method is called from a worker thread, it executes the new Task
     * immediately in the same thread and then returns the control to the calling Task. <br />
-    * While Tasks are executed, AWT events are dequeued from the AWT Event Queue; 
-    * even in case of AWT events that throw RuntimeExceptions or Errors, this method will 
+    * While Tasks are executed, AWT events are dequeued from the AWT Event Queue;
+    * even in case of AWT events that throw RuntimeExceptions or Errors, this method will
     * not return until the first Task (posted from the Event Dispatch Thread) is finished.
     * @throws IllegalStateException if is not called from the Event Dispatch Thread nor
     * from a worker thread.

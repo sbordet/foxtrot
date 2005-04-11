@@ -14,7 +14,7 @@ import java.security.AccessController;
 import javax.swing.SwingUtilities;
 
 /**
- * A time-consuming task to be executed in the Worker Thread that may throw checked exceptions. <br>
+ * A time-consuming task to be executed in the Worker Thread that may throw checked exceptions. <br />
  * Users must implement the {@link #run} method with the time-consuming code, and not worry about
  * exceptions, for example:
  * <pre>
@@ -28,9 +28,9 @@ import javax.swing.SwingUtilities;
  * };
  * </pre>
  * Exceptions and Errors thrown by the <code>run()</code> method will be rethrown automatically by
- * {@link Worker#post(Task) Worker.post(Task task)}.
- *
+ * {@link Worker#post(Task)} or by {@link ConcurrentWorker#post(Task)}
  * @see Worker
+ * @see ConcurrentWorker
  * @version $Revision$
  */
 public abstract class Task
@@ -60,7 +60,6 @@ public abstract class Task
     * If an exception or an error is thrown by {@link #run}, it is rethrown here.
     * Synchronized since the variables are accessed from 2 threads
     * Accessed from the AWT Event Dispatch Thread.
-    * Package protected, used by Worker
     * @see #setResult
     * @see #setThrowable
     */
@@ -187,7 +186,7 @@ public abstract class Task
       {
          public final void run()
          {
-            if (Worker.debug) System.out.println("[Task] Run completed for task " + Task.this);
+            if (AbstractWorker.debug) System.out.println("[Task] Run completed for task " + Task.this);
          }
       });
    }
