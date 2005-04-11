@@ -10,9 +10,9 @@ package foxtrot;
 
 import javax.swing.SwingUtilities;
 
-import foxtrot.pumps.JDK13QueueEventPump;
-import foxtrot.pumps.SunJDK140ConditionalEventPump;
-import foxtrot.pumps.SunJDK141ConditionalEventPump;
+import foxtrot.pumps.ConditionalEventPump;
+import foxtrot.pumps.QueueEventPump;
+import foxtrot.pumps.SunJDK14ConditionalEventPump;
 
 /**
  * Base class for Foxtrot workers that have synchronous behavior.
@@ -29,21 +29,22 @@ abstract class AbstractSyncWorker extends AbstractWorker
    /**
     * Returns the EventPump for this worker, creating it if not already set. <br />
     * Uses a C-style getter method to avoid clash with the static getter method
-    * present in subclasses.
+    * present in subclasses for API compatibility.
     * @see #createDefaultEventPump
+    * @see #eventPump(EventPump)
     */
    EventPump eventPump()
    {
-      if (eventPump == null)
-         eventPump(createDefaultEventPump());
+      if (eventPump == null) eventPump(createDefaultEventPump());
       return eventPump;
    }
 
    /**
     * Sets the EventPump for this worker. <br />
     * Uses a C-style setter method to avoid clash with the static setter method
-    * present in subclasses.
+    * present in subclasses for API compatibility.
     * @throws IllegalArgumentException if eventPump is null
+    * @see #eventPump()
     */
    void eventPump(EventPump eventPump)
    {
@@ -57,24 +58,25 @@ abstract class AbstractSyncWorker extends AbstractWorker
     */
    EventPump createDefaultEventPump()
    {
-      if (JREVersion.isJRE141())
+      if (JREVersion.isJRE14())
       {
-         return new SunJDK141ConditionalEventPump();
+         // Handles also JDK 5.0
+         return new SunJDK14ConditionalEventPump();
       }
-      else if (JREVersion.isJRE140())
+      else if (JREVersion.isJRE13())
       {
-         return new SunJDK140ConditionalEventPump();
+         return new ConditionalEventPump();
       }
-      else if (JREVersion.isJRE13() || JREVersion.isJRE12())
+      else if (JREVersion.isJRE12())
       {
-         return new JDK13QueueEventPump();
+         return new QueueEventPump();
       }
       else
       {
          throw new Error("The current JRE is not supported");
       }
    }
-   
+
    /**
     * Executes the given Task using the given workerThread and eventPump.
     * This method blocks (while dequeuing AWT events) until the Task is finished,
@@ -85,7 +87,7 @@ abstract class AbstractSyncWorker extends AbstractWorker
       boolean isEventThread = SwingUtilities.isEventDispatchThread();
       if (!isEventThread && !workerThread.isWorkerThread())
       {
-         throw new IllegalStateException("Worker.post() can be called only from the AWT Event Dispatch Thread or from a worker thread");
+         throw new IllegalStateException("Method post() can be called only from the AWT Event Dispatch Thread or from a worker thread");
       }
 
       if (isEventThread)
@@ -110,10 +112,10 @@ abstract class AbstractSyncWorker extends AbstractWorker
          task.reset();
       }
    }
-   
+
    /**
     * Executes the given Job using the given workerThread and eventPump.
-    * This method has the same behavior of {@link post(Task)}
+    * This method has the same behavior of {@link #post(Task, WorkerThread, EventPump)}
     */
    Object post(Job job, WorkerThread workerThread, EventPump eventPump)
    {
