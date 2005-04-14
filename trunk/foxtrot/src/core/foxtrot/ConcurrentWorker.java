@@ -87,7 +87,7 @@ public class ConcurrentWorker extends AbstractSyncWorker
     * @see Worker#post(Job)
     * @see #post(Task)
     */
-   public static Object post(Job job) throws Exception
+   public static Object post(Job job)
    {
       return instance.post(job, getWorkerThread(), getEventPump());
    }
