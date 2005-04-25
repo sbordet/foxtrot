@@ -17,30 +17,33 @@ delegated the time-consuming task to a worker thread. The worker thread has to d
 <p>Take a look at the code below which uses Foxtrot's <b>AsyncWorker</b>, which is an asynchronous solution.</p>
 <p>Let's concentrate on the button's listener (the <code>actionPerformed()</code> method): the first statement,
 as in the freeze example, changes the text of the button and thus posts a repaint event to the Event Queue.<br />
-The next statement creates a AsyncWorker object and starts it. This operation is quick, and non blocking.
-When a AsyncWorker is started, a worker thread is also started for executing the code contained in <code>construct()</code>;
-when the <code>construct()</code> method ends, the <code>finished()</code> method is called (using
+The next statement posts an AsyncTask to Foxtrot's AsyncWorker. This operation is quick, non blocking, and returns
+immediately.<br />
+When an AsyncTask is posted to AsyncWorker, a worker thread is also started to execute the code contained
+in the <code>run()</code> method of AsyncTask;
+when the <code>run()</code> method ends, the <code>finish()</code> method is called (using
 <code>SwingUtilities.invokeLater()</code>) and executed in the Event Dispatch Thread.<br />
-So we create the AsyncWorker, we start it, the listener finishes and returns; the Event Dispatch Thread
+So we post the AsyncTask, returning immediately; the Event Dispatch Thread
 can thus dequeue the next event and process it (very likely this event is the one posted by the first statement,
 that changes the button's text to "Sleeping...").<br />
-When the worker thread finishes, the <code>finished()</code> method is posted as event in the Event Queue, and again the
-Event Dispatch Thread can dequeue it and process it, finally calling <code>finished()</code>.<br />
-This is why these solutions are called asynchronous: they let the event listener return immediately, and the code the
-listener is supposed to execute is run asynchronously, while the listener still returns.
+When the worker thread finishes, an event that wraps the <code>finish()</code> method is posted to the Event Queue,
+and the Event Dispatch Thread can dequeue it and process it, finally calling <code>finish()</code>.<br />
+This is why these solutions are called asynchronous: they let the event listener return immediately (since
+AsyncWorker.post() returns immediately), and the code the listener is supposed to execute is run asynchronously,
+while the listener still completes.
 </p>
 <p>This solution, while resolving the freeze problem, has several drawbacks:
 <ul>
-<li>Note the ugly exception handling. Even in this simple example, 3 chained if-else statements are required. Furthermore,
-the exception handling is done inside the AsyncWorker, not inside the listener: there is no simple way to rethrow exceptions
-(it is possible but needs more coding).
-<li>Note the asymmetry: the first <code>setText()</code> is made outside the AsyncWorker, the second inside of it
-<li>Note the confusing <code>get()</code> method: if <code>construct()</code> returns null (because the operation had a void return
-value - like <code>Thread.sleep()</code>), it is easy to forget to call <code>get()</code> to see if any exception was thrown by the
-time-consuming code.
-<li>What happens if the time-consuming code stays the same, but we want to execute 2 different <code>finished()</code> methods
+<li>Note the non-optimal exception handling.
+The exception handling is done inside the AsyncTask, not inside the listener, where it would be more intuitive.
+<li>Note the asymmetry: the first <code>setText()</code> is made outside the AsyncTask, the second inside of it.
+<li>Note the <code>getResultOrThrow()</code> method: if <code>run()</code> returns null (because the operation had
+a void return value - like <code>Thread.sleep()</code>), it is easy to forget to call <code>getResultOrThrow()</code>
+to see if any exception was thrown by the time-consuming code.
+<li>What happens if the time-consuming code stays the same, but we want to execute 2 different <code>finish()</code> methods
 depending on the place from where we want to execute the time-consuming task ?
-<li>If some code is written after <code>AsyncWorker.start()</code>, it will be always executed <em>before</em> <code>finished()</code>.
+<li>If some code is written after <code>AsyncWorker.post()</code>, it will be always executed <em>before</em>
+<code>finish()</code>.
 Thus looking at the code, we see:
 <ul>
 <li><code>setText("Sleeping...")</code>
@@ -56,12 +59,13 @@ but the real order of execution is:
 <li><code>setText("Slept !");</code>
 </ul>
 making debugging and code readability very difficult.<br>
-This is why a golden rule of the AsyncWorker is to never put code after <code>AsyncWorker.start()</code>.
-<li>If the code inside <code>finished()</code> requires a new time-consuming operation, a new <em>nested</em> AsyncWorker should be used,
-making the code complex and obscure, especially with respect to the sequence order of the operations executed.
+This is why a golden rule of the AsyncWorker is to never put code after <code>AsyncWorker.post()</code>.
+<li>If the code inside <code>finish()</code> requires a new time-consuming operation, a new <em>nested</em>
+AsyncWorker should be used, making the code complex and obscure, especially with respect to the sequence order
+of the operations executed.
 </ul>
 </p>
-<p>Fortunately, <a href="foxtrot.php">Foxtrot</a> solves these issues.</p>
+<p>Fortunately, <a href="foxtrot.php">Foxtrot's synchronous solutions</a> solve these issues.</p>
 <table width="100%" cellspacing="0" cellpadding="0">
 <tr><td width="60%">
 <pre><span class="code">
@@ -101,7 +105,8 @@ public class AsyncExample extends JFrame
                   }
                   catch (Exception x)
                   {</span><span class="event">
-                     // Do exception handling</span><span class="code">
+                     // Do exception handling: here is rethrown
+                     // what is eventually thrown inside run()</span><span class="code">
                   }
                }
             }</span><span class="event">);
@@ -132,7 +137,7 @@ public class AsyncExample extends JFrame
 <tr><td class="legend">Legend</td></tr>
 <tr><td class="legend-entry"><span class="main">Main Thread</span></td></tr>
 <tr><td class="legend-entry"><span class="event">Event Dispatch Thread</span></td></tr>
-<tr><td class="legend-entry"><span class="worker">SwingWorker Thread</span></td></tr>
+<tr><td class="legend-entry"><span class="worker">AsyncWorker Thread</span></td></tr>
 </table>
 </td></tr>
 </table>
