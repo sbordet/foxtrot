@@ -15,9 +15,17 @@
 
 <!-- Header start -->
 <tr><td class="header-logo" colspan="3">
-<div align="center"><img src="../images/logo.gif"></div>
+<div align="center">
+   <a href="http://foxtrot.sourceforge.net">
+      <img src="../images/logo.gif" />
+   </a>
+</div>
 </td></tr>
-<tr><td class="header-text" colspan="3">Foxtrot - Easy API for JFC/Swing - Documentation</td></tr>
+<tr><td class="header-text" colspan="3">
+   <a href="http://foxtrot.sourceforge.net">
+      Foxtrot - Easy API for JFC/Swing - Documentation
+   </a>
+</td></tr>
 <tr><td colspan="3">
 <div align="center">
 <img src="../images/acnvrule.gif"/>
