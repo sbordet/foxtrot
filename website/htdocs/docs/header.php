@@ -3,7 +3,7 @@
 <html>
 
 <head>
-<link rel="stylesheet" href="../styles.css">
+<link rel="stylesheet" href="http://foxtrot.sourceforge.net/styles.css">
 <title>Foxtrot - Easy API for JFC/Swing - Documentation</title>
 <meta name="description" content="Foxtrot - Easy API for JFC/Swing">
 <meta name="keywords" content="Foxtrot,Swing,Threads,Swing Threads,SwingWorker,Worker,SwingUtilities,SwingUtilities.invokeLater,invokeLater,AWT,Simone Bordet">
@@ -22,7 +22,7 @@
 </div>
 </td></tr>
 <tr><td class="header-text" colspan="3">
-   <a href="http://foxtrot.sourceforge.net">
+   <a href="http://foxtrot.sourceforge.net/docs/toc.php">
       Foxtrot - Easy API for JFC/Swing - Documentation
    </a>
 </td></tr>
