@@ -8,16 +8,16 @@
 
 package foxtrot.pumps;
 
-import java.lang.reflect.Method;
-import java.lang.reflect.InvocationHandler;
-import java.lang.reflect.Proxy;
-import java.lang.reflect.InvocationTargetException;
-import java.security.AccessController;
-import java.security.PrivilegedExceptionAction;
-import java.security.PrivilegedAction;
 import java.awt.AWTEvent;
 import java.awt.EventQueue;
 import java.awt.Toolkit;
+import java.lang.reflect.InvocationHandler;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+import java.lang.reflect.Proxy;
+import java.security.AccessController;
+import java.security.PrivilegedAction;
+import java.security.PrivilegedExceptionAction;
 
 import foxtrot.EventPump;
 import foxtrot.Task;
@@ -26,6 +26,7 @@ import foxtrot.Task;
  * This implementation of EventPump calls the package protected method
  * <code>java.awt.EventDispatchThread.pumpEvents(Conditional)</code>
  * to pump events while a Task is executed.
+ *
  * @version $Revision$
  */
 public class ConditionalEventPump implements EventPump, EventFilterable
@@ -232,7 +233,7 @@ public class ConditionalEventPump implements EventPump, EventFilterable
     * Waiting for events is necessary in this case: a Task is posted and we would like to start
     * pumping, but no events have been posted yet ({@link #peekEvent} returns null).
     */
-   private AWTEvent waitForEvent()
+   protected AWTEvent waitForEvent()
    {
       EventQueue queue = getEventQueue();
       AWTEvent nextEvent = null;
