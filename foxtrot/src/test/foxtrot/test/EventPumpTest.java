@@ -49,8 +49,8 @@ public class EventPumpTest extends FoxtrotTestCase
    {
       testPumpEventsBlocks(pump);
       testPumpEventsDequeues(pump);
-      tesPumpEventsOnThrowException(pump);
-      tesPumpEventsOnThrowError(pump);
+      testPumpEventsOnThrowException(pump);
+      testPumpEventsOnThrowError(pump);
    }
 
    /**
@@ -141,7 +141,7 @@ public class EventPumpTest extends FoxtrotTestCase
    /**
     * Verifies that EventPump.pumpEvents(Task) does not return in case of runtime exceptions
     */
-   private void tesPumpEventsOnThrowException(final EventPump pump) throws Exception
+   private void testPumpEventsOnThrowException(final EventPump pump) throws Exception
    {
       invokeTest(null, new Runnable()
       {
@@ -195,7 +195,7 @@ public class EventPumpTest extends FoxtrotTestCase
    /**
     * Verifies that EventPump.pumpEvents(Task) does not return in case of errors
     */
-   private void tesPumpEventsOnThrowError(final EventPump pump) throws Exception
+   private void testPumpEventsOnThrowError(final EventPump pump) throws Exception
    {
       invokeTest(null, new Runnable()
       {
@@ -250,7 +250,7 @@ public class EventPumpTest extends FoxtrotTestCase
    {
       try
       {
-         Method completed = Task.class.getDeclaredMethod("setCompleted", new Class[] {boolean.class});
+         Method completed = Task.class.getDeclaredMethod("setCompleted", new Class[]{boolean.class});
          completed.setAccessible(true);
          completed.invoke(task, new Object[]{Boolean.TRUE});
 
