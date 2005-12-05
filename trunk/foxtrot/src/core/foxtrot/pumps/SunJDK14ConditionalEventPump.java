@@ -9,6 +9,7 @@
 package foxtrot.pumps;
 
 import java.awt.AWTEvent;
+import java.awt.EventQueue;
 
 /**
  * Specialized ConditionalEventPump for Sun's JDK 1.4 and 5.0.
@@ -17,7 +18,7 @@ import java.awt.AWTEvent;
  *
  * @version $Revision$
  */
-public class SunJDK14ConditionalEventPump extends ConditionalEventPump implements EventFilterable
+public class SunJDK14ConditionalEventPump extends ConditionalEventPump
 {
    /**
     * Flushes pending events before waiting for the next event.
@@ -28,9 +29,28 @@ public class SunJDK14ConditionalEventPump extends ConditionalEventPump implement
     */
    protected AWTEvent waitForEvent()
    {
-      // Important: call flushPendingEvents() outside any synchronized
-      // block on the EventQueue, otherwise there is risk of deadlock
-      sun.awt.SunToolkit.flushPendingEvents();
-      return super.waitForEvent();
+      EventQueue queue = getEventQueue();
+      AWTEvent nextEvent = peekEvent(queue);
+      if (nextEvent != null) return nextEvent;
+
+      while (true)
+      {
+         sun.awt.SunToolkit.flushPendingEvents();
+         synchronized (queue)
+         {
+            nextEvent = peekEvent(queue);
+            if (nextEvent != null) return nextEvent;
+            if (debug) System.out.println("[SunJDK14ConditionalEventPump] Waiting for events...");
+            try
+            {
+               queue.wait();
+            }
+            catch (InterruptedException e)
+            {
+               Thread.currentThread().interrupt();
+               return null;
+            }
+         }
+      }
    }
 }
