@@ -202,7 +202,7 @@ public class ConditionalEventPump implements EventPump, EventFilterable
       return true;
    }
 
-   private EventQueue getEventQueue()
+   protected EventQueue getEventQueue()
    {
       return (EventQueue)AccessController.doPrivileged(new PrivilegedAction()
       {
