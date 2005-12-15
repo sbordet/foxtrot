@@ -117,12 +117,5 @@ Your Swing code will immediately benefit of:
 <img src="images/acnvrule.gif"/>
 </div>
 
-<div align="center">
-<small>
-Last updated on $Date$. Send feedback to
-<a href="mailto:biorn_steedom@users.sourceforge.net">Simone Bordet</a>.
-</small>
-</div>
-
 </body>
 </html>
