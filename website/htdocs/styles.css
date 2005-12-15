@@ -1,4 +1,5 @@
 body         { color: navy; background-color: #FFFFCC; font-family: Verdana, Arial, Helvetica; background-image: url('images/cnvbkgnd.jpg') }
+
 code         { font-size: 12pt }
 
 ul           { list-style-image: url('images/acnvbul1.gif') }
@@ -15,6 +16,8 @@ h3           { color: navy }
 h4           { color: navy }
 h5           { color: navy }
 h6           { color: navy }
+
+img          { border: none }
 
 td.header-logo { }
 td.header-text { text-align: center; padding-bottom: 15px }

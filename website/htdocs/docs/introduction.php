@@ -24,7 +24,9 @@ with a command line similar to this one (under Windows):</p>
 license are met.<br />
 These requirements aren't restrictive at all, and roughly say that when Swing applications developed using Foxtrot are
 redistributed (along with Foxtrot's binaries or source code), the Foxtrot license must be redistributed as well, for example
-in the documentation.<br />
+in the documentation of the Swing application.
+</p>
+<p>
 A nice suggestion may be to use a Help/About dialog similar to Internet Explorer's, with a sentence like this: <br />
 <b>"This application has been developed using Foxtrot (http://foxtrot.sourceforge.net). <br />
 Foxtrot is released under the BSD license, see the included documentation for further information"</b>.</p>
