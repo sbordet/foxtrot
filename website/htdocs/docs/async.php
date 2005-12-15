@@ -7,7 +7,7 @@
 <p>Solutions have been proposed for the <a href="freeze.php">GUI freeze problem</a>; asynchronous solutions
 rely on the combined usage of a worker thread and the <code>SwingUtilities.invokeLater()</code> method.
 We will see in few lines why they're called asynchronous.</p>
-<p>The main idea behind asynchronous solution is to return quickly from the time-consuming listener, after having
+<p>The main idea behind an asynchronous solution is to return quickly from the time-consuming listener, after having
 delegated the time-consuming task to a worker thread. The worker thread has to do 2 things:
 <ul>
 <li>Execute the time-consuming task
@@ -17,18 +17,18 @@ delegated the time-consuming task to a worker thread. The worker thread has to d
 <p>Take a look at the code below which uses Foxtrot's <b>AsyncWorker</b>, which is an asynchronous solution.</p>
 <p>Let's concentrate on the button's listener (the <code>actionPerformed()</code> method): the first statement,
 as in the freeze example, changes the text of the button and thus posts a repaint event to the Event Queue.<br />
-The next statement posts an AsyncTask to Foxtrot's AsyncWorker. This operation is quick, non blocking, and returns
+The next statement posts an <b>AsyncTask</b> to Foxtrot's AsyncWorker. This operation is quick, non blocking, and returns
 immediately.<br />
 When an AsyncTask is posted to AsyncWorker, a worker thread is also started to execute the code contained
 in the <code>run()</code> method of AsyncTask;
 when the <code>run()</code> method ends, the <code>finish()</code> method is called (using
 <code>SwingUtilities.invokeLater()</code>) and executed in the Event Dispatch Thread.<br />
-So we post the AsyncTask, returning immediately; the Event Dispatch Thread
+So we post the AsyncTask, and that returns immediately; the Event Dispatch Thread
 can thus dequeue the next event and process it (very likely this event is the one posted by the first statement,
 that changes the button's text to "Sleeping...").<br />
 When the worker thread finishes, an event that wraps the <code>finish()</code> method is posted to the Event Queue,
 and the Event Dispatch Thread can dequeue it and process it, finally calling <code>finish()</code>.<br />
-This is why these solutions are called asynchronous: they let the event listener return immediately (since
+This is why these solutions are called asynchronous: they let the event listener return quickly (since
 AsyncWorker.post() returns immediately), and the code the listener is supposed to execute is run asynchronously,
 while the listener still completes.
 </p>

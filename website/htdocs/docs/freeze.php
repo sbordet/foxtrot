@@ -1,14 +1,5 @@
 <?php include 'header.php';?>
 
-<tr><td align="center" colspan="3">
-<a href="http://foxtrot.sourceforge.net"><img class="nav-btn-en" hspace="10" src="../images/cnvhome.gif"/></a>
-<a href="toc.php"><img class="nav-btn-en" hspace="10" src="../images/cnvup.gif"/></a>
-<img class="nav-btn-dis" hspace="10" src="../images/cnvprev.gif"/>
-<img class="nav-btn-dis" hspace="10" src="../images/cnvnext.gif"/>
-</td></tr>
-
-<tr><td class="date" colspan="3">Last Updated: $Date$</td></tr>
-
 <tr><td class="documentation">
 
 <h2>The GUI freeze problem</h2>
