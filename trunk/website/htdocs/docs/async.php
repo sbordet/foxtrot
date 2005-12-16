@@ -8,10 +8,10 @@
 rely on the combined usage of a worker thread and the <code>SwingUtilities.invokeLater()</code> method.
 We will see in few lines why they're called asynchronous.</p>
 <p>The main idea behind an asynchronous solution is to return quickly from the time-consuming listener, after having
-delegated the time-consuming task to a worker thread. The worker thread, usually, has to do 2 things:
+delegated the time-consuming task to a worker thread. The worker thread, usually, does two things:
 <ul>
-<li>Execute the time-consuming task
-<li>Post an event to the Event Queue using <code>SwingUtilities.invokeLater()</code>
+<li>Executes the time-consuming task
+<li>Posts an event to the Event Queue using <code>SwingUtilities.invokeLater()</code>
 </ul>
 </p>
 <p>Take a look at the code below which uses Foxtrot's <b>AsyncWorker</b>, which is an asynchronous solution.</p>
@@ -25,7 +25,7 @@ the Event Dispatch Thread is free to continue its execution, and will execute th
 method.<br />
 Therefore, there is a potentially concurrent execution of the code in the AsyncTask and of the code in
 <code>somethingElse()</code>.
-When the <code>run()</code> method of AsyncTask ends, the <code>finish()</code> method is called (using
+When the <code>run()</code> method of AsyncTask ends, its <code>finish()</code> method is called (using
 <code>SwingUtilities.invokeLater()</code>) and executed in the Event Dispatch Thread.
 </p>
 <p>This is why these solutions are called asynchronous: the code in the event listener and the code of the AsyncTask
@@ -43,7 +43,7 @@ to see if any exception was thrown by the time-consuming code of the AsyncTask.
 depending on the place from where we want to execute the time-consuming task ?
 <li>If some code is written after <code>AsyncWorker.post()</code>, like the <code>somethingElse()</code> method,
 it will be always executed <em>before</em> the <code>finish()</code> method.
-Reading the source code, we see:
+Reading the source code we see, from top to bottom:
 <ul>
 <li><code>setText("Sleeping...")</code>
 <li><code>Thread.sleep()</code>
@@ -64,7 +64,7 @@ AsyncWorker should be used, making the code complex and obscure, especially with
 of the operations executed.
 </ul>
 </p>
-<p>Fortunately, <a href="foxtrot.php">Foxtrot's synchronous solutions</a> solve these issues.</p>
+<p>Fortunately, <a href="toc.php">Foxtrot's synchronous solutions</a> solve these issues.</p>
 <table width="100%" cellspacing="0" cellpadding="0">
 <tr><td width="60%">
 <pre><span class="code">

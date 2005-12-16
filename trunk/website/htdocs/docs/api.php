@@ -20,7 +20,7 @@ the following classes:</p>
 <li><code>interface foxtrot.WorkerThread</code></li>
 <li><code>class foxtrot.AbstractWorkerThread</code></li>
 </ul>
-<p>Normally users do not need to deal with these classes to use Foxtrot in their Swing applications, since
+<p>Normally users do not need to deal with the above three classes to use Foxtrot in their Swing applications, since
 Foxtrot will configure itself with the most suitable implementations; however, if
 a specific customization of the event pumping mechanism or of the worker thread mechanism is needed, the APIs
 provided by these classes allow fine grained control on Foxtrot's behavior.</p>
@@ -33,10 +33,10 @@ will be executed each one in its own Foxtrot Worker Thread (thus <code>Task</cod
 executed concurrently). <br />
 <p>The <code>AsyncWorker</code> class is used to post <code>AsyncTask</code>s that will be executed each one
 in its own Foxtrot Worker Thread (thus <code>AsyncTask</code>s are executed concurrently).</p>
-<p>The <code>Task</code> class is subclassed by the user to perform heavy tasks that throw checked exceptions.<br />
-The <code>Job</code> class, conversely, is subclassed by the user to perform heavy tasks that do not throw
-checked exceptions, but only RuntimeExceptions (or Errors).<br />
-The <code>AsyncTask</code> class is subclassed by the user to perform asynchronous heavy tasks and to post
+<p>The <code>Task</code> class is subclassed by the user to perform heavy tasks that throw checked exceptions.</p>
+<p>The <code>Job</code> class, conversely, is subclassed by the user to perform heavy tasks that do not throw
+checked exceptions, but only RuntimeExceptions (or Errors).</p>
+<p>The <code>AsyncTask</code> class is subclassed by the user to perform asynchronous heavy tasks and to post
 an event to the Event Dispatch Thread when the <code>AsyncTask</code> is completed.</p>
 <p>The <code>Worker</code> and <code>ConcurrentWorker</code> classes have the following two public methods that
 can be used to post <code>Task</code>s or <code>Job</code>s:</p>
@@ -68,10 +68,11 @@ for example, an InvocationTargetException.</p>
 </ul>
 The <code>run()</code> method must be implemented with the time-consuming code exactly like the <code>Task</code>
 class, while the <code>finish()</code> method must be implemented by calling the
-<code>AsyncTask.getResultOrThrow()</code> method to get the result returned by the <code>run()</code> method or to
-rethrow any exception thrown during its execution, and eventually other code executed in the Event Dispatch Thread.</p>
+<code>AsyncTask.getResultOrThrow()</code> method to get the result returned by the <code>run()</code> method (or to
+rethrow any exception thrown during its execution), and eventually other code to be executed in the
+Event Dispatch Thread.</p>
 
-<p>The usage is very simple; here's an example of <code>Worker</code> with the <code>Job</code> class:</p>
+<p>Here's an example of <code>Worker</code> with the <code>Job</code> class:
 <pre><span class="code">
 Worker.post(new Job()
 {
@@ -81,8 +82,8 @@ Worker.post(new Job()
       // that does not throw checked exceptions
    }
 });
-</span></pre>
-<p>and here's an example of <code>Worker</code> with the <code>Task</code> class:</p>
+</span></pre></p>
+<p>and here's an example of <code>Worker</code> with the <code>Task</code> class:
 <pre><span class="code">
 try
 {
@@ -99,12 +100,12 @@ catch (Exception x)
 {
    // Handle the exception thrown by the Task
 }
-</span></pre>
+</span></pre></p>
 <p>It is possible to narrow the throws clause of the <code>Task</code> class, but unfortunately not the one of
 the <code>Worker</code> or <code>ConcurrentWorker</code> classes. <br />
 So, when using the <code>post(Task task)</code> method, you have to surround it in a
 <code>try...catch(Exception x)</code> block (unless the method that contains <code>post(Task task)</code>
-throws <code>Exception</code> itself).</p>
+throws <code>Exception</code> itself).
 <pre><span class="code">
 try
 {
@@ -137,9 +138,8 @@ catch (Exception ignored)
    // to write this catch block: Worker.post(Task t)
    // requires it.
 }
-</span></pre>
-
-<p>Here's an example of <code>AsyncWorker</code> with the <code>AsyncTask</code>:</p>
+</span></pre></p>
+<p>Here's an example of <code>AsyncWorker</code> with the <code>AsyncTask</code>:
 <pre><span class="code">
 AsyncWorker.post(new AsyncTask()
 {
@@ -163,14 +163,14 @@ AsyncWorker.post(new AsyncTask()
       }
    }
 });
-</span></pre>
-<p>All worker classes, from Foxtrot 2.x, have the following public methods to deal with the
+</span></pre></p>
+<p>All worker classes (from Foxtrot 2.x) have the following public methods to deal with the
 <code>WorkerThread</code> component:</p>
 <ul>
 <li><code>public static WorkerThread getWorkerThread()</code></li>
 <li><code>public static void setWorkerThread(WorkerThread worker)</code></li>
 </ul>
-<p>The <code>Worker</code> class, from Foxtrot 2.x, and the <code>ConcurrentWorker</code> class, have also the
+<p>The <code>Worker</code> class (from Foxtrot 2.x) and the <code>ConcurrentWorker</code> class have also the
 following public methods to deal with the <code>EventPump</code> component:</p>
 <ul>
 <li><code>public static EventPump getEventPump()</code></li>
@@ -189,9 +189,8 @@ on the Java Runtime Environment version Foxtrot is running on, so that features 
 in JDK 1.4.x or viceversa. <br />
 Playing with AWT events too badly is normally looking for troubles, so consider you warned :)</p>
 <p>The same holds for <code>WorkerThread</code> implementations, that should extend the abstract class
-<code>AbstractWorkerThread</code>: Foxtrot uses a <strong>synchronous</strong> model, so replacing (for example)
-the default <code>WorkerThread</code> implementation may lead to unexpected behavior. <br />
-
+<code>AbstractWorkerThread</code>: replacing the default <code>WorkerThread</code> implementation may lead
+to unexpected behavior.</p>
 <p>Refer to the bundled Javadoc documentation for further information, and to the bundled examples for
 further details on how to use the Foxtrot classes with Swing.<br />
 And do not forget the <a href="tips.php">Tips 'n' Tricks</a> section !<p>
