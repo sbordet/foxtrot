@@ -57,12 +57,6 @@ No worries about code executed after <code>Worker.post()</code>.
 <li>No nesting of <code>Worker.post()</code> is necessary, just 2 consecutive <code>Worker.post()</code> calls.
 </ul>
 </p>
-<p>We have used Foxtrot heavily in a large Swing application, and the code benefited greatly from the use of the
-Foxtrot framework.</p>
-<h3>Acknowledgements</h3>
-<p>Marco Cravero had the first idea of exploring how dialogs work to find a better solution for using threads in Swing.<br>
-Simone Bordet implemented the Foxtrot API following this idea.<br>
-Luca Berra suggested the 'Foxtrot' name.</p>
 <table width="100%" cellspacing="0" cellpadding="0">
 <tr><td width="60%">
 <pre><span class="code">
