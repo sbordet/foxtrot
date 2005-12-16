@@ -1,19 +1,9 @@
 <?php include 'header.php';?>
 
-<tr><td align="center" colspan="3">
-<a href="http://foxtrot.sourceforge.net"><img class="nav-btn-en" hspace="10" src="../images/cnvhome.gif"/></a>
-<a href="toc.php"><img class="nav-btn-en" hspace="10" src="../images/cnvup.gif"/></a>
-<img class="nav-btn-dis" hspace="10" src="../images/cnvprev.gif"/>
-<img class="nav-btn-dis" hspace="10" src="../images/cnvnext.gif"/>
-</td></tr>
-
-<tr><td class="date" colspan="3">Last Updated: $Date$</td></tr>
-
 <tr><td class="documentation">
 
 <h2>Tips & Tricks</h2>
-<p>In this section we will discuss some tip and trick that applies when using threads in Swing Applications.<br />
-The examples are coded with the Foxtrot API, but are valid also for other solutions such as the SwingWorker.</p>
+<p>In this section we will discuss some tip and trick that applies when using threads in Swing Applications.</p>
 <p>Topics are:
 <ul>
 <li>Working correctly with Swing Models
@@ -24,8 +14,8 @@ The examples are coded with the Foxtrot API, but are valid also for other soluti
 
 <h3>Working correctly with Swing Models</h3>
 <p>When threads are used in a Swing Application, the issue of concurrent access to shared data structures is always
-present. No matter if the chosen solution is asynchronous or synchronous (SwingWorker or Foxtrot), care must be taken
-to interact with Swing Models, since code working well against a plain Swing solution (ie without use of threads), may
+present. No matter if the chosen solution is asynchronous or synchronous, care must be taken
+to interact with Swing Models, since code working well against a plain Swing solution (i.e. without use of threads), may
 not work as well when using threads.</p>
 <p>Let's make an example: suppose you have a <code>JTable</code>, and you use as a model a subclass of <code>AbstractTableModel</code> that you feeded with
 your data. Suppose also that the user can change the content of a cell by editing it, but the operation to validate the
@@ -244,13 +234,15 @@ method, that returns when all the listeners have been notified. Using <code>Swin
 this method to return immediately, normally before listeners have been notified, breaking the semantic.</p>
 
 <h3>Working correctly with <code>JComboBox</code></h3>
-<p><code>JComboBox</code> shows a non-usual behavior with respect to item selection when compared, for example, with <code>JMenu</code>: both show
-a <code>JPopup</code> with a list of items to be selected by the user, but after selecting an item in <code>JMenu</code> the <code>JPopup</code>
-disappears immediately, while in <code>JComboBox</code> it remains shown until all listeners are processed.</p>
-<p>Swing Applications that contain <code>JComboBox</code>es that have to perform heavy operations when an item is selected will suffer
-of the "<code>JPopup</code> shown problem" when using plain Swing programming (in this case the GUI is also frozen) and when using the
-Foxtrot API (this problem does not appear when using the SwingWorker).</p>
-<p>However this problem is easily solved by asking <code>JComboBox</code> to explicitely close the <code>JPopup</code>, as the example below shows:</p>
+<p><code>JComboBox</code> shows a non-usual behavior with respect to item selection when compared, for example,
+with <code>JMenu</code>: both show a <code>JPopup</code> with a list of items to be selected by the user, but after
+selecting an item in <code>JMenu</code> the <code>JPopup</code> disappears immediately, while in <code>JComboBox</code>
+it remains shown until all listeners are processed.</p>
+<p>Swing Applications that contain <code>JComboBox</code>es that have to perform heavy operations when an item is
+selected will suffer of the "<code>JPopup</code> shown problem" when using plain Swing programming (in this case
+the GUI is also frozen) and when using synchronous APIs (this problem does not appear when using asynchronous APIs).</p>
+<p>However this problem is easily solved by asking <code>JComboBox</code> to explicitely close the <code>JPopup</code>,
+as the example below shows:
 <pre><span class="code">
 final JComboBox combo = new JComboBox(...);
 combo.addActionListener(new ActionListener()
@@ -283,9 +275,9 @@ combo.addActionListener(new ActionListener()
       catch (Exception ignored) {}
    }
 });
-</span></pre>
+</span></pre></p>
 <p>This is the only small anomaly I've found so far using Swing with the Foxtrot API, and I tend to think it's more
-a Swing anomaly more than a Foxtrot's.</p>
+a Swing anomaly than Foxtrot's.</p>
 
 <!--
 TODO:

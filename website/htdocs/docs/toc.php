@@ -11,7 +11,7 @@
 <div class="toc-sect"><a href="freeze.php">GUI freeze</a></div>
 <div class="toc-chapt">3 - Asynchronous solution</div>
 <div class="toc-sect"><a href="async.php">Foxtrot's AsyncWorker</a></div>
-<div class="toc-chapt">4 - Synchronous solution</div>
+<div class="toc-chapt">4 - Synchronous solutions</div>
 <div class="toc-sect"><a href="worker.php">Foxtrot's Worker</a></div>
 <div class="toc-sect"><a href="concurrent-worker.php">Foxtrot's ConcurrentWorker</a></div>
 <div class="toc-chapt">5 - Foxtrot</div>

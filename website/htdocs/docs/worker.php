@@ -2,7 +2,7 @@
 
 <tr><td class="documentation">
 
-<h2>Foxtrot: synchronous solution</h2>
+<h2>Foxtrot's synchronous solutions</h2>
 <p>The <b>Foxtrot</b> framework is based on a different approach than asynchronous solutions. While a worker thread is still
 used to execute time-consuming tasks, <code>SwingUtilities.invokeLater()</code> is not used.<br />
 The main problem of the asynchronous solution is that it lets the listener continue during the execution of the task;
