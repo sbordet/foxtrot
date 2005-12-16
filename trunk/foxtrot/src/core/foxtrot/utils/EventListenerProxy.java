@@ -18,14 +18,14 @@ import java.util.EventListener;
  * <code>ActionListener</code>s, <code>MouseListener</code>s and so on) making sure that if
  * a wrapped listener is executing, another wrapped listener (even of different type) it is
  * not executed.
- * <br>
+ * <br />
  * For example, if a user clicks very quickly on a button, it may trigger the execution of
  * the associated listener more than once. When the listener contains Foxtrot code, the
  * second click event is dequeued by Foxtrot and processed again, invoking the listener
  * again. Using this class to wrap the listener avoids this problem: the second event will
  * be dequeued and processed by Foxtrot as before, but the wrapped listener will not be
  * called.
- * <br>
+ * <br />
  * Example Usage:
  * <pre>
  * final JButton apply = new JButton("Apply");
@@ -92,7 +92,7 @@ public class EventListenerProxy implements InvocationHandler
    }
 
    /**
-    * Creates a proxy for the given listener. <br>
+    * Creates a proxy for the given listener. <br />
     * The listener must implement the given listener interface
     * @param listenerInterface The interface used to create the proxy
     * @param listener The listener to proxy

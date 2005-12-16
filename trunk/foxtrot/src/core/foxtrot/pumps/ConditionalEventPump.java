@@ -302,7 +302,7 @@ public class ConditionalEventPump implements EventPump, EventFilterable
    {
       /**
        * The callback method invoked by the AWT event dispatch mechanism when an unexpected
-       * exception or error is thrown during event dispatching. <br>
+       * exception or error is thrown during event dispatching. <br />
        * It just logs the exception.
        */
       public void handle(Throwable t)

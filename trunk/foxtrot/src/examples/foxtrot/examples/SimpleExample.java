@@ -22,9 +22,9 @@ import foxtrot.Task;
 import foxtrot.Worker;
 
 /**
- * A very simple example that shows Swing limits. <br>
+ * A very simple example that shows Swing limits. <br />
  * A button executes a time-consuming task, and when executing this task the same button is used to
- * interrupt the task. <br>
+ * interrupt the task. <br />
  * This is impossible to do with plain Swing, but easy with Foxtrot.
  *
  * For a comparison, look at the freezeSleep method and to the workerSleep method, and try to run the
