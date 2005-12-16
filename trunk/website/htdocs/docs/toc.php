@@ -6,6 +6,7 @@
 <div class="toc-chapt">1 - Overview</div>
 <div class="toc-sect"><a href="introduction.php">Introduction</a></div>
 <div class="toc-sect"><a href="license.php">BSD License</a></div>
+<div class="toc-sect"><a href="acks.php">Acknowledgements</a></div>
 <div class="toc-chapt">2 - The problem</div>
 <div class="toc-sect"><a href="freeze.php">GUI freeze</a></div>
 <div class="toc-chapt">3 - Asynchronous solution</div>

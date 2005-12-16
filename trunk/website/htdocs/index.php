@@ -92,7 +92,7 @@ applications.</p>
 the most known, they are all based on the Asynchronous Model which, for non-trivial Swing applications,
 carries several problems such as code asymmetry, bad code readability and difficult exception handling.</p>
 <p>The Foxtrot API cleanly solves the problems that solutions based on the Asynchronous Model have, and it's
-simpler to use.<br>
+simpler to use.<br />
 Your Swing code will immediately benefit of:
 <ul><ul>
 <li>code symmetry and readability
