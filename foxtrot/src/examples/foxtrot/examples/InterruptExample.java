@@ -23,9 +23,9 @@ import foxtrot.Task;
 import foxtrot.Worker;
 
 /**
- * An example of how to create a Task that is interruptible. <p>
+ * An example of how to create a Task that is interruptible. <br />
  * This is not provided by the Foxtrot API, because it is too much application dependent: what are
- * the correct actions to take when a Task is interrupted ? <br>
+ * the correct actions to take when a Task is interrupted ? <br />
  * This implies that the Task must be collaborative, and check once in a while if it is interrupted
  * by another thread.
  *
