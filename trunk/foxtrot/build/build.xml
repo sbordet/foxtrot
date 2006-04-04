@@ -1,19 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<!--
-
-Copyright (c) 2002, Simone Bordet
-All rights reserved.
-
-This software is distributable under the BSD license.
-See the terms of the BSD license in the documentation provided with this software.
-
--->
-
 <project name="Foxtrot" default="main" basedir="..">
 
    <property name="name" value="foxtrot"/>
-   <!-- REMEMBER: change also the manifest information -->
    <property name="version" value="3.0.beta.1"/>
 
    <property name="src.dir" value="${basedir}/src"/>
@@ -63,7 +52,7 @@ See the terms of the BSD license in the documentation provided with this softwar
       <include name="**/*.java"/>
    </patternset>
 
-   <target name="compile">
+   <target name="compile" description="Compiles the source, examples and test classes">
       <mkdir dir="${core.classes.dir}"/>
       <javac srcdir="${core.src.dir}"
          destdir="${core.classes.dir}"
@@ -99,7 +88,7 @@ See the terms of the BSD license in the documentation provided with this softwar
       </javac>
    </target>
 
-   <target name="manifest">
+   <target name="manifest" description="Prepares the manifest file, adding version number and date">
       <tstamp>
          <format property="now" pattern="EEEE d MMMM yyyy HH:mm z" locale="en"/>
       </tstamp>
@@ -109,7 +98,7 @@ See the terms of the BSD license in the documentation provided with this softwar
       </manifest>
    </target>
 
-   <target name="jar" depends="compile, manifest">
+   <target name="jar" depends="compile, manifest" description="Packs the jars for binary, examples, tests and sources distribution">
       <mkdir dir="${dist.lib.dir}"/>
 
       <jar jarfile="${core.jar.file}"
@@ -147,7 +136,7 @@ See the terms of the BSD license in the documentation provided with this softwar
       </jar>
    </target>
 
-   <target name="javadocs">
+   <target name="javadocs" description="Generates the JavaDocs">
       <mkdir dir="${dist.docs.api.dir}"/>
       <javadoc destdir="${dist.docs.api.dir}"
          packagenames="foxtrot.*"
@@ -227,7 +216,7 @@ See the terms of the BSD license in the documentation provided with this softwar
       Creates a release building jars and docs an creating zip and tar.gz
       release file. The filenames are built using the version label
    -->
-   <target name="release" depends="clean, jar, javadocs">
+   <target name="release" depends="clean, jar, javadocs" description="Creates a zip and gzip release, ready for distribution">
       <mkdir dir="${dist.release.dir}"/>
 
       <!-- Miscellaneous files -->
@@ -256,7 +245,7 @@ See the terms of the BSD license in the documentation provided with this softwar
       <delete dir="${dist.release.dir}" quiet="true"/>
    </target>
 
-   <target name="clean">
+   <target name="clean" description="Deletes the output directories">
       <delete dir="${classes.dir}" quiet="true"/>
       <delete dir="${dist.dir}" quiet="true"/>
    </target>
