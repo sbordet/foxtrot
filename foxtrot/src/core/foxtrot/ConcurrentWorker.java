@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2002-2005, Simone Bordet
+ * Copyright (c) 2002-2006, Simone Bordet
  * All rights reserved.
  *
  * This software is distributable under the BSD license.
@@ -44,6 +44,7 @@ import foxtrot.workers.MultiWorkerThread;
  * <br />
  * Needless to say, this concurrent behavior imposes further care in designing the
  * system to respect thread safety, and to keep the system simple to understand.
+ * @version $Revision$
  */
 public class ConcurrentWorker extends AbstractSyncWorker
 {
