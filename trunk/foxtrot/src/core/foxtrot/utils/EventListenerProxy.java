@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2003-2005, Simone Bordet
+ * Copyright (c) 2003-2006, Simone Bordet
  * All rights reserved.
  *
  * This software is distributable under the BSD license.
