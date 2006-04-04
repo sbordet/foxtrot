@@ -2,7 +2,7 @@
 
 <tr><td class="documentation">
 
-<h2>Foxtrot's synchronous solutions</h2>
+<h2>Foxtrot's synchronous solution: Worker</h2>
 <p>The <b>Foxtrot</b> framework is based on a different approach than asynchronous solutions. While a worker thread is still
 used to execute time-consuming tasks, <code>SwingUtilities.invokeLater()</code> is not used.<br />
 The main problem of the asynchronous solution is that it lets the listener continue during the execution of the task;
@@ -28,7 +28,7 @@ as the appear in the code.</p>
 <p>Let's concentrate on the button's listener (the <code>actionPerformed()</code> method): the first statement, as in
 the freeze example, changes the text of the button and thus posts a repaint event to the queue.<br />
 The next statement uses the Foxtrot API to create a <code>Task</code> and post it to the worker queue, using the
-<code>Worker</code> class.
+<code>foxtrot.Worker</code> class.
 The <code>Worker.post()</code> method is blocking and must be called from the Event Dispatch Thread. <br />
 When initialized, the <code>Worker</code> class starts a single worker thread to execute time-consuming tasks,
 and has a single worker queue where time-consuming tasks are queued before being executed.<br />
