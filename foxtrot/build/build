@@ -6,6 +6,7 @@ fi
 CP=ant.jar;
 CP=$CP:ant-launcher.jar
 CP=$CP:ant-junit.jar
+CP=$CP:../lib/maven-artifact-ant-2.0.4-dep.jar
 CP=$CP:../lib/junit.jar
 CP=$CP:$JAVA_HOME/lib/tools.jar
 
