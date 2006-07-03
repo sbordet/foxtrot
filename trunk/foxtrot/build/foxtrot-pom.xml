@@ -6,6 +6,9 @@
     <artifactId>foxtrot-core</artifactId>
     <packaging>jar</packaging>
     <version>3.0-beta-1</version>
+    <name>Foxtrot</name>
+    <url>http://foxtrot.sourceforge.net</url>
+    <description>Foxtrot is an easy and powerful API to use threads in JFC/Swing applications</description>
 
     <issueManagement />
 
@@ -19,9 +22,17 @@
 
     <contributors />
 
-    <licenses />
+    <licenses>
+        <license>
+            <name>The BSD license</name>
+            <url>http://foxtrot.sourceforge.net/docs/license.php</url>
+        </license>
+    </licenses>
 
-    <scm />
+    <scm>
+        <connection>https://svn.sourceforge.net/svnroot/foxtrot</connection>
+        <url>http://svn.sourceforge.net/foxtrot</url>
+    </scm>
 
     <build />
 
