@@ -27,6 +27,9 @@
     <property name="dist.test.dir" value="${dist.dir}/test" />
     <property name="dist.test.xml.dir" value="${dist.test.dir}/xml/${java.version}" />
     <property name="dist.test.html.dir" value="${dist.test.dir}/html/${java.version}" />
+
+    <property name="website.dir" value="${basedir}/../website/htdocs" />
+
     <property name="dist.repo.dir" value="${dist.dir}/maven2" />
 
     <property name="core.jar.file" value="${dist.lib.dir}/${name}-core-${version}.jar" />
@@ -231,6 +234,12 @@
             <!--<maven:remoteRepository url="file://${dist.repo.dir}" />-->
             <maven:pom file="${pom.file}" />
         </maven:deploy>
+    </target>
+
+    <target name="website" description="Copies the website files to SourceForge">
+        <scp todir="simonebordet@shell.sourceforge.net:/home/groups/f/fo/foxtrot/htdocs/" password="${password}" trust="yes">
+            <fileset dir="${website.dir}" />
+        </scp>
     </target>
 
     <!--
