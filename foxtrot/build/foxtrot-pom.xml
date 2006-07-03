@@ -6,7 +6,6 @@
     <artifactId>foxtrot-core</artifactId>
     <packaging>jar</packaging>
     <version>3.0-beta-1</version>
-    <name>Foxtrot</name>
 
     <issueManagement />
 

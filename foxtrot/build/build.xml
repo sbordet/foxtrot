@@ -218,16 +218,17 @@
        </target>
     -->
 
-    <target name="install" depends="jar">
+    <target name="install" depends="jar" description="Installs Foxtrot in the local Maven2 repository">
         <maven:install file="${core.jar.file}">
             <maven:pom file="${pom.file}" />
         </maven:install>
     </target>
 
-    <target name="deploy" depends="jar">
-        <mkdir dir="${dist.repo.dir}" />
+    <target name="deploy" depends="jar" description="Deploys Foxtrot in the Maven2 repository">
+        <!--<mkdir dir="${dist.repo.dir}" />-->
+        <maven:install-provider artifactId="wagon-webdav" version="1.0-beta-1"/>
         <maven:deploy file="${core.jar.file}">
-            <maven:remoteRepository url="file://${dist.repo.dir}" />
+            <!--<maven:remoteRepository url="file://${dist.repo.dir}" />-->
             <maven:pom file="${pom.file}" />
         </maven:deploy>
     </target>
