@@ -21,14 +21,9 @@ import junit.framework.TestCase;
  *
  * @version $Revision$
  */
-public class FoxtrotTestCase extends TestCase
+public abstract class FoxtrotTestCase extends TestCase
 {
     protected boolean debug = false;
-
-    protected FoxtrotTestCase(String s)
-    {
-        super(s);
-    }
 
     /**
      * Invokes the given Runnable in the AWT Event Dispatch Thread and waits for its
@@ -147,6 +142,7 @@ public class FoxtrotTestCase extends TestCase
 
     protected void sleep(long ms)
     {
+        if (ms <= 0) return;
         try
         {
             Thread.sleep(ms);

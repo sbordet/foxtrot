@@ -22,11 +22,6 @@ import foxtrot.pumps.SunJDK14ConditionalEventPump;
  */
 public class EventPumpTest extends FoxtrotTestCase
 {
-    public EventPumpTest(String s)
-    {
-        super(s);
-    }
-
     public void testJDK13QueueEventPump() throws Exception
     {
         if (!isJRE14())

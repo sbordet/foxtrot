@@ -16,11 +16,6 @@ import foxtrot.workers.MultiWorkerThread;
  */
 public class MultiWorkerThreadTest extends FoxtrotTestCase
 {
-    public MultiWorkerThreadTest(String s)
-    {
-        super(s);
-    }
-
     public void testThreads() throws Exception
     {
         final MutableHolder thread = new MutableHolder(null);

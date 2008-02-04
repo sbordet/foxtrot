@@ -27,11 +27,6 @@ import foxtrot.Worker;
  */
 public class WorkerTest extends FoxtrotTestCase
 {
-    public WorkerTest(String s)
-    {
-        super(s);
-    }
-
     public void testThreads() throws Exception
     {
         invokeTest(Worker.getWorkerThread(), new Runnable()
@@ -486,8 +481,8 @@ public class WorkerTest extends FoxtrotTestCase
                 long plainElapsed = end - start;
                 System.out.println("Plain Listener performance: " + count + " calls in " + plainElapsed + " ms");
 
-                int perthousand = 1;
-                if ((workerElapsed - plainElapsed) * 1000 > plainElapsed * perthousand) fail();
+                int perthousand = 10;
+                if (Math.abs(workerElapsed - plainElapsed) * 1000 > plainElapsed * perthousand) fail();
             }
         }, null);
     }

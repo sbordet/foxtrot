@@ -23,11 +23,6 @@ import foxtrot.pumps.EventFilterable;
  */
 public class EventFilterableTest extends FoxtrotTestCase
 {
-    public EventFilterableTest(String s)
-    {
-        super(s);
-    }
-
     public void testEventNotFiltered() throws Exception
     {
         invokeTest(Worker.getWorkerThread(), new Runnable()
