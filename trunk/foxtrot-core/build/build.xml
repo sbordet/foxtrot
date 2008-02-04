@@ -253,7 +253,7 @@
         <!-- Miscellaneous files -->
         <copy todir="${dist.release.dir}">
             <fileset dir="${etc.dir}"
-                     includes="README,LICENSE" />
+                     includes="README.txt,LICENSE.txt" />
         </copy>
 
         <!-- The core, examples, tests and source foxtrot jars -->
