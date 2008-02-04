@@ -20,11 +20,6 @@ import foxtrot.WorkerThread;
  */
 public class AsyncWorkerTest extends FoxtrotTestCase
 {
-    public AsyncWorkerTest(String s)
-    {
-        super(s);
-    }
-
     public void testPostAndForget() throws Exception
     {
         final MutableHolder result = new MutableHolder(null);

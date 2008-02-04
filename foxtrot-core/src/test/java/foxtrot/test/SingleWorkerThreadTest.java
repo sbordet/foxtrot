@@ -16,11 +16,6 @@ import foxtrot.workers.SingleWorkerThread;
  */
 public class SingleWorkerThreadTest extends FoxtrotTestCase
 {
-    public SingleWorkerThreadTest(String s)
-    {
-        super(s);
-    }
-
     private class TestSingleWorkerThread extends SingleWorkerThread
     {
         public void stop()
