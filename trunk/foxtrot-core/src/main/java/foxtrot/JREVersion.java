@@ -24,9 +24,6 @@ class JREVersion
     private static Boolean jre13;
     private static Boolean jre12;
 
-    /**
-     * @deprecated
-     */
     static boolean isJRE141()
     {
         if (jre141 == null)
@@ -38,9 +35,6 @@ class JREVersion
         return jre141.booleanValue();
     }
 
-    /**
-     * @deprecated
-     */
     static boolean isJRE140()
     {
         if (jre140 == null)

@@ -11,10 +11,19 @@ package foxtrot.pumps;
 import java.awt.AWTEvent;
 import java.awt.EventQueue;
 
+import sun.awt.SunToolkit;
+
 /**
- * Specialized ConditionalEventPump for Sun's JDK 1.4 and 5.0.
- * It fixes what I think is a misbehavior of {@link java.awt.EventQueue#peekEvent()},
+ * Specialized ConditionalEventPump for Sun's JDK 1.4, 5.0 and 6.0.
+ * It fixes what I think is a misbehavior of {@link EventQueue#peekEvent()},
  * that does not flush pending events to the EventQueue before peeking for them.
+ * The implementation of {@link EventQueue#getNextEvent()} calls
+ * {@link SunToolkit#flushPendingEvents()} before returning the next event, thus
+ * ensuring that all events are flushed to the EventQueue.
+ * However, the implementation of {@link EventQueue#peekEvent()} does not call
+ * {@link SunToolkit#flushPendingEvents()} resulting in peekEvents() returning
+ * null (no events available) while getNextEvent() returns not null (a flushed
+ * event).
  *
  * @version $Revision$
  */
@@ -35,7 +44,7 @@ public class SunJDK14ConditionalEventPump extends ConditionalEventPump
 
         while (true)
         {
-            sun.awt.SunToolkit.flushPendingEvents();
+            SunToolkit.flushPendingEvents();
             synchronized (queue)
             {
                 nextEvent = peekEvent(queue);

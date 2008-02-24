@@ -14,12 +14,21 @@ import java.security.AccessController;
 import java.security.PrivilegedExceptionAction;
 
 /**
- * Specialized ConditionalEventPump for Sun's JDK 1.4.1.
+ * Specialized ConditionalEventPump for Sun's JDK 1.4.1, 1.4.2, 5.0 and 6.0.
+ * This class used to implement a workaround for bug #4531693 that has been
+ * fixed in JDK 1.4.2 and backported to 1.4.1.
+ * However, the handling of sequenced events is very difficult in the JDK
+ * itself (especially in conjunction with usage of modal dialogs, which use
+ * the same mechanism used by Foxtrot) and various reincarnations of the
+ * bug reappeared in JDK 5 and 6.
+ * Basically it is <em>dangerous</em> to pump events when the pump starts
+ * as a consequence of events delivered with <code>SequencedEvent</code>s
+ * (such as focus events and window focus events).
+ * SequencedEvents must be delivered in sequence, so it is good to pump
+ * the second event in the sequence from the listener of the first event,
+ * and this class avoids just that.
  *
  * @version $Revision$
- * @deprecated This class implements a workaround for bug #4531693 that has been fixed
- *             in JDK 1.4.2 and backported to 1.4.1. Therefore it is recommended to upgrade to those
- *             fixed JDK versions, as the bug not only affects Foxtrot but also the usage of dialogs.
  */
 public class SunJDK141ConditionalEventPump extends SunJDK14ConditionalEventPump
 {
@@ -51,14 +60,26 @@ public class SunJDK141ConditionalEventPump extends SunJDK14ConditionalEventPump
 
     protected boolean canPumpEvent(AWTEvent event)
     {
-        try
+        boolean result = false;
+        if (sequencedEventClass.isInstance(event))
         {
-            Object first = getFirstMethod.invoke(event, null);
-            if (first == event) return true;
+            try
+            {
+                Object first = getFirstMethod.invoke(event, null);
+                if (first == event) result = true;
+            }
+            catch (Throwable x)
+            {
+                if (debug) x.printStackTrace();
+                result = false;
+            }
+            if (debug) System.out.println("[SunJDK141ConditionalEventPump] SequencedEvent can" + (result ? "" : "not") + " be pumped");
         }
-        catch (Exception ignored)
+        else
         {
+            result = true;
         }
-        return false;
+
+        return result;
     }
 }
