@@ -16,11 +16,10 @@ import java.util.LinkedList;
 
 /**
  * Specialized ConditionalEventPump for Sun's JDK 1.4.0.
+ * This class used to implement a workaround for bug #4531693.
+ * It is strongly recommended to upgrade to newer JDK versions.
  *
  * @version $Revision$
- * @deprecated This class implements a workaround for bug #4531693 that has been fixed
- *             in JDK 1.4.2 and backported to 1.4.1. Therefore it is recommended to upgrade to those
- *             fixed JDK versions, as the bug not only affects Foxtrot but also the usage of dialogs.
  */
 public class SunJDK140ConditionalEventPump extends SunJDK14ConditionalEventPump
 {
@@ -52,17 +51,22 @@ public class SunJDK140ConditionalEventPump extends SunJDK14ConditionalEventPump
 
     protected boolean canPumpEvent(AWTEvent event)
     {
-        try
+        if (sequencedEventClass.isInstance(event))
         {
-            LinkedList list = (LinkedList)listField.get(event);
-            synchronized (sequencedEventClass)
+            try
             {
-                if (list.getFirst() == event) return true;
+                LinkedList list = (LinkedList)listField.get(event);
+                synchronized (sequencedEventClass)
+                {
+                    if (list.getFirst() == event) return true;
+                }
+            }
+            catch (Throwable x)
+            {
+                if (debug) x.printStackTrace();
+                return false;
             }
         }
-        catch (Exception x)
-        {
-        }
-        return false;
+        return true;
     }
 }

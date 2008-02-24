@@ -1,15 +1,18 @@
 package foxtrot.examples;
 
 import java.awt.BorderLayout;
+import java.awt.EventQueue;
+import java.awt.Frame;
+import java.awt.HeadlessException;
 import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
 
+import javax.swing.JDialog;
 import javax.swing.JFrame;
 import javax.swing.JTextField;
 
 import foxtrot.Job;
 import foxtrot.Worker;
-import foxtrot.pumps.SunJDK141ConditionalEventPump;
 
 /**
  * @version $Revision$ $Date$
@@ -29,7 +32,7 @@ public class FocusLostExample extends JFrame
     {
         setDefaultCloseOperation(DISPOSE_ON_CLOSE);
         textField = new JTextField(10);
-        setLayout(new BorderLayout(10, 10));
+        getContentPane().setLayout(new BorderLayout(10, 10));
         getContentPane().add(textField, BorderLayout.NORTH);
         getContentPane().add(new JTextField(20), BorderLayout.SOUTH);
         textField.addFocusListener(new FocusListener()
@@ -40,13 +43,16 @@ public class FocusLostExample extends JFrame
 
             public void focusLost(FocusEvent e)
             {
-/*
-                JDialog dialog = new JDialog(FocusLostExample.this, "Dialog", true);
-                dialog.setDefaultCloseOperation(DISPOSE_ON_CLOSE);
-                dialog.setSize(400, 300);
-                dialog.setVisible(true);
-*/
-                Worker.setEventPump(new SunJDK141ConditionalEventPump());
+//                EventQueue.invokeLater(new Runnable()
+//                {
+//                    public void run()
+//                    {
+//                        System.out.println("FOCUS LOST");
+//                        JDialog dialog = new WaitDialog(FocusLostExample.this);
+//                        dialog.setVisible(true);
+//                    }
+//                });
+
                 Worker.post(new Job()
                 {
                     public Object run()
@@ -65,5 +71,48 @@ public class FocusLostExample extends JFrame
             }
         });
         setSize(800, 600);
+    }
+
+    private class WaitDialog extends JDialog
+    {
+        private WaitDialog(Frame owner) throws HeadlessException
+        {
+            super(owner, "Dialog", true);
+            setDefaultCloseOperation(DISPOSE_ON_CLOSE);
+            setSize(400, 300);
+            setLocationRelativeTo(null);
+        }
+
+        public void setVisible(boolean visible)
+        {
+            if (visible) startWait();
+            super.setVisible(visible);
+        }
+
+        private void startWait()
+        {
+            new Thread(new Runnable()
+            {
+                public void run()
+                {
+                    try
+                    {
+                        System.out.println("DIALOG WAITING");
+                        Thread.sleep(1000);
+                    }
+                    catch (InterruptedException x)
+                    {
+                    }
+                    EventQueue.invokeLater(new Runnable()
+                    {
+                        public void run()
+                        {
+                            System.out.println("DIALOG HIDING");
+                            WaitDialog.this.setVisible(false);
+                        }
+                    });
+                }
+            }).start();
+        }
     }
 }
