@@ -6,7 +6,7 @@
  * See the terms of the BSD license in the documentation provided with this software.
  */
 
-package foxtrot.test;
+package foxtrot.examples;
 
 import java.awt.AWTEvent;
 import java.awt.Dialog;
