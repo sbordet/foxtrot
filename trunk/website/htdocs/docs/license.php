@@ -3,7 +3,7 @@
 <tr>
 <td align="center">
 <pre>
-Copyright (c) 2002-2006, Simone Bordet & Marco Cravero
+Copyright (c) 2002-2008, Simone Bordet & Marco Cravero
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without modification, are permitted
