@@ -24,6 +24,8 @@ import foxtrot.ConcurrentWorker;
 import foxtrot.Job;
 
 /**
+ * TODO: add javadocs
+ *
  * @version $Revision$
  */
 public class ConcurrentWorkerExample extends JFrame
