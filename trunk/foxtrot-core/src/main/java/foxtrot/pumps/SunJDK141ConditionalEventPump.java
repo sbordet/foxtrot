@@ -24,7 +24,7 @@ import java.security.PrivilegedExceptionAction;
  * Basically it is <em>dangerous</em> to pump events when the pump starts
  * as a consequence of events delivered with <code>SequencedEvent</code>s
  * (such as focus events and window focus events).
- * SequencedEvents must be delivered in sequence, so it is good to pump
+ * SequencedEvents must be delivered in sequence, so it is not good to pump
  * the second event in the sequence from the listener of the first event,
  * and this class avoids just that.
  *
