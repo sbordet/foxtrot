@@ -194,8 +194,8 @@ public class ConditionalEventPump implements EventPump, EventFilterable
      * that uses the same event pumping mechanism); the new event pump might try to dispatch the
      * SequencedEvent second in the list (while the first wasn't completely dispatched yet),
      * causing the application to hang.
-     * Bug #4531693 has been fixed in JDK 1.4.2, and backported to 1.4.1, so there is no longer
-     * need to check for this situation, unless using JDK 1.4.0 or non-fixed versions of JDK 1.4.1.
+     * Bug #4531693 has been fixed in JDK 1.4.2, and backported to 1.4.1, but seems to be
+     * sneaking in again in JDK 5 and JDK 6.
      */
     protected boolean canPumpEvent(AWTEvent event)
     {
@@ -285,7 +285,8 @@ public class ConditionalEventPump implements EventPump, EventFilterable
          */
         public Object invoke(Object proxy, Method method, Object[] args) throws Throwable
         {
-            return pumpEvent(task);
+            if (method.getDeclaringClass() != Object.class) return pumpEvent(task);
+            return method.invoke(this, args);
         }
     }
 
