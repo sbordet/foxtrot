@@ -17,7 +17,7 @@
         <dependency>
             <groupId>foxtrot</groupId>
             <artifactId>foxtrot-core</artifactId>
-            <version>${version}</version>
+            <version>${parent.version}</version>
         </dependency>
     </dependencies>
 

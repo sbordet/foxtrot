@@ -1,58 +1,293 @@
-body         { color: navy; background-color: #FFFFCC; font-family: Verdana, Arial, Helvetica; background-image: url('images/cnvbkgnd.jpg') }
+* {
+    margin: 0;
+    padding: 0;
+}
 
-code         { font-size: 12pt }
+a {
+    color: #963;
+}
 
-ul           { list-style-image: url('images/acnvbul1.gif') }
-ul ul        { list-style-image: url('images/acnvbul2.gif') }
-ul ul ul     { list-style-image: url('images/acnvbul3.gif') }
+a:hover {
+    color: #C60;
+}
 
-a:link       { color: #663399 }
-a:visited    { color: #003399 }
-a:active     { color: #339999 }
+body {
+    background: #CCD8E0;
+    color: #444;
+    font: normal 80% Tahoma, sans-serif;
+}
 
-h1           { color: navy; text-align: center }
-h2           { color: navy; text-align: center }
-h3           { color: navy }
-h4           { color: navy }
-h5           { color: navy }
-h6           { color: navy }
+code {
+    background: #FFF;
+    border: 1px solid #EEE;
+    border-left: 6px solid #C1CAD3;
+    color: #666;
+    display: block;
+    font: normal 1em Tahoma, sans-serif;
+    line-height: 1.6em;
+    margin-bottom: 12px;
+    padding: 8px 10px;
+    white-space: pre;
+}
 
-img          { border: none }
+h1 {
+    font: normal 1.8em Tahoma, sans-serif;
+    margin-bottom: 4px;
+}
 
-td.header-logo { }
-td.header-text { text-align: center; padding-bottom: 15px }
+h1, h2, h3 {
+    padding-top: 6px;
+}
 
-td.menu      { width: 15%; vertical-align: top }
+html {
+    min-height: 100%;
+}
 
-table.menu-header { margin-top: 30px; border: solid 1px navy }
-td.menu-header { background-color: navy; color: #FFFFCC; text-align: center }
-div.menu-title { font-size: 11pt; font-weight: bold; padding: 5px 5px 5px 5px; background: url('')}
-div.menu-entry { font-size: 10pt; padding-left: 20px }
+img {
+    border: 0;
+}
 
-td.content   { font-size: 11pt; padding: 10px 10px 0px 10px }
+li {
+    list-style: none;
+}
 
-td.news      { width: 15%; vertical-align: top; font-size: 11pt; padding: 10px 0px 0px 0px }
+p {
+    padding: 0.6em 0;
+}
 
-li           { padding: 2px 0px 2px 10px }
+pre {
+    font-size: larger;
+}
 
-/* For the documentation */
+tt {
+    font-size: larger;
+}
 
-td.date      { font-size: 10pt; text-align: center; padding: 10px 0px 20px 0px }
-td.documentation { font-size: 11pt; padding 10px 10px 0px 10px }
-div.toc      { font-size: 12pt; font-weight: bold; padding: 0px 0px 10px 0px }
-div.toc-chapt { font-size: 11pt; font-weight: bold; padding: 5px 0px 5px 10px }
-div.toc-sect { font-size: 10pt; padding: 0px 0px 0px 40px }
-img.nav-btn-en { border: solid 1px #003399 }
-img.nav-btn-dis { border: solid 1px #339999 }
+ul {
+    padding-bottom: 1.2em;
+}
 
+.clearer {
+    clear: both;
+}
+
+.left {
+    float: left;
+}
+
+.right {
+    float: right;
+}
+
+.container {
+    background: #FFF;
+    font-size: 1.2em;
+    margin: 0 auto;
+    padding: 0 10px 10px;
+    width: 780px;
+}
+
+.header {
+    background: #FFF;
+    font-size: 1.2em;
+    height: 150px;
+    margin: 0 auto;
+    padding: 10px 10px 5px;
+    width: 780px;
+}
+
+.header .left, .header .right {
+    background: #A4A4A0;
+    color: #FFF;
+    height: 150px;
+}
+
+.header .left {
+    background: #B3C2C7;
+    font: normal 2.8em "Trebuchet MS", sans-serif;
+    line-height: 150px;
+    text-align: center;
+    width: 564px;
+}
+
+.header .right {
+    overflow: auto;
+    text-align: center;
+    width: 212px;
+}
+
+.navigation {
+    background: #D9E1E5 url('images/navigation.gif');
+    border: 1px solid #DFEEF7;
+    border-color: #DFEEF7 #CFDEE7;
+    height: 41px;
+}
+
+.navigation a {
+    background: #D9E1E5 url('images/navigation.gif');
+    border-right: 1px solid #AFBEC7;
+    color: #456;
+    display: block;
+    float: left;
+    font: bold 1.1em sans-serif;
+    line-height: 41px;
+    padding: 0 20px;
+    text-decoration: none;
+}
+
+.navigation a:hover {
+    background-position: left bottom;
+    color: #234;
+}
+
+.main-right {
+    border-top: 4px solid #FFF;
+    background: url('images/bgmainr.gif') repeat-y;
+}
+
+.main-left {
+    border-top: 4px solid #FFF;
+    background: url('images/bgmainl.gif') repeat-y;
+}
+
+.news {
+    float: right;
+    width: 210px;
+}
+
+.news h2 {
+    border-bottom: 1px solid #EAEADA;
+    color: #5A5A43;
+    line-height: 30px;
+    margin: 0;
+    padding: 10px 0 0 12px;
+}
+
+.news p {
+    border-bottom: 1px solid #EAEADA;
+    padding: 8px 0 8px 12px;
+}
+
+.news .date {
+    font-size: 75%;
+    padding: 8px 0;
+}
+
+.news p a {
+    color: #554;
+    text-decoration: none;
+}
+
+
+.news p a:hover {
+    background: #F0F0EB;
+    color: #654;
+}
+
+.sidenav {
+    float: left;
+    width: 210px;
+}
+
+.sidenav h2 {
+    color: #5A5A43;
+    font-size: 1.1em;
+    line-height: 30px;
+    margin: 0;
+    padding-left: 12px;
+}
+
+.sidenav ul {
+    padding: 0;
+    border-top: 1px solid #EAEADA;
+}
+
+.sidenav li {
+    border-bottom: 1px solid #EAEADA;
+}
+
+.sidenav li a {
+    color: #554;
+    display: block;
+    padding: 8px 0 8px 5%;
+    text-decoration: none;
+    width: 95%;
+}
+
+.sidenav li a:hover {
+    background: #F0F0EB;
+    color: #654;
+}
+
+.content {
+    float: left;
+    margin: 10px 0;
+    padding: 0 16px;
+    width: 531px;
+}
+
+.content .descr {
+    color: #664;
+    font-size: 0.9em;
+    margin-bottom: 6px;
+}
+
+.content li {
+    list-style: url('images/li.gif');
+    margin-left: 18px;
+}
+
+.content p {
+    font-family: "Lucida Sans Unicode", sans-serif;
+}
+
+.footer {
+    background: url('images/bgfooter.gif') repeat-x;
+    color: #FFF;
+    font: bold 1em sans-serif;
+    line-height: 39px;
+    text-align: center;
+}
+
+.footer a, .footer a:hover {
+    color: #FFF;
+}
+
+/* OLD CSS for the code examples*/
 /* For the code */
 
-span.code { color: black }
-span.main { color: navy }
-span.event { color: #00BF00 }
-span.worker {color: red }
-span.foxtrot {color: #FF9000 }
+span.code {
+    color: black
+}
 
-table.legend { margin-top: 15px; border: solid 1px navy }
-td.legend { background-color: navy; color: #FFFFCC; text-align: center }
-td.legend-entry { font-size: 10pt; padding: 5px 0px 5px 10px }
+span.main {
+    color: navy
+}
+
+span.event {
+    color: #00BF00
+}
+
+span.worker {
+    color: red
+}
+
+span.foxtrot {
+    color: #FF9000
+}
+
+table.legend {
+    margin-top: 15px;
+    border: solid 1px navy
+}
+
+td.legend {
+    background-color: navy;
+    color: #FFFFCC;
+    text-align: center
+}
+
+td.legend-entry {
+    font-size: 10pt;
+    padding: 5px 0 5px 10px
+}

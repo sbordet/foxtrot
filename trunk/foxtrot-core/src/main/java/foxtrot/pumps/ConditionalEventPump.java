@@ -24,7 +24,7 @@ import foxtrot.Task;
 
 /**
  * This implementation of EventPump calls the package protected method
- * <code>java.awt.EventDispatchThread.pumpEvents(Conditional)</code>
+ * <tt>java.awt.EventDispatchThread.pumpEvents(Conditional)</tt>
  * to pump events while a Task is executed.
  *
  * @version $Revision$
@@ -265,7 +265,7 @@ public class ConditionalEventPump implements EventPump, EventFilterable
     }
 
     /**
-     * Implements the <code>java.awt.Conditional</code> interface,
+     * Implements the <tt>java.awt.Conditional</tt> interface,
      * that is package private, with a JDK 1.3+ dynamic proxy.
      */
     private class Conditional implements InvocationHandler
@@ -281,7 +281,7 @@ public class ConditionalEventPump implements EventPump, EventFilterable
         }
 
         /**
-         * Implements method <code>java.awt.Conditional.evaluate()</code>
+         * Implements method <tt>java.awt.Conditional.evaluate()</tt>
          */
         public Object invoke(Object proxy, Method method, Object[] args) throws Throwable
         {
@@ -292,7 +292,7 @@ public class ConditionalEventPump implements EventPump, EventFilterable
 
     /**
      * Handler for RuntimeExceptions or Errors thrown during dispatching of AWT events. <br />
-     * The name of this class is used as a value of the property <code>sun.awt.exception.handler</code>,
+     * The name of this class is used as a value of the property <tt>sun.awt.exception.handler</tt>,
      * and the AWT event dispatch mechanism calls it when an unexpected runtime exception or error
      * is thrown during event dispatching. If the user specifies a different exception handler,
      * this one will not be used, and the user's one is used instead.

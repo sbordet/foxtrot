@@ -22,7 +22,7 @@ import java.security.PrivilegedExceptionAction;
  * the same mechanism used by Foxtrot) and various reincarnations of the
  * bug reappeared in JDK 5 and 6.
  * Basically it is <em>dangerous</em> to pump events when the pump starts
- * as a consequence of events delivered with <code>SequencedEvent</code>s
+ * as a consequence of events delivered with <tt>SequencedEvent</tt>s
  * (such as focus events and window focus events).
  * SequencedEvents must be delivered in sequence, so it is not good to pump
  * the second event in the sequence from the listener of the first event,

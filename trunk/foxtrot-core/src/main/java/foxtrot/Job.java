@@ -25,7 +25,7 @@ package foxtrot;
  *     }
  * };
  * </pre>
- * RuntimeExceptions or Errors thrown by the <code>run()</code> method will be rethrown automatically by
+ * RuntimeExceptions or Errors thrown by the <tt>run()</tt> method will be rethrown automatically by
  * {@link Worker#post(Job)} or {@link ConcurrentWorker#post(Job)}.
  *
  * @version $Revision$

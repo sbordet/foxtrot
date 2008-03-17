@@ -8,7 +8,7 @@
 <ul>
 <li>Working correctly with Swing Models
 <li>Working correctly with Custom Event Emitters
-<li>Working correctly with <code>JComboBox</code>
+<li>Working correctly with <tt>JComboBox</tt>
 </ul>
 </p>
 
@@ -17,7 +17,7 @@
 present. No matter if the chosen solution is asynchronous or synchronous, care must be taken
 to interact with Swing Models, since code working well against a plain Swing solution (i.e. without use of threads), may
 not work as well when using threads.</p>
-<p>Let's make an example: suppose you have a <code>JTable</code>, and you use as a model a subclass of <code>AbstractTableModel</code> that you feeded with
+<p>Let's make an example: suppose you have a <tt>JTable</tt>, and you use as a model a subclass of <tt>AbstractTableModel</tt> that you feeded with
 your data. Suppose also that the user can change the content of a cell by editing it, but the operation to validate the
 new input takes time.<br />
 Using plain Swing programming, this code looks similar to this:</p>
@@ -47,7 +47,7 @@ public class MyModel extends AbstractTableModel
 </table>
 </td></tr>
 </table>
-<p>If <code>isValid(Object value)</code> is fast, no problem; otherwise the user has the GUI frozen and no feedback on what
+<p>If <tt>isValid(Object value)</tt> is fast, no problem; otherwise the user has the GUI frozen and no feedback on what
 is going on.<br />
 Thus you may decide to use Foxtrot, and you convert the old code to this:</p>
 <pre><span class="code">
@@ -76,12 +76,12 @@ public class MyModel extends AbstractTableModel
 }
 </span></pre>
 <p>The above is just plain <b>wrong</b>.<br />
-It is wrong because the data member <code>m_data</code> is accessed from two threads: from the Foxtrot Worker Thread
-(since it is modified inside <code>Job.run()</code>) and from the AWT Event Dispatch Thread (since any repaint event
-that occurs will call <code>getValueAt(int row, int col)</code>).</p>
-<p>Avoid the temptation to modify <em>anything</em> from inside <code>Job.run()</code>. It should just take data
+It is wrong because the data member <tt>m_data</tt> is accessed from two threads: from the Foxtrot Worker Thread
+(since it is modified inside <tt>Job.run()</tt>) and from the AWT Event Dispatch Thread (since any repaint event
+that occurs will call <tt>getValueAt(int row, int col)</tt>).</p>
+<p>Avoid the temptation to modify <em>anything</em> from inside <tt>Job.run()</tt>. It should just take data
 from outside, perform some heavy operation and <em>return the result of the operation</em>.<br />
-The pattern to follow in the implementation of <code>Job.run()</code> is <b>Compute and Return</b>, see example below.</p>
+The pattern to follow in the implementation of <tt>Job.run()</tt> is <b>Compute and Return</b>, see example below.</p>
 <pre><span class="code">
 public class MyModel extends AbstractTableModel
 {
@@ -109,8 +109,8 @@ public class MyModel extends AbstractTableModel
    }
 }
 </span></pre>
-<p>Note how <em>only</em> the heavy operation is isolated inside <code>Job.run()</code>, while modifications to the
-data member <code>m_data</code> now happen in the AWT Event Dispatch Thread, thus following the Swing Programming Rules
+<p>Note how <em>only</em> the heavy operation is isolated inside <tt>Job.run()</tt>, while modifications to the
+data member <tt>m_data</tt> now happen in the AWT Event Dispatch Thread, thus following the Swing Programming Rules
 and avoiding concurrent read/write access to it.</p>
 
 <h3>Working correctly with Custom Event Emitters</h3>
@@ -119,7 +119,7 @@ state change, following the well-known <b>Subject-Observer</b> pattern.<br />
 When threads are used in such a Swing Application, you have to be careful about which thread will actually notify the
 listeners.</p>
 <p>Let's make an example: suppose you created a custom data structure that emits event when its state changes, and
-suppose that state change is triggered by <code>JButton</code>s. In plain Swing programming, the code may be similar to this:</p>
+suppose that state change is triggered by <tt>JButton</tt>s. In plain Swing programming, the code may be similar to this:</p>
 <pre><span class="code">
 public class Machine
 {
@@ -169,8 +169,8 @@ button.addActionListener(new ActionListener()
    }
 });
 </span></pre>
-<p>The <code>Machine</code> class is a JavaBean, and does not deal with Swing code.<br />
-While you implement <code>Machine.start()</code> you discover that the process of starting a Machine is a long one, and
+<p>The <tt>Machine</tt> class is a JavaBean, and does not deal with Swing code.<br />
+While you implement <tt>Machine.start()</tt> you discover that the process of starting a Machine is a long one, and
 decide to not freeze the GUI after pressing the button.<br />
 With the Foxtrot API, a small change in the listener will do the job:</p>
 <pre><span class="code">
@@ -190,13 +190,13 @@ button.addActionListener(new ActionListener()
 });
 </span></pre>
 <p>Unfortunately, the above is plain <b>wrong</b>.<br />
-It is wrong because now <code>Machine.start()</code> is called in the Foxtrot Worker Thread, and so is
-<code>Machine.notifyListeners()</code> and finally also any registered listener have the
-<code>Listener.stateChanged()</code> called in the Foxtrot Worker Thread.<br />
-In the example above, the <code>statusLabel</code>'s text is thus changed in the Foxtrot Worker Thread, violating the
+It is wrong because now <tt>Machine.start()</tt> is called in the Foxtrot Worker Thread, and so is
+<tt>Machine.notifyListeners()</tt> and finally also any registered listener have the
+<tt>Listener.stateChanged()</tt> called in the Foxtrot Worker Thread.<br />
+In the example above, the <tt>statusLabel</tt>'s text is thus changed in the Foxtrot Worker Thread, violating the
 Swing Programming Rules.</p>
-<p>Below you can find one solution to this problem (my favorite), that fixes the <code>Machine.notifyListeners()</code>
-implementation using <code>SwingUtilities.invokeAndWait()</code>:</p>
+<p>Below you can find one solution to this problem (my favorite), that fixes the <tt>Machine.notifyListeners()</tt>
+implementation using <tt>SwingUtilities.invokeAndWait()</tt>:</p>
 <pre><span class="code">
 public class Machine
 {
@@ -229,19 +229,19 @@ public class Machine
    }
 }
 </span></pre>
-<p>The use of <code>SwingUtilities.invokeAndWait()</code> preserves the semantic of the <code>Machine.notifyListeners()</code>
-method, that returns when all the listeners have been notified. Using <code>SwingUtilities.invokeLater()</code> causes
+<p>The use of <tt>SwingUtilities.invokeAndWait()</tt> preserves the semantic of the <tt>Machine.notifyListeners()</tt>
+method, that returns when all the listeners have been notified. Using <tt>SwingUtilities.invokeLater()</tt> causes
 this method to return immediately, normally before listeners have been notified, breaking the semantic.</p>
 
-<h3>Working correctly with <code>JComboBox</code></h3>
-<p><code>JComboBox</code> shows a non-usual behavior with respect to item selection when compared, for example,
-with <code>JMenu</code>: both show a <code>JPopup</code> with a list of items to be selected by the user, but after
-selecting an item in <code>JMenu</code> the <code>JPopup</code> disappears immediately, while in <code>JComboBox</code>
+<h3>Working correctly with <tt>JComboBox</tt></h3>
+<p><tt>JComboBox</tt> shows a non-usual behavior with respect to item selection when compared, for example,
+with <tt>JMenu</tt>: both show a <tt>JPopup</tt> with a list of items to be selected by the user, but after
+selecting an item in <tt>JMenu</tt> the <tt>JPopup</tt> disappears immediately, while in <tt>JComboBox</tt>
 it remains shown until all listeners are processed.</p>
-<p>Swing Applications that contain <code>JComboBox</code>es that have to perform heavy operations when an item is
-selected will suffer of the "<code>JPopup</code> shown problem" when using plain Swing programming (in this case
+<p>Swing Applications that contain <tt>JComboBox</tt>es that have to perform heavy operations when an item is
+selected will suffer of the "<tt>JPopup</tt> shown problem" when using plain Swing programming (in this case
 the GUI is also frozen) and when using synchronous APIs (this problem does not appear when using asynchronous APIs).</p>
-<p>However this problem is easily solved by asking <code>JComboBox</code> to explicitely close the <code>JPopup</code>,
+<p>However this problem is easily solved by asking <tt>JComboBox</tt> to explicitely close the <tt>JPopup</tt>,
 as the example below shows:
 <pre><span class="code">
 final JComboBox combo = new JComboBox(...);
