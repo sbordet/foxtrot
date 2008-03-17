@@ -153,7 +153,7 @@ public class ExtendedConcurrentWorkerExample extends JFrame
             public void run()
             {
                 System.out.println("Showing the dialog");
-                // dialog.display(workerThread);
+                 dialog.display(workerThread);
             }
         });
     }

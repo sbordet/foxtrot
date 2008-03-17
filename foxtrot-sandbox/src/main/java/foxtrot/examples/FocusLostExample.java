@@ -85,7 +85,7 @@ public class FocusLostExample extends JFrame
     {
         private WaitDialog(Frame owner) throws HeadlessException
         {
-            super(owner, "Dialog", true);
+            super((Frame)null, "Dialog", true);
             setDefaultCloseOperation(DISPOSE_ON_CLOSE);
             setSize(400, 300);
             setLocationRelativeTo(null);
@@ -117,6 +117,8 @@ public class FocusLostExample extends JFrame
                         {
                             System.out.println("DIALOG HIDING");
                             WaitDialog.this.setVisible(false);
+                            System.out.println("WaitDialog.this.isDisplayable() = " + WaitDialog.this.isDisplayable());
+                            WaitDialog.this.dispose();
                         }
                     });
                 }

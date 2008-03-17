@@ -67,17 +67,15 @@ public class AsyncWorkerTest extends FoxtrotTestCase
                         return VALUE;
                     }
 
-                    public void finish()
+                    public void success(Object r)
                     {
-                        try
-                        {
-                            String value = (String)getResultOrThrow();
-                            if (!VALUE.equals(value)) result.set("AsyncTask.run() does not return the result");
-                        }
-                        catch (Exception x)
-                        {
-                            result.set(x.toString());
-                        }
+                        String value = (String)r;
+                        if (!VALUE.equals(value)) result.set("AsyncTask.run() does not return the result");
+                    }
+
+                    public void failure(Throwable x)
+                    {
+                        result.set(x.toString());
                     }
                 });
 
@@ -116,25 +114,23 @@ public class AsyncWorkerTest extends FoxtrotTestCase
                         return null;
                     }
 
-                    public void finish()
+                    public void success(Object r)
                     {
-                        try
+                        String failure = (String)r;
+                        if (failure == null)
                         {
-                            String failure = (String)getResultOrThrow();
-                            if (failure == null)
-                            {
-                                // Check that I'm in the AWT Event Dispatch Thread
-                                if (!SwingUtilities.isEventDispatchThread()) result.set("Must be in the Event Dispatch Thread");
-                            }
-                            else
-                            {
-                                result.set(failure);
-                            }
+                            // Check that I'm in the AWT Event Dispatch Thread
+                            if (!SwingUtilities.isEventDispatchThread()) result.set("Must be in the Event Dispatch Thread");
                         }
-                        catch (Exception x)
+                        else
                         {
-                            result.set(x.toString());
+                            result.set(failure);
                         }
+                    }
+
+                    public void failure(Throwable x)
+                    {
+                        result.set(x.toString());
                     }
                 });
 
@@ -164,18 +160,18 @@ public class AsyncWorkerTest extends FoxtrotTestCase
                         throw ex;
                     }
 
-                    public void finish()
+                    public void success(Object r)
                     {
-                        try
-                        {
-                            getResultOrThrow();
-                            result.set("Expected exception");
-                        }
-                        catch (IndexOutOfBoundsException x)
+                        result.set("Expected exception");
+                    }
+
+                    public void failure(Throwable x)
+                    {
+                        if (x instanceof IndexOutOfBoundsException)
                         {
                             if (x != ex) result.set("Expected same exception");
                         }
-                        catch (Exception x)
+                        else
                         {
                             result.set("Did not expect checked exception");
                         }
@@ -208,18 +204,18 @@ public class AsyncWorkerTest extends FoxtrotTestCase
                         throw ex;
                     }
 
-                    public void finish()
+                    public void success(Object r)
                     {
-                        try
-                        {
-                            getResultOrThrow();
-                            result.set("Expected error");
-                        }
-                        catch (Error x)
+                        result.set("Expected error");
+                    }
+
+                    public void failure(Throwable x)
+                    {
+                        if (x instanceof Error)
                         {
                             if (x != ex) result.set("Expected same error");
                         }
-                        catch (Exception x)
+                        else
                         {
                             result.set("Did not expect exception");
                         }
@@ -258,24 +254,25 @@ public class AsyncWorkerTest extends FoxtrotTestCase
                                 return null;
                             }
 
-                            public void finish()
+                            public void success(Object result)
+                            {
+                            }
+
+                            public void failure(Throwable x)
                             {
                             }
                         });
                         return null;
                     }
 
-                    public void finish()
+                    public void success(Object r)
                     {
-                        try
-                        {
-                            getResultOrThrow();
-                            result.set("Expected exception");
-                        }
-                        catch (IllegalStateException x)
-                        {
-                        }
-                        catch (Exception x)
+                        result.set("Expected exception");
+                    }
+
+                    public void failure(Throwable x)
+                    {
+                        if (!(x instanceof IllegalStateException))
                         {
                             result.set("Did not expect exception");
                         }

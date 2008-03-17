@@ -27,7 +27,7 @@ import javax.swing.SwingUtilities;
  *     }
  * };
  * </pre>
- * Exceptions and Errors thrown by the <code>run()</code> method will be rethrown automatically by
+ * Exceptions and Errors thrown by the <tt>run()</tt> method will be rethrown automatically by
  * {@link Worker#post(Task)} or by {@link ConcurrentWorker#post(Task)}
  *
  * @version $Revision$

@@ -25,7 +25,8 @@ import foxtrot.AsyncTask;
 import foxtrot.AsyncWorker;
 
 /**
- * TODO: add javadocs
+ * A simple example that shows how to use the Foxtrot API in case of use
+ * of the asynchronous model, similar to the SwingWorker.
  *
  * @version $Revision$
  */
@@ -39,6 +40,8 @@ public class AsyncExample extends JFrame
 
     private JLabel tasksSending;
     private JLabel tasksSent;
+    private JButton button;
+    private boolean sent;
 
     public AsyncExample()
     {
@@ -48,9 +51,9 @@ public class AsyncExample extends JFrame
 
     private void init()
     {
-        tasksSending = new JLabel("Sending: ");
-        tasksSent = new JLabel("Sent:    ");
-        setDefaultCloseOperation(EXIT_ON_CLOSE);
+        tasksSending = new JLabel();
+        tasksSent = new JLabel();
+        setDefaultCloseOperation(DISPOSE_ON_CLOSE);
 
         JPanel panel = new JPanel(new GridLayout(2, 0));
         panel.add(tasksSending);
@@ -60,15 +63,20 @@ public class AsyncExample extends JFrame
         c.setLayout(new BorderLayout());
         c.add(panel, BorderLayout.NORTH);
 
-        JButton button = new JButton("Send !");
+        button = new JButton();
         c.add(button, BorderLayout.SOUTH);
         button.addActionListener(new ActionListener()
         {
             public void actionPerformed(ActionEvent e)
             {
-                send();
+                if (sent)
+                    reset();
+                else
+                    send();
             }
         });
+
+        reset();
 
         setSize(300, 200);
 
@@ -81,7 +89,8 @@ public class AsyncExample extends JFrame
 
     public void send()
     {
-        tasksSending.setText(tasksSending.getText() + ".");
+        tasksSending.setText("Task submitted, waiting for result...");
+        button.setText("Sending...");
         AsyncWorker.post(new AsyncTask()
         {
             public Object run() throws Exception
@@ -89,23 +98,31 @@ public class AsyncExample extends JFrame
                 // Send the data to a system that is asynchronous
                 // Assume it will take time to send
                 Thread.sleep(2000);
-                return null;
+                return System.getProperty("user.dir");
             }
 
-            public void finish()
+            public void success(Object result)
             {
-                try
-                {
-                    // Be sure the send has been performed successfully
-                    getResultOrThrow();
-                    tasksSent.setText(tasksSent.getText() + ".");
-                }
-                catch (Exception x)
-                {
-                    // Show the problem to the user
-                    x.printStackTrace();
-                }
+                // The result is what we returned from run() above
+                String data = (String)result;
+                tasksSent.setText("Result: " + data);
+                button.setText("Reset");
+                sent = true;
+            }
+
+            public void failure(Throwable x)
+            {
+                // Show the problem to the user
+                x.printStackTrace();
             }
         });
+    }
+
+    public void reset()
+    {
+        sent = false;
+        tasksSending.setText("No tasks submitted");
+        tasksSent.setText("Result:");
+        button.setText("Click Me !");
     }
 }

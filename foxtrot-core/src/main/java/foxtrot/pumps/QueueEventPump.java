@@ -23,7 +23,7 @@ import foxtrot.Task;
 
 /**
  * Implementation of an EventPump that should work with JDK 1.2 and 1.3
- * and only uses the public API of the <code>java.awt.*</code> package.
+ * and only uses the public API of the <tt>java.awt.*</tt> package.
  *
  * @version $Revision$
  */
@@ -107,8 +107,8 @@ public class QueueEventPump implements EventPump, EventFilterable
 
     /**
      * Handle a RuntimeException or Error happened during event dispatching.
-     * If the system property <code>sun.awt.exception.handler</code> is defined,
-     * that handler will be used, otherwise it simply logs on <code>System.err</code>.
+     * If the system property <tt>sun.awt.exception.handler</tt> is defined,
+     * that handler will be used, otherwise it simply logs on <tt>System.err</tt>.
      */
     private void handleThrowable(Throwable x)
     {

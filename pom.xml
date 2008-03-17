@@ -7,6 +7,7 @@
     <packaging>pom</packaging>
     <version>3.0-SNAPSHOT</version>
     <name>Foxtrot</name>
+    <url>http://foxtrot.sourceforge.net</url>
 
     <issueManagement>
         <system>sourceforge</system>
@@ -20,8 +21,8 @@
     <mailingLists>
         <mailingList>
             <name>Foxtrot-Users</name>
-            <subscribe>http://lists.sourceforge.net/mailman/listinfo/foxtrot-user</subscribe>
-            <unsubscribe>http://lists.sourceforge.net/mailman/listinfo/foxtrot-user</unsubscribe>
+            <subscribe>https://lists.sourceforge.net/lists/listinfo/foxtrot-user</subscribe>
+            <unsubscribe>https://lists.sourceforge.net/lists/listinfo/foxtrot-user</unsubscribe>
         </mailingList>
     </mailingLists>
 
@@ -42,9 +43,9 @@
     </licenses>
 
     <scm>
-        <connection>scm:svn:https://svn.sourceforge.net/svnroot/foxtrot</connection>
-        <developerConnection>scm:svn:https://svn.sourceforge.net/svnroot/foxtrot</developerConnection>
-        <url>http://svn.sourceforge.net/foxtrot</url>
+        <connection>scm:svn:https://foxtrot.svn.sourceforge.net/svnroot/foxtrot</connection>
+        <developerConnection>scm:svn:https://foxtrot.svn.sourceforge.net/svnroot/foxtrot</developerConnection>
+        <url>http://foxtrot.svn.sourceforge.net</url>
     </scm>
 
     <build>

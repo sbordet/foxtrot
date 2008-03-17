@@ -15,7 +15,7 @@ import java.util.EventListener;
 
 /**
  * This class wraps an EventListener subclass (and thus any AWT/Swing event listener such as
- * <code>ActionListener</code>s, <code>MouseListener</code>s and so on) making sure that if
+ * <tt>ActionListener</tt>s, <tt>MouseListener</tt>s and so on) making sure that if
  * a wrapped listener is executing, another wrapped listener (even of different type) it is
  * not executed.
  * <br />

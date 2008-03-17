@@ -5,28 +5,28 @@
 <h2>Asynchronous Solutions</h2>
 
 <p>Solutions have been proposed for the <a href="freeze.php">GUI freeze problem</a>; asynchronous solutions
-rely on the combined usage of a worker thread and the <code>SwingUtilities.invokeLater()</code> method.
+rely on the combined usage of a worker thread and the <tt>SwingUtilities.invokeLater()</tt> method.
 We will see in few lines why they're called asynchronous.</p>
 <p>The main idea behind an asynchronous solution is to return quickly from the time-consuming listener, after having
 delegated the time-consuming task to a worker thread. The worker thread, usually, does two things:
 <ul>
 <li>Executes the time-consuming task
-<li>Posts an event to the Event Queue using <code>SwingUtilities.invokeLater()</code>
+<li>Posts an event to the Event Queue using <tt>SwingUtilities.invokeLater()</tt>
 </ul>
 </p>
 <p>Take a look at the code below which uses Foxtrot's <b>AsyncWorker</b>, which is an asynchronous solution.</p>
-<p>Let's concentrate on the button's listener (the <code>actionPerformed()</code> method): the first statement,
+<p>Let's concentrate on the button's listener (the <tt>actionPerformed()</tt> method): the first statement,
 as in the freeze example, changes the text of the button and thus posts a repaint event to the Event Queue.<br />
 The next statement posts an <b>AsyncTask</b> to Foxtrot's AsyncWorker. This operation is quick, non blocking, and returns
 immediately.<br />
 Posting an AsyncTask to to Foxtrot's AsyncWorker causes the Foxtrot worker thread to start executing the code contained
-in the <code>run()</code> method of AsyncTask;
-the Event Dispatch Thread is free to continue its execution, and will execute the <code>somethingElse()</code>
+in the <tt>run()</tt> method of AsyncTask;
+the Event Dispatch Thread is free to continue its execution, and will execute the <tt>somethingElse()</tt>
 method.<br />
 Therefore, there is a potentially concurrent execution of the code in the AsyncTask and of the code in
-<code>somethingElse()</code>.
-When the <code>run()</code> method of AsyncTask ends, its <code>finish()</code> method is called (using
-<code>SwingUtilities.invokeLater()</code>) and executed in the Event Dispatch Thread.
+<tt>somethingElse()</tt>.
+When the <tt>run()</tt> method of AsyncTask ends, its <tt>finish()</tt> method is called (using
+<tt>SwingUtilities.invokeLater()</tt>) and executed in the Event Dispatch Thread.
 </p>
 <p>This is why these solutions are called asynchronous: the code in the event listener and the code of the AsyncTask
 are executed concurrently and noone waits for the other to complete.
@@ -35,31 +35,31 @@ are executed concurrently and noone waits for the other to complete.
 <ul>
 <li>Note the non-optimal exception handling.
 The exception handling is done inside the AsyncTask, not inside the listener, where it would be more intuitive.
-<li>Note the asymmetry: the first <code>setText()</code> is made outside the AsyncTask, the second inside of it.
-<li>Note the <code>getResultOrThrow()</code> method: if <code>run()</code> returns null (because the operation had
-a void return value - like <code>Thread.sleep()</code>), it is easy to forget to call <code>getResultOrThrow()</code>
+<li>Note the asymmetry: the first <tt>setText()</tt> is made outside the AsyncTask, the second inside of it.
+<li>Note the <tt>getResultOrThrow()</tt> method: if <tt>run()</tt> returns null (because the operation had
+a void return value - like <tt>Thread.sleep()</tt>), it is easy to forget to call <tt>getResultOrThrow()</tt>
 to see if any exception was thrown by the time-consuming code of the AsyncTask.
-<li>What happens if the time-consuming code stays the same, but we want to execute 2 different <code>finish()</code> methods
+<li>What happens if the time-consuming code stays the same, but we want to execute 2 different <tt>finish()</tt> methods
 depending on the place from where we want to execute the time-consuming task ?
-<li>If some code is written after <code>AsyncWorker.post()</code>, like the <code>somethingElse()</code> method,
-it will be always executed <em>before</em> the <code>finish()</code> method.
+<li>If some code is written after <tt>AsyncWorker.post()</tt>, like the <tt>somethingElse()</tt> method,
+it will be always executed <em>before</em> the <tt>finish()</tt> method.
 Reading the source code we see, from top to bottom:
 <ul>
-<li><code>setText("Sleeping...")</code>
-<li><code>Thread.sleep()</code>
-<li><code>setText("Slept !");</code>
-<li><code>somethingElse()</code>
+<li><tt>setText("Sleeping...")</tt>
+<li><tt>Thread.sleep()</tt>
+<li><tt>setText("Slept !");</tt>
+<li><tt>somethingElse()</tt>
 </ul>
 but the real order of execution is:
 <ul>
-<li><code>setText("Sleeping...")</code>
-<li><code>somethingElse()</code> [before, concurrently or after <code>Thread.sleep()</code>]
-<li><code>Thread.sleep()</code>
-<li><code>setText("Slept !");</code>
+<li><tt>setText("Sleeping...")</tt>
+<li><tt>somethingElse()</tt> [before, concurrently or after <tt>Thread.sleep()</tt>]
+<li><tt>Thread.sleep()</tt>
+<li><tt>setText("Slept !");</tt>
 </ul>
 making debugging and code readability very difficult.<br />
-This is why a golden rule of the AsyncWorker is to never put code after <code>AsyncWorker.post()</code>.
-<li>If the code inside <code>finish()</code> requires a new time-consuming operation, a new <em>nested</em>
+This is why a golden rule of the AsyncWorker is to never put code after <tt>AsyncWorker.post()</tt>.
+<li>If the code inside <tt>finish()</tt> requires a new time-consuming operation, a new <em>nested</em>
 AsyncWorker should be used, making the code complex and obscure, especially with respect to the sequence order
 of the operations executed.
 </ul>
