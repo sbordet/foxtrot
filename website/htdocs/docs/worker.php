@@ -55,8 +55,11 @@ This greatly improve code readability and semplicity. No worries about code exec
 <li>No nesting of <tt>Worker.post()</tt> is necessary, just 2 consecutive <tt>Worker.post()</tt> calls.</li>
 </ul>
 </p>
-<table width="100%" cellspacing="0" cellpadding="0">
-<tr><td width="60%">
+<div class="legend">Legend<br/>
+<span class="main">Main Thread</span><br/>
+<span class="event">Event Dispatch Thread</span><br/>
+<span class="foxtrot">Foxtrot Worker Thread</span>
+</div>
 <pre><span class="code">
 public class FoxtrotExample extends JFrame
 {
@@ -113,15 +116,5 @@ public class FoxtrotExample extends JFrame
    }
 }</span>
 </pre>
-</td>
-<td valign="top" align="left">
-<table class="legend" width="50%" cellspacing="0" cellpadding="0">
-<tr><td class="legend">Legend</td></tr>
-<tr><td class="legend-entry"><span class="main">Main Thread</span></td></tr>
-<tr><td class="legend-entry"><span class="event">Event Dispatch Thread</span></td></tr>
-<tr><td class="legend-entry"><span class="foxtrot">Foxtrot Worker Thread</span></td></tr>
-</table>
-</td></tr>
-</table>
 
 <?php include 'footer.php';?>

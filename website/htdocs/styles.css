@@ -96,22 +96,21 @@ ul {
     width: 780px;
 }
 
-.header .left, .header .right {
-    background: #A4A4A0;
-    color: #FFF;
-    height: 150px;
-}
-
 .header .left {
     background: #B3C2C7;
+    color: #FFF;
     font: normal 2.8em "Trebuchet MS", sans-serif;
+    height: 150px;
     line-height: 150px;
     text-align: center;
     width: 564px;
 }
 
 .header .right {
+    background: #A4A4A0;
+    height: 110px;
     overflow: auto;
+    padding-top: 40px;
     text-align: center;
     width: 212px;
 }
@@ -226,12 +225,6 @@ ul {
     width: 531px;
 }
 
-.content .descr {
-    color: #664;
-    font-size: 0.9em;
-    margin-bottom: 6px;
-}
-
 .content li {
     list-style: url('images/li.gif');
     margin-left: 18px;
@@ -253,41 +246,23 @@ ul {
     color: #FFF;
 }
 
-/* OLD CSS for the code examples*/
-/* For the code */
-
 span.code {
-    color: black
+    color: #444;
 }
 
 span.main {
-    color: navy
+    color: navy;
 }
 
 span.event {
-    color: #00BF00
-}
-
-span.worker {
-    color: red
+    color: #00BF00;
 }
 
 span.foxtrot {
-    color: #FF9000
+    color: #FF9000;
 }
 
-table.legend {
+.legend {
     margin-top: 15px;
-    border: solid 1px navy
-}
-
-td.legend {
-    background-color: navy;
-    color: #FFFFCC;
-    text-align: center
-}
-
-td.legend-entry {
-    font-size: 10pt;
-    padding: 5px 0 5px 10px
+    text-align: right;
 }

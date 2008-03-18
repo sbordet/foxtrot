@@ -27,8 +27,10 @@ and the other pending events in the Event Queue finally get a chance to be execu
 Being repaint events, the two button events are executed quickly. So first the button text is changed to "Sleeping...", and immediately
 after to "Slept !", too quick for the eye to see.<br />
 Before that, during 10 seconds, the GUI was <b>frozen</b>.</p>
-<table width="100%" cellspacing="0" cellpadding="0">
-<tr><td width="60%">
+<div class="legend">Legend<br/>
+<span class="main">Main Thread</span><br/>
+<span class="event">Event Dispatch Thread</span>
+</div>
 <pre><span class="code">
 public class FreezeExample extends JFrame
 {
@@ -70,14 +72,5 @@ public class FreezeExample extends JFrame
    }
 }</span>
 </pre>
-</td>
-<td valign="top" align="left">
-<table class="legend" width="50%" cellspacing="0" cellpadding="0">
-<tr><td class="legend">Legend</td></tr>
-<tr><td class="legend-entry"><span class="main">Main Thread</span></td></tr>
-<tr><td class="legend-entry"><span class="event">Event Dispatch Thread</span></td></tr>
-</table>
-</td></tr>
-</table>
 
 <?php include 'footer.php';?>

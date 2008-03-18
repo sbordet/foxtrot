@@ -31,8 +31,11 @@ not lead to any benefit with respect to <tt>Worker</tt>, and it's probably slowe
 <tt>ConcurrentWorker.post()</tt> block until the task is completed.
 Therefore, posting two jobs consecutively in the code results in the jobs being executed one after the
 other, because the first call to blocks until the first task is completed.</p>
-<table width="100%" cellspacing="0" cellpadding="0">
-<tr><td width="60%">
+<div class="legend">Legend<br/>
+<span class="main">Main Thread</span><br/>
+<span class="event">Event Dispatch Thread</span><br/>
+<span class="foxtrot">Foxtrot Worker Thread</span>
+</div>
 <pre><span class="code">
 public class ConcurrentWorkerWrongExample1 extends JFrame
 {
@@ -109,16 +112,6 @@ public class ConcurrentWorkerWrongExample1 extends JFrame
    }
 }</span>
 </pre>
-</td>
-<td valign="top" align="left">
-<table class="legend" width="50%" cellspacing="0" cellpadding="0">
-<tr><td class="legend">Legend</td></tr>
-<tr><td class="legend-entry"><span class="main">Main Thread</span></td></tr>
-<tr><td class="legend-entry"><span class="event">Event Dispatch Thread</span></td></tr>
-<tr><td class="legend-entry"><span class="foxtrot">Foxtrot Worker Thread</span></td></tr>
-</table>
-</td></tr>
-</table>
 
 <p>Another wrong example is to use <tt>ConcurrentWorker</tt> in an asynchronous context. <br />
 For example, suppose to have an application with a <tt>javax.swing.JTabbedPane</tt>, and suppose that
