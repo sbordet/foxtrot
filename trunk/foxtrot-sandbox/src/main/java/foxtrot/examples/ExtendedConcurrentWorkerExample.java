@@ -92,7 +92,7 @@ public class ExtendedConcurrentWorkerExample extends JFrame
         c.gridy = 2;
         content.add(button, c);
 
-        setDefaultCloseOperation(EXIT_ON_CLOSE);
+        setDefaultCloseOperation(DISPOSE_ON_CLOSE);
         setSize(300, 200);
         Dimension screen = Toolkit.getDefaultToolkit().getScreenSize();
         Dimension size = getSize();

@@ -24,7 +24,7 @@ import foxtrot.ConcurrentWorker;
 import foxtrot.Job;
 
 /**
- * TODO: add javadocs
+ * An example that shows the correct usage context for {@link ConcurrentWorker}.
  *
  * @version $Revision$
  */
@@ -59,7 +59,7 @@ public class ConcurrentWorkerExample extends JFrame
         content.setLayout(new GridBagLayout());
         content.add(button);
 
-        setDefaultCloseOperation(EXIT_ON_CLOSE);
+        setDefaultCloseOperation(DISPOSE_ON_CLOSE);
         setSize(300, 200);
         Dimension screen = Toolkit.getDefaultToolkit().getScreenSize();
         Dimension size = getSize();
@@ -70,8 +70,7 @@ public class ConcurrentWorkerExample extends JFrame
 
     private void startLongTask()
     {
-        disableFrame();
-
+        // The dialog that can cancel the long task
         final CancelDialog dialog = new CancelDialog();
 
         System.out.println("Posting task...");
@@ -79,12 +78,14 @@ public class ConcurrentWorkerExample extends JFrame
         {
             public Object run()
             {
+                // Shows a modal dialog to prevent the user to click
+                // on other parts of the user interface
                 Thread workerThread = Thread.currentThread();
-                edtShowDialog(dialog, workerThread);
+                showDialogInEventThread(dialog, workerThread);
 
                 try
                 {
-                    // Start very long task, calling a server
+                    // Start very long task, for example calling a server
                     Thread.sleep(5000);
                     System.out.println("Task ended");
                 }
@@ -93,27 +94,17 @@ public class ConcurrentWorkerExample extends JFrame
                     System.out.println("Task interrupted");
                 }
 
-                edtHideDialog(dialog);
+                // Hides the dialog, since the task is either completed
+                // or it has been interrupted
+                hideDialogInEventThread(dialog);
 
                 return null;
             }
         });
         System.out.println("Task finished");
-
-        enableFrame();
     }
 
-    private void enableFrame()
-    {
-        button.setEnabled(true);
-    }
-
-    private void disableFrame()
-    {
-        button.setEnabled(false);
-    }
-
-    private void edtShowDialog(final CancelDialog dialog, final Thread workerThread)
+    private void showDialogInEventThread(final CancelDialog dialog, final Thread workerThread)
     {
         SwingUtilities.invokeLater(new Runnable()
         {
@@ -125,7 +116,7 @@ public class ConcurrentWorkerExample extends JFrame
         });
     }
 
-    private void edtHideDialog(final CancelDialog dialog)
+    private void hideDialogInEventThread(final CancelDialog dialog)
     {
         SwingUtilities.invokeLater(new Runnable()
         {
@@ -145,16 +136,13 @@ public class ConcurrentWorkerExample extends JFrame
         {
             public Object run()
             {
-                // Call the server to cancel the task
+                // Simulate a call to the server to cancel the task, signaling
+                // that the task posted previously must be interrupted
                 sleep(1000);
                 if (workerThread != null) workerThread.interrupt();
                 return null;
             }
         });
-
-        dialog.undisplay();
-
-        enableFrame();
     }
 
     private void sleep(long millis)
@@ -214,7 +202,7 @@ public class ConcurrentWorkerExample extends JFrame
         public void undisplay()
         {
             this.workerThread = null;
-            if (isVisible()) setVisible(false);
+            if (isVisible()) dispose();
         }
     }
 }

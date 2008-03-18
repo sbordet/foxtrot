@@ -37,7 +37,7 @@ import foxtrot.workers.MultiWorkerThread;
  * This ensures that the code after the second invocation of
  * <tt>ConcurrentWorker.post()</tt> is always executed before the code after the first
  * invocation of <tt>ConcurrentWorker.post()</tt> (this is not guaranteed when
- * using {@link AsyncWorker}.
+ * using {@link AsyncWorker}).
  * <br />
  * Using {@link Worker} would make it impossible to cancel the task, since <i>task2</i> will
  * be executed only when <i>task1</i> is finished. <br />

@@ -49,7 +49,7 @@ public class CrazyClickExample extends JFrame implements ActionListener
 
         setSize(800, 600);
         setLocation(100, 100);
-        setDefaultCloseOperation(EXIT_ON_CLOSE);
+        setDefaultCloseOperation(DISPOSE_ON_CLOSE);
     }
 
     public void actionPerformed(ActionEvent e)

@@ -1,7 +1,5 @@
 <?php include 'header.php';?>
 
-<tr><td class="documentation">
-
 <h2>Foxtrot API</h2>
 <p>The Foxtrot API is very small and simple, and consists of six main classes to be used in Swing applications:</p>
 <ul>
@@ -20,19 +18,19 @@ the following classes:</p>
 <li><tt>interface foxtrot.WorkerThread</tt></li>
 <li><tt>class foxtrot.AbstractWorkerThread</tt></li>
 </ul>
-<p>Normally users do not need to deal with the above three classes to use Foxtrot in their Swing applications, since
-Foxtrot will configure itself with the most suitable implementations; however, if
+<p>Normally users do not need to deal with the above three classes to use Foxtrot in their Swing applications,
+since Foxtrot will configure itself with the most suitable implementations; however, if
 a specific customization of the event pumping mechanism or of the worker thread mechanism is needed, the APIs
 provided by these classes allow fine grained control on Foxtrot's behavior.</p>
 
 <h2>Foxtrot API Details</h2>
-<p>The <tt>Worker</tt> class is used to post <tt>Task</tt>s or <tt>Job</tt>s that will be executed
-sequentially in one Foxtrot Worker Thread. <br />
-<p>The <tt>ConcurrentWorker</tt> class is used to post <tt>Task</tt>s or <tt>Job</tt>s that
-will be executed each one in its own Foxtrot Worker Thread (thus <tt>Task</tt>s or <tt>Job</tt>s are
+<p>The <tt>Worker</tt> class is used to post with blocking behavior <tt>Task</tt>s or <tt>Job</tt>s that will
+be executed sequentially in one Foxtrot Worker Thread. <br />
+<p>The <tt>ConcurrentWorker</tt> class is used to post with blocking behavior <tt>Task</tt>s or <tt>Job</tt>s
+that will be executed each one in its own Foxtrot Worker Thread (thus <tt>Task</tt>s or <tt>Job</tt>s are
 executed concurrently). <br />
-<p>The <tt>AsyncWorker</tt> class is used to post <tt>AsyncTask</tt>s that will be executed each one
-in its own Foxtrot Worker Thread (thus <tt>AsyncTask</tt>s are executed concurrently).</p>
+<p>The <tt>AsyncWorker</tt> class is used to post with non-blocking behavior <tt>AsyncTask</tt>s that will be
+executed each one in its own Foxtrot Worker Thread (thus <tt>AsyncTask</tt>s are executed concurrently).</p>
 <p>The <tt>Task</tt> class is subclassed by the user to perform heavy tasks that throw checked exceptions.</p>
 <p>The <tt>Job</tt> class, conversely, is subclassed by the user to perform heavy tasks that do not throw
 checked exceptions, but only RuntimeExceptions (or Errors).</p>
@@ -61,16 +59,18 @@ for example, an InvocationTargetException.</p>
 <ul>
 <li><tt>public static Object post(AsyncTask task)</tt></li>
 </ul>
-<p>The <tt>AsyncTask</tt> class has two abstract method that must be implemented by the user:</p>
+<p>The <tt>AsyncTask</tt> class has three abstract method that must be implemented by the user:</p>
 <ul>
 <li><tt>public abstract Object run() throws Exception</tt></li>
-<li><tt>public abstract void finish()</tt></li>
+<li><tt>public abstract void success(Object result)</tt></li>
+<li><tt>public abstract void failure(Throwable x)</tt></li>
 </ul>
 The <tt>run()</tt> method must be implemented with the time-consuming code exactly like the <tt>Task</tt>
-class, while the <tt>finish()</tt> method must be implemented by calling the
-<tt>AsyncTask.getResultOrThrow()</tt> method to get the result returned by the <tt>run()</tt> method (or to
-rethrow any exception thrown during its execution), and eventually other code to be executed in the
-Event Dispatch Thread.</p>
+class.<br/>
+The <tt>success(Object result) method must be implemented with the code to execute in case the <tt>Task</tt>
+completed successfully, and will be run in the Event Dispatch Thread.<br/>
+The <tt>failure(Throwable x) method must be implemented with the code to execute in case the <tt>Task</tt>
+threw an Exception or an Error, and will be run in the Event Dispatch Thread.</p>
 
 <p>Here's an example of <tt>Worker</tt> with the <tt>Job</tt> class:
 <pre><span class="code">
@@ -149,18 +149,15 @@ AsyncWorker.post(new AsyncTask()
       // that may throw checked exceptions
    }
 
-   public void finish()
+   public void success(Object result)
    {
-      try
-      {
-         Object result = getResultOrThrow();
-         // Here handle the result
-      }
-      catch (Exception x)
-      {
-         // Here handle the exception possibly thrown by run(),
-         // for example displaying a dialog to the user
-      }
+      // Here handle the result
+   }
+
+   public void failure(Throwable x)
+   {
+      // Here handle the exception possibly thrown by run(),
+      // for example displaying a dialog to the user
    }
 });
 </span></pre></p>
@@ -182,7 +179,7 @@ Some implementations of <tt>EventPump</tt> or <tt>WorkerThread</tt> allow an eve
 of the component.</p>
 <p>For example, implementations of <tt>EventPump</tt> that also implement the
 <tt>foxtrot.pumps.EventFilterable</tt> interface may allow the user to filter events that are being dispatched
-by the <tt>java.awt.EventQueue</tt>. See also the bundled Javadocs for further details. <br />
+by the <tt>java.awt.EventQueue</tt>. See also the Javadocs for further details. <br />
 However, it is recommended not to exploit these features unless knowing <strong>exactly</strong> what one is doing:
 Foxtrot's defaults may change from version to version to suit better implementations, and these defaults may depend
 on the Java Runtime Environment version Foxtrot is running on, so that features working in JDK 1.3.x may not work
@@ -191,10 +188,8 @@ Playing with AWT events too badly is normally looking for troubles, so consider 
 <p>The same holds for <tt>WorkerThread</tt> implementations, that should extend the abstract class
 <tt>AbstractWorkerThread</tt>: replacing the default <tt>WorkerThread</tt> implementation may lead
 to unexpected behavior.</p>
-<p>Refer to the bundled Javadoc documentation for further information, and to the bundled examples for
+<p>Refer to the Javadoc documentation for further information, and to the examples for
 further details on how to use the Foxtrot classes with Swing.<br />
 And do not forget the <a href="tips.php">Tips 'n' Tricks</a> section !<p>
-
-</td></tr>
 
 <?php include 'footer.php';?>

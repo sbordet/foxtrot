@@ -29,7 +29,7 @@ public class SequencedEventExample
         final JFrame frame1 = new JFrame("FRAME 1");
         frame1.setSize(300, 200);
         frame1.setLocation(200, 150);
-        frame1.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        frame1.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 
         Container cp = frame1.getContentPane();
         cp.setLayout(new GridLayout(1, 0, 10, 0));

@@ -1,19 +1,17 @@
 <?php include 'header.php';?>
 
-<tr><td class="documentation">
-
 <h2>Foxtrot's synchronous solution: Worker</h2>
 <p>The <b>Foxtrot</b> framework is based on a different approach than asynchronous solutions. While a worker thread is still
 used to execute time-consuming tasks, <tt>SwingUtilities.invokeLater()</tt> is not used.<br />
 The main problem of the asynchronous solution is that it lets the listener continue during the execution of the task;
 in the most common cases, the listener returns immediately. This is done to allow the
 Event Dispatch Thread to dequeue the next event and process it, so that the GUI does not appear to be frozen.<br />
-In contrast, Foxtrot lets the Event Dispatch Thread enter but not return from the listener method, instead rerouting the
+In contrast, Foxtrot lets the Event Dispatch Thread enter but not return from the listener method; instead, it re-routes the
 Event Dispatch Thread to continue dequeuing events from the Event Queue and processing them. Once the worker thread
-has finished, the Event Dispatch Thread is rerouted again, continuing the execution of the listener method (in the most
+has finished, the Event Dispatch Thread is re-routed again, continuing the execution of the listener method (in the most
 common cases, just returning from the listener method).</p>
 <p>This approach is similar to the one used to display modal dialogs in AWT or Swing; unfortunately all classes that allow
-dialogs to reroute the Event Dispatch Thread inside a listener to continue dequeueing and processing events are private
+dialogs to re-route the Event Dispatch Thread inside a listener to continue dequeueing and processing events are private
 to package <tt>java.awt</tt>. However, AWT and Swing architects left enough room to achieve exactly the same behavior,
 just with a little more coding necessary in the Foxtrot implementation.</p>
 <p>The main idea behind the synchronous solution is to prevent the Event
@@ -34,7 +32,7 @@ When initialized, the <tt>Worker</tt> class starts a single worker thread to exe
 and has a single worker queue where time-consuming tasks are queued before being executed.<br />
 When a <tt>Task</tt> is posted, the worker thread executes the code contained in <tt>Task.run()</tt>
 and the Event Dispatch Thread is told to contemporarly dequeue events from the Event Queue.
-On the Event Queue it finds the repaint event posted by the first <tt>setText()</tt>, and processes it.<br />
+On the Event Queue it finds the repaint event posted by the first <tt>setText()</tt> invocation, and processes it.<br />
 The <tt>Worker.post()</tt> method does not return until the time-consuming task is finished or throws an exception.
 When the time-consuming task is finished, the <tt>Worker</tt> class tells the Event Dispatch Thread
 to stop dequeueing events from the Event Queue, and to return from the <tt>Worker.post()</tt> method.
@@ -46,15 +44,15 @@ time-consuming task is run by the worker thread.</p>
 <ul>
 <li>Simple exception handling: exceptions can be caught and rethrown within the listener. No need for chained if-else
 statements. The only drawback is that the listener is required to always catch <tt>Exception</tt> from the
-<tt>Worker.post()</tt> method when posting <tt>Task</tt>s (this is not necessary when using <tt>Job</tt>s).
-<li>Note the symmetry: the two <tt>setText()</tt> calls are both inside the listener.
-<li>No <tt>get()</tt> method, whether you expect a result or not. If there is an exception, it will be rethrown.
+<tt>Worker.post()</tt> method when posting <tt>Task</tt>s (this is not necessary when using <tt>Job</tt>s).</li>
+<li>Note the symmetry: the two <tt>setText()</tt> calls are both inside the listener.</li>
+<li>No callback methods, whether the Task completed successfully or threw an exception.</li>
 <li>The code after the time-consuming task is independent of the time-consuming task itself. This allows refactoring of
 <tt>Worker.post()</tt> calls, and it is possible to execute different code after <tt>Worker.post()</tt> depending on the place from where we
-want to execute the time-consuming task.
-<li>Code written after <tt>Worker.post()</tt> is always executed afterwards. This greatly improve code readability and semplicity.
-No worries about code executed after <tt>Worker.post()</tt>.
-<li>No nesting of <tt>Worker.post()</tt> is necessary, just 2 consecutive <tt>Worker.post()</tt> calls.
+want to execute the time-consuming task.</li>
+<li>Code written after <tt>Worker.post()</tt> is always executed after the code in <tt>Task.run()</tt>.
+This greatly improve code readability and semplicity. No worries about code executed after <tt>Worker.post()</tt>.</li>
+<li>No nesting of <tt>Worker.post()</tt> is necessary, just 2 consecutive <tt>Worker.post()</tt> calls.</li>
 </ul>
 </p>
 <table width="100%" cellspacing="0" cellpadding="0">
@@ -99,7 +97,7 @@ public class FoxtrotExample extends JFrame
          }
       });</span><span class="main">
 
-      setDefaultCloseOperation(EXIT_ON_CLOSE);
+      setDefaultCloseOperation(DISPOSE_ON_CLOSE);
 
       Container c = getContentPane();
       c.setLayout(new GridBagLayout());
@@ -125,7 +123,5 @@ public class FoxtrotExample extends JFrame
 </table>
 </td></tr>
 </table>
-
-</td></tr>
 
 <?php include 'footer.php';?>

@@ -164,7 +164,7 @@ public class OwnerModalDialog extends JDialog
                 System.out.println("Closed Dialog");
             }
         }));
-        frame.setDefaultCloseOperation(EXIT_ON_CLOSE);
+        frame.setDefaultCloseOperation(DISPOSE_ON_CLOSE);
         frame.pack();
         frame.show();
     }

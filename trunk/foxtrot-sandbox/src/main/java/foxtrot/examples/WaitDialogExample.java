@@ -55,7 +55,7 @@ public class WaitDialogExample extends JFrame implements Runnable
         timer = new Timer(500, null);
         timer.setInitialDelay(500);
 
-        setDefaultCloseOperation(EXIT_ON_CLOSE);
+        setDefaultCloseOperation(DISPOSE_ON_CLOSE);
 
         setSize(600, 400);
 
