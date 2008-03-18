@@ -65,14 +65,14 @@ for example, an InvocationTargetException.</p>
 <li><tt>public abstract void success(Object result)</tt></li>
 <li><tt>public abstract void failure(Throwable x)</tt></li>
 </ul>
-The <tt>run()</tt> method must be implemented with the time-consuming code exactly like the <tt>Task</tt>
+<p>The <tt>run()</tt> method must be implemented with the time-consuming code exactly like the <tt>Task</tt>
 class.<br/>
-The <tt>success(Object result) method must be implemented with the code to execute in case the <tt>Task</tt>
+The <tt>success(Object result)</tt> method must be implemented with the code to execute in case the <tt>Task</tt>
 completed successfully, and will be run in the Event Dispatch Thread.<br/>
-The <tt>failure(Throwable x) method must be implemented with the code to execute in case the <tt>Task</tt>
+The <tt>failure(Throwable x)</tt> method must be implemented with the code to execute in case the <tt>Task</tt>
 threw an Exception or an Error, and will be run in the Event Dispatch Thread.</p>
 
-<p>Here's an example of <tt>Worker</tt> with the <tt>Job</tt> class:
+<p>Here is an example of <tt>Worker</tt> with the <tt>Job</tt> class:</p>
 <pre><span class="code">
 Worker.post(new Job()
 {
@@ -82,8 +82,8 @@ Worker.post(new Job()
       // that does not throw checked exceptions
    }
 });
-</span></pre></p>
-<p>and here's an example of <tt>Worker</tt> with the <tt>Task</tt> class:
+</span></pre>
+<p>and here is an example of <tt>Worker</tt> with the <tt>Task</tt> class:</p>
 <pre><span class="code">
 try
 {
@@ -100,7 +100,7 @@ catch (Exception x)
 {
    // Handle the exception thrown by the Task
 }
-</span></pre></p>
+</span></pre>
 <p>It is possible to narrow the throws clause of the <tt>Task</tt> class, but unfortunately not the one of
 the <tt>Worker</tt> or <tt>ConcurrentWorker</tt> classes. <br />
 So, when using the <tt>post(Task task)</tt> method, you have to surround it in a
