@@ -19,8 +19,11 @@ not work as well when using threads.</p>
 your data. Suppose also that the user can change the content of a cell by editing it, but the operation to validate the
 new input takes time.<br />
 Using plain Swing programming, this code looks similar to this:</p>
-<table width="100%" cellspacing="0" cellpadding="0">
-<tr><td width="60%">
+<div class="legend">Legend<br/>
+<span class="main">Main Thread</span><br/>
+<span class="event">Event Dispatch Thread</span><br/>
+<span class="foxtrot">Foxtrot Worker Thread</span>
+</div>
 <pre><span class="code">
 public class MyModel extends AbstractTableModel
 {
@@ -35,16 +38,7 @@ public class MyModel extends AbstractTableModel
    }
 }
 </span></pre>
-</td>
-<td valign="top" align="left">
-<table class="legend" width="50%" cellspacing="0" cellpadding="0">
-<tr><td class="legend">Legend</td></tr>
-<tr><td class="legend-entry"><span class="main">Main Thread</span></td></tr>
-<tr><td class="legend-entry"><span class="event">Event Dispatch Thread</span></td></tr>
-<tr><td class="legend-entry"><span class="foxtrot">Foxtrot Worker Thread</span></td></tr>
-</table>
-</td></tr>
-</table>
+
 <p>If <tt>isValid(Object value)</tt> is fast, no problem; otherwise the user has the GUI frozen and no feedback on what
 is going on.<br />
 Thus you may decide to use Foxtrot, and you convert the old code to this:</p>

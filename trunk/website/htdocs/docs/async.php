@@ -63,8 +63,11 @@ of the operations executed.</li>
 </ul>
 </p>
 <p>Fortunately, <a href="worker.php">Foxtrot's synchronous solutions</a> solve these issues.</p>
-<table width="100%" cellspacing="0" cellpadding="0">
-<tr><td width="60%">
+<div class="legend">Legend<br/>
+<span class="main">Main Thread</span><br/>
+<span class="event">Event Dispatch Thread</span><br/>
+<span class="foxtrot">Foxtrot Worker Thread</span>
+</div>
 <pre><span class="code">
 public class AsyncExample extends JFrame
 {
@@ -88,7 +91,7 @@ public class AsyncExample extends JFrame
             AsyncWorker.post(new AsyncTask()</span><span class="code">
             {
                public Object run() throws Exception
-               {</span><span class="worker">
+               {</span><span class="foxtrot">
                   Thread.sleep(10000);
                   return "Slept !";</span><span class="code">
                }
@@ -126,15 +129,5 @@ public class AsyncExample extends JFrame
    }
 }</span>
 </pre>
-</td>
-<td valign="top" align="left">
-<table class="legend" width="50%" cellspacing="0" cellpadding="0">
-<tr><td class="legend">Legend</td></tr>
-<tr><td class="legend-entry"><span class="main">Main Thread</span></td></tr>
-<tr><td class="legend-entry"><span class="event">Event Dispatch Thread</span></td></tr>
-<tr><td class="legend-entry"><span class="worker">AsyncWorker Thread</span></td></tr>
-</table>
-</td></tr>
-</table>
 
 <?php include 'footer.php';?>
