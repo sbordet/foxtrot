@@ -53,7 +53,7 @@ public class ProgressMonitorExample extends JFrame
             }
         });
 
-        setDefaultCloseOperation(EXIT_ON_CLOSE);
+        setDefaultCloseOperation(DISPOSE_ON_CLOSE);
 
         Container c = getContentPane();
         c.setLayout(new GridBagLayout());

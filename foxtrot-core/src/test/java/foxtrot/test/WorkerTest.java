@@ -499,7 +499,7 @@ public class WorkerTest extends FoxtrotTestCase
                 {
                     public void run()
                     {
-                        dialog.setVisible(false);
+                        dialog.dispose();
                     }
                 });
 

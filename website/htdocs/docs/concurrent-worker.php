@@ -1,20 +1,36 @@
 <?php include 'header.php';?>
 
-<tr><td class="documentation">
-
 <h2>Foxtrot's synchronous solution: ConcurrentWorker</h2>
-<p>The class <tt>foxtrot.ConcurrentWorker</tt> is a synchronous solutions like
-<a href="worker.php"><tt>foxtrot.Worker</tt></a>.<br />
+<p>Foxtrot's <tt>ConcurrentWorker</tt> is a synchronous solution like <a href="worker.php"><tt>Worker</tt></a>.<br />
 Where <tt>Worker</tt> enqueues the <tt>Task</tt>s or <tt>Job</tt>s to be run in a single worker queue,
 so that they're executed one after the other, in <tt>ConcurrentWorker</tt> the <tt>Task</tt>s or
-<tt>Job</tt>s are run each one in its own worker thread.</p>
+<tt>Job</tt>s are run as soon as they are posted and each in its own worker thread.</p>
 <p>While at first <tt>ConcurrentWorker</tt> seems more powerful than <tt>Worker</tt>, it has a peculiar
 behavior that is less intuitive than <tt>Worker</tt>, and may lead to surprises when used in the wrong
 context.</p>
-<p>For example, posting two jobs consecutively in the code results in the jobs being executed one after the other,
-since <tt>ConcurrentWorker.post()</tt> is synchronous. The following example shows that using
-<tt>ConcurrentWorker</tt> in a strictly synchronous context does not lead to any benefit with respect to
-<tt>Worker</tt>, and it's probably slower.</p>
+<p>The ideal context for the correct usage of <tt>ConcurrentWorker</tt> is when a task posted
+<em>after</em> a first task needs to be executed concurrently with the first task <b>and</b> there must
+be a synchronous behavior (that is, the first call to <tt>ConcurrentWorker.post()</tt> must complete
+only after the second call to <tt>ConcurrentWorker.post()</tt>).</p>
+<p>A typical example is when an application executes a time-consuming task that can be canceled,
+but the action of cancelling is also a time-consuming operation.</p>
+<p>If <tt>Worker</tt> is used in this case, the two tasks will be both enqueued in the single worker queue of
+<tt>Worker</tt>, and the second task (that should cancel the first one) gets the chance of being executed
+only after the first task completes, making it useless.</p>
+<p><tt>ConcurrentWorker</tt> instead executes the tasks as soon as they are posted, so in the above case
+the second task is executed concurrently with the first task in order to get the chance of cancelling
+the first task while it is still being executed.<br/>
+However, the application requires that the first call to <tt>ConcurrentWorker.post()</tt> returns only
+after the second call to <tt>ConcurrentWorker.post()</tt> completes cancelling the first task, so that
+any code after the first <tt>ConcurrentWorker.post()</tt> call can discern whether the task completed
+successfully or was canceled.</p>
+<p>Remembering that <tt>ConcurrentWorker</tt> is a synchronous solution is the key to avoid to use it in
+the wrong contexts.<br/>
+The following example shows that using <tt>ConcurrentWorker</tt> in a strictly synchronous context does
+not lead to any benefit with respect to <tt>Worker</tt>, and it's probably slower, because calls to
+<tt>ConcurrentWorker.post()</tt> block until the task is completed.
+Therefore, posting two jobs consecutively in the code results in the jobs being executed one after the
+other, because the first call to blocks until the first task is completed.</p>
 <table width="100%" cellspacing="0" cellpadding="0">
 <tr><td width="60%">
 <pre><span class="code">
@@ -38,21 +54,23 @@ public class ConcurrentWorkerWrongExample1 extends JFrame
             button.setText("Sleeping...");</span><span class="code">
 
             </span><span class="event">
+            // Blocking call
             ConcurrentWorker.post(new Job()</span><span class="code">
             {
                public Object run()
                {</span><span class="foxtrot">
-                  Thread.sleep(10000);
+                  sleep(10000);
                   return null;</span><span class="code">
                }
             }</span><span class="event">);</span><span class="code">
 
             </span><span class="event">
+            // Blocking call
             ConcurrentWorker.post(new Job()</span><span class="code">
             {
                public Object run()
                {</span><span class="foxtrot">
-                  Thread.sleep(5000);
+                  sleep(5000);
                   return null;</span><span class="code">
                }
             }</span><span class="event">);</span><span class="code">
@@ -63,7 +81,7 @@ public class ConcurrentWorkerWrongExample1 extends JFrame
          }
       });</span><span class="main">
 
-      setDefaultCloseOperation(EXIT_ON_CLOSE);
+      setDefaultCloseOperation(DISPOSE_ON_CLOSE);
 
       Container c = getContentPane();
       c.setLayout(new GridBagLayout());
@@ -77,6 +95,18 @@ public class ConcurrentWorkerWrongExample1 extends JFrame
       int y = (screen.height - size.height) >> 1;
       setLocation(x, y);</span><span class="code">
    }
+
+   public void sleep(long ms)
+   {
+      try
+      {
+         Thread.sleep(ms);
+      }
+      catch (InterruptedException x)
+      {
+         Thread.currentThread().interrupt();
+      }
+   }
 }</span>
 </pre>
 </td>
@@ -89,66 +119,16 @@ public class ConcurrentWorkerWrongExample1 extends JFrame
 </table>
 </td></tr>
 </table>
-<p>Another wrong usage is to use <tt>ConcurrentWorker</tt> in an asynchronous context. <br />
-For example, loading tabs of a <tt>javax.swing.JTabbedPane</tt> when the user clicks on them is normally an
-asynchronous operation, since it's driven by the user (the application does not know when the user clicks on a
-tab). Using <tt>ConcurrentWorker</tt> in the code that loads the tabs results in the tabs being displayed one
-after the other. The following example shows that using <tt>ConcurrentWorker</tt> in an asynchronous context
-leads to unexpected behavior.</p>
-<table width="100%" cellspacing="0" cellpadding="0">
-<tr><td width="60%">
-<pre><span class="code">
-public class ConcurrentWorkerWrongExample2 extends JFrame
-{
-   public ConcurrentWorkerWrongExample2() { ... }
 
-   public void loadTab(final int tabIndex)
-   {</span><span class="event">
-      ConcurrentWorker.post(new Job()</span><span class="code">
-      {
-         public Object run()
-         {</span><span class="foxtrot">
-            // Here goes the code that loads the tabs
-            Thread.sleep(5000 * tabIndex);
-            return null;</span><span class="code">
-         }
-      }</span><span class="event">);</span><span class="code">
-
-      </span><span class="event">
-      System.out.println("Done tab " + tabIndex);
-   }
-}</span>
-</pre>
-</td></tr>
-</table>
-<p>Why <tt>ConcurrentWorker</tt> shows this behavior in this case ?</p>
-<p>The user clicks on the first tab, and an AWT event is generated, "tab1", that calls <tt>loadTab(1)</tt>.
-Inside <tt>loadTab(1)<tt>, in the example, a <tt>Job</tt> "job1" is posted to load the tab in worker thread
-"thread1", and in the meanwhile <tt>ConcurrentWorker</tt> dequeues other AWT events. <br />
-If the user clicks on another tab, it generates another AWT event, "tab2", that is dequeued by
-<tt>ConcurrentWorker</tt>, that calls <tt>loadTab(2)</tt>, where "job2" is posted and the tab loaded in worker
-thread "thread2". <br />
-Now, since <tt>ConcurrentWorker.post()</tt> is synchronous, it cannot return until "job2" is finished. But event
-"tab1" (which is the one that spawned "job2") also cannot finish until "job2" is finished, because
-<tt>ConcurrentWorker.post()</tt> is synchronous. Since "tab1" has been dequeued by the first
-<tt>ConcurrentWorker.post()</tt> call, that call cannot return until "tab1" is finished (and hance until "job2" is
-finished), no matter if "job1" is already finished.
-
-
-
-
-
-
-
-
-
-
-
-<p>To understand the peculiar behavior of <tt>ConcurrentWorker</tt>, one must remember that there is only one
-AWT event queue. When a <tt>Task</tt> or <tt>Job</tt> is posted using the Foxtrot APIs, events are dequeued
-from the AWT event queue, one after the other
-
-
-</td></tr>
+<p>Another wrong example is to use <tt>ConcurrentWorker</tt> in an asynchronous context. <br />
+For example, suppose to have an application with a <tt>javax.swing.JTabbedPane</tt>, and suppose that
+each tab takes a while to load the data it presents to the user. A user may click on the first tab, then
+click on the second tab before the first finishes loading, then on the third before the second finishes
+loading and so on. The loading of each tab is usually an asynchronous operation, since we want the tabs
+to load concurrently, but we do not want that the first tab waits until the last tab is loaded.
+Each tab loading is independent from the others. The correct solution in this cases is to use
+<a href="async.php"><tt>AsyncWorker</tt></a>.</p>
+<p>Using <tt>ConcurrentWorker</tt> in the code that loads the tabs results in the tabs being displayed
+one after the other, from the last to the first, which is not what is normally expected.</p>
 
 <?php include 'footer.php';?>

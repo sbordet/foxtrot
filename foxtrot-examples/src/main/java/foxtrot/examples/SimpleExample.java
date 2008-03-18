@@ -59,7 +59,7 @@ public class SimpleExample extends JFrame
             }
         });
 
-        setDefaultCloseOperation(EXIT_ON_CLOSE);
+        setDefaultCloseOperation(DISPOSE_ON_CLOSE);
 
         Container c = getContentPane();
         c.setLayout(new GridBagLayout());

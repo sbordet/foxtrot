@@ -36,7 +36,7 @@ public class DialogExample extends JFrame
 
         setSize(300, 300);
 //      setLocationRelativeTo(null);
-        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        setDefaultCloseOperation(DISPOSE_ON_CLOSE);
 
         Container cp = getContentPane();
         cp.setLayout(new BorderLayout());

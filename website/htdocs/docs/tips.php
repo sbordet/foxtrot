@@ -1,7 +1,5 @@
 <?php include 'header.php';?>
 
-<tr><td class="documentation">
-
 <h2>Tips & Tricks</h2>
 <p>In this section we will discuss some tip and trick that applies when using threads in Swing Applications.</p>
 <p>Topics are:
@@ -278,16 +276,5 @@ combo.addActionListener(new ActionListener()
 </span></pre></p>
 <p>This is the only small anomaly I've found so far using Swing with the Foxtrot API, and I tend to think it's more
 a Swing anomaly than Foxtrot's.</p>
-
-<!--
-TODO:
-- Do not allow user to click on the gui while performing a heavy operation
-   - Use modal dialog with cancel
-   - Use GlassPane + Cursor
-
-- Don't nest Workers: refactor inside the listener
--->
-
-</td></tr>
 
 <?php include 'footer.php';?>

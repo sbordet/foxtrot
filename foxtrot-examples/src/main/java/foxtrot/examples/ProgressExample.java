@@ -67,7 +67,7 @@ public class ProgressExample extends JFrame
         bar = new JProgressBar();
         bar.setStringPainted(true);
 
-        setDefaultCloseOperation(EXIT_ON_CLOSE);
+        setDefaultCloseOperation(DISPOSE_ON_CLOSE);
 
         Container c = getContentPane();
         c.setLayout(new BorderLayout(0, 0));

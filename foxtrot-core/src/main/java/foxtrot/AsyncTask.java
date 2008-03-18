@@ -63,7 +63,7 @@ public abstract class AsyncTask extends Task
      * @see #failure(Throwable)
      * @see #getResultOrThrow()
      */
-    public void finish()
+    protected void finish()
     {
         try
         {
