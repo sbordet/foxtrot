@@ -6,7 +6,7 @@
  * See the terms of the BSD license in the documentation provided with this software.
  */
 
-package foxtrot.test;
+package foxtrot;
 
 /**
  * @version $Revision$
@@ -25,30 +25,23 @@ public class MutableInteger implements Comparable
         return value;
     }
 
+    public boolean equals(Object obj)
+    {
+        if (this == obj) return true;
+        if (!(obj instanceof MutableInteger)) return false;
+        MutableInteger that = (MutableInteger)obj;
+        return value == that.value;
+    }
+
     public int hashCode()
     {
         return value;
-    }
-
-    public boolean equals(Object obj)
-    {
-        if (obj == null) return false;
-        if (obj == this) return true;
-        try
-        {
-            return get() == ((MutableInteger)obj).get();
-        }
-        catch (ClassCastException x)
-        {
-        }
-        return false;
     }
 
     public int compareTo(Object obj)
     {
         if (obj == null) return 1;
         if (obj == this) return 0;
-
         int thisValue = get();
         int otherValue = ((MutableInteger)obj).get();
         if (thisValue > otherValue) return 1;

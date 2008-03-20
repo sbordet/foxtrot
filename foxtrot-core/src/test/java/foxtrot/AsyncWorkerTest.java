@@ -6,14 +6,9 @@
  * See the terms of the BSD license in the documentation provided with this software.
  */
 
-package foxtrot.test;
+package foxtrot;
 
 import javax.swing.SwingUtilities;
-
-import foxtrot.AsyncTask;
-import foxtrot.AsyncWorker;
-import foxtrot.Task;
-import foxtrot.WorkerThread;
 
 /**
  * @version $Revision$
@@ -22,7 +17,7 @@ public class AsyncWorkerTest extends FoxtrotTestCase
 {
     public void testPostAndForget() throws Exception
     {
-        final MutableHolder result = new MutableHolder(null);
+        final MutableReference result = new MutableReference(null);
         final WorkerThread workerThread = AsyncWorker.getWorkerThread();
         invokeTest(workerThread, new Runnable()
         {
@@ -52,7 +47,7 @@ public class AsyncWorkerTest extends FoxtrotTestCase
 
     public void testUsage() throws Exception
     {
-        final MutableHolder result = new MutableHolder(null);
+        final MutableReference result = new MutableReference(null);
         invokeTest(AsyncWorker.getWorkerThread(), new Runnable()
         {
             public void run()
@@ -92,7 +87,7 @@ public class AsyncWorkerTest extends FoxtrotTestCase
 
     public void testThreads() throws Exception
     {
-        final MutableHolder result = new MutableHolder(null);
+        final MutableReference result = new MutableReference(null);
         invokeTest(AsyncWorker.getWorkerThread(), new Runnable()
         {
             public void run()
@@ -147,7 +142,7 @@ public class AsyncWorkerTest extends FoxtrotTestCase
 
     public void testTaskException() throws Exception
     {
-        final MutableHolder result = new MutableHolder(null);
+        final MutableReference result = new MutableReference(null);
         invokeTest(AsyncWorker.getWorkerThread(), new Runnable()
         {
             public void run()
@@ -191,7 +186,7 @@ public class AsyncWorkerTest extends FoxtrotTestCase
 
     public void testTaskError() throws Exception
     {
-        final MutableHolder result = new MutableHolder(null);
+        final MutableReference result = new MutableReference(null);
         invokeTest(AsyncWorker.getWorkerThread(), new Runnable()
         {
             public void run()
@@ -235,7 +230,7 @@ public class AsyncWorkerTest extends FoxtrotTestCase
 
     public void testPostFromTask() throws Exception
     {
-        final MutableHolder result = new MutableHolder(null);
+        final MutableReference result = new MutableReference(null);
         invokeTest(AsyncWorker.getWorkerThread(), new Runnable()
         {
             public void run()

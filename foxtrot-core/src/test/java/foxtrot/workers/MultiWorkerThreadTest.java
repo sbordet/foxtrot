@@ -6,10 +6,12 @@
  * See the terms of the BSD license in the documentation provided with this software.
  */
 
-package foxtrot.test;
+package foxtrot.workers;
 
+import foxtrot.FoxtrotTestCase;
 import foxtrot.Job;
-import foxtrot.workers.MultiWorkerThread;
+import foxtrot.MutableInteger;
+import foxtrot.MutableReference;
 
 /**
  * @version $Revision$
@@ -18,7 +20,7 @@ public class MultiWorkerThreadTest extends FoxtrotTestCase
 {
     public void testThreads() throws Exception
     {
-        final MutableHolder thread = new MutableHolder(null);
+        final MutableReference thread = new MutableReference(null);
         final MultiWorkerThread worker = new MultiWorkerThread()
         {
             public void run()
@@ -33,7 +35,7 @@ public class MultiWorkerThreadTest extends FoxtrotTestCase
             {
                 worker.start();
 
-                final MutableHolder runner = new MutableHolder(null);
+                final MutableReference runner = new MutableReference(null);
                 worker.postTask(new Job()
                 {
                     public Object run()

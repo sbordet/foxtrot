@@ -6,16 +6,16 @@
  * See the terms of the BSD license in the documentation provided with this software.
  */
 
-package foxtrot.test;
+package foxtrot.pumps;
 
 import java.lang.reflect.Method;
 
 import javax.swing.SwingUtilities;
 
 import foxtrot.EventPump;
+import foxtrot.FoxtrotTestCase;
+import foxtrot.MutableInteger;
 import foxtrot.Task;
-import foxtrot.pumps.QueueEventPump;
-import foxtrot.pumps.SunJDK14ConditionalEventPump;
 
 /**
  * @version $Revision$
@@ -24,7 +24,7 @@ public class EventPumpTest extends FoxtrotTestCase
 {
     public void testJDK13QueueEventPump() throws Exception
     {
-        if (!isJRE14())
+        if (isJRE13())
         {
             QueueEventPump pump = new QueueEventPump();
             testEventPump(pump);
