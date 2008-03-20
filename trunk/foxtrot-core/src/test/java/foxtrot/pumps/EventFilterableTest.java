@@ -6,17 +6,17 @@
  * See the terms of the BSD license in the documentation provided with this software.
  */
 
-package foxtrot.test;
+package foxtrot.pumps;
 
 import java.awt.AWTEvent;
 
 import javax.swing.SwingUtilities;
 
 import foxtrot.EventPump;
+import foxtrot.FoxtrotTestCase;
 import foxtrot.Job;
+import foxtrot.MutableReference;
 import foxtrot.Worker;
-import foxtrot.pumps.EventFilter;
-import foxtrot.pumps.EventFilterable;
 
 /**
  * @version $Revision$
@@ -31,7 +31,7 @@ public class EventFilterableTest extends FoxtrotTestCase
             {
                 EventPump pump = Worker.getEventPump();
 
-                final MutableHolder check = new MutableHolder(null);
+                final MutableReference check = new MutableReference(null);
                 EventFilterable filterable = null;
                 EventFilter oldFilter = null;
                 try
@@ -101,7 +101,7 @@ public class EventFilterableTest extends FoxtrotTestCase
             {
                 EventPump pump = Worker.getEventPump();
 
-                final MutableHolder check = new MutableHolder(null);
+                final MutableReference check = new MutableReference(null);
                 EventFilterable filterable = null;
                 EventFilter oldFilter = null;
                 try

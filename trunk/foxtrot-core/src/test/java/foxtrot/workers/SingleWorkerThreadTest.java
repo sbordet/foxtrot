@@ -6,10 +6,12 @@
  * See the terms of the BSD license in the documentation provided with this software.
  */
 
-package foxtrot.test;
+package foxtrot.workers;
 
+import foxtrot.FoxtrotTestCase;
+import foxtrot.MutableInteger;
+import foxtrot.MutableReference;
 import foxtrot.Task;
-import foxtrot.workers.SingleWorkerThread;
 
 /**
  * @version $Revision$
@@ -85,7 +87,7 @@ public class SingleWorkerThreadTest extends FoxtrotTestCase
         {
             public void run()
             {
-                final MutableHolder thread = new MutableHolder(null);
+                final MutableReference thread = new MutableReference(null);
                 TestSingleWorkerThread worker = new TestSingleWorkerThread()
                 {
                     public void run()
@@ -195,7 +197,7 @@ public class SingleWorkerThreadTest extends FoxtrotTestCase
         {
             public void run()
             {
-                final MutableHolder thread = new MutableHolder(null);
+                final MutableReference thread = new MutableReference(null);
                 final MutableInteger pass = new MutableInteger(0);
                 worker.postTask(new Task()
                 {
@@ -250,7 +252,7 @@ public class SingleWorkerThreadTest extends FoxtrotTestCase
         {
             public void run()
             {
-                final MutableHolder thread = new MutableHolder(null);
+                final MutableReference thread = new MutableReference(null);
                 final MutableInteger pass = new MutableInteger(0);
                 worker.postTask(new Task()
                 {
@@ -306,7 +308,7 @@ public class SingleWorkerThreadTest extends FoxtrotTestCase
         {
             public void run()
             {
-                final MutableHolder thread = new MutableHolder(null);
+                final MutableReference thread = new MutableReference(null);
                 final MutableInteger pass = new MutableInteger(0);
                 worker.postTask(new Task()
                 {

@@ -26,7 +26,7 @@ import foxtrot.Task;
  */
 public class MultiWorkerThread extends SingleWorkerThread
 {
-    private final List runners = new LinkedList();
+    private final List threads = new LinkedList();
 
     protected String getThreadName()
     {
@@ -45,7 +45,7 @@ public class MultiWorkerThread extends SingleWorkerThread
                 {
                     synchronized (MultiWorkerThread.this)
                     {
-                        runners.add(Thread.currentThread());
+                        threads.add(Thread.currentThread());
                     }
 
                     runTask(task);
@@ -54,7 +54,7 @@ public class MultiWorkerThread extends SingleWorkerThread
                 {
                     synchronized (MultiWorkerThread.this)
                     {
-                        runners.remove(Thread.currentThread());
+                        threads.remove(Thread.currentThread());
                     }
                 }
             }
@@ -68,7 +68,7 @@ public class MultiWorkerThread extends SingleWorkerThread
     {
         synchronized (this)
         {
-            return runners.contains(Thread.currentThread());
+            return threads.contains(Thread.currentThread());
         }
     }
 
@@ -76,7 +76,7 @@ public class MultiWorkerThread extends SingleWorkerThread
     {
         synchronized (this)
         {
-            return super.hasPendingTasks() || runners.size() > 0;
+            return super.hasPendingTasks() || threads.size() > 0;
         }
     }
 }

@@ -6,13 +6,12 @@
  * See the terms of the BSD license in the documentation provided with this software.
  */
 
-package foxtrot.test;
+package foxtrot;
 
 import java.lang.reflect.Method;
 
 import javax.swing.SwingUtilities;
 
-import foxtrot.WorkerThread;
 import foxtrot.workers.SingleWorkerThread;
 import junit.framework.TestCase;
 
@@ -37,7 +36,7 @@ public abstract class FoxtrotTestCase extends TestCase
 
         final Object lock = new Object();
         final MutableInteger barrier = new MutableInteger(0);
-        final MutableHolder throwable = new MutableHolder(null);
+        final MutableReference throwable = new MutableReference(null);
 
         // This call returns immediately. It posts on the AWT Event Queue
         // a Runnable that is executed.
@@ -147,27 +146,20 @@ public abstract class FoxtrotTestCase extends TestCase
         {
             Thread.sleep(ms);
         }
-        catch (InterruptedException ignored)
+        catch (InterruptedException x)
         {
+            Thread.currentThread().interrupt();
         }
+    }
+
+    protected boolean isJRE13()
+    {
+        return JREVersion.isJRE13();
     }
 
     protected boolean isJRE14()
     {
-        return loadClass("java.awt.SequencedEvent") != null;
-    }
-
-    private Class loadClass(String className)
-    {
-        // We ask directly to the boot classloader
-        try
-        {
-            return Class.forName(className, false, null);
-        }
-        catch (ClassNotFoundException ignored)
-        {
-        }
-        return null;
+        return JREVersion.isJRE14();
     }
 
     private boolean hasPendingTasks(WorkerThread workerThread) throws Exception

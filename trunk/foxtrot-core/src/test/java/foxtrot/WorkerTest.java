@@ -6,7 +6,7 @@
  * See the terms of the BSD license in the documentation provided with this software.
  */
 
-package foxtrot.test;
+package foxtrot;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -17,10 +17,6 @@ import javax.swing.JButton;
 import javax.swing.JDialog;
 import javax.swing.JFrame;
 import javax.swing.SwingUtilities;
-
-import foxtrot.Job;
-import foxtrot.Task;
-import foxtrot.Worker;
 
 /**
  * @version $Revision$
