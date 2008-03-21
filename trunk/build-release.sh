@@ -1,6 +1,6 @@
 #! /bin/sh
 set -v
-mvn clean
+mvn clean install
 cd foxtrot-core
 mvn javadoc:javadoc
 cd ..
