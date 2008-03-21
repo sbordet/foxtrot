@@ -83,7 +83,7 @@ public class EventPumpTest extends FoxtrotTestCase
                 long stop = System.currentTimeMillis();
 
                 long elapsed = stop - start;
-                if (elapsed <= delay) fail("Blocking is not effective: expecting " + delay + ", blocked for only " + elapsed);
+                if (elapsed < delay) fail("Blocking is not effective: expecting " + delay + ", blocked for only " + elapsed);
             }
         }, null);
     }
@@ -177,7 +177,7 @@ public class EventPumpTest extends FoxtrotTestCase
                     pump.pumpEvents(task);
                     long stop = System.currentTimeMillis();
                     long elapsed = stop - start;
-                    if (elapsed <= delay) fail("Blocking is not effective when events throw exceptions: expecting " + delay + ", blocked for only " + elapsed);
+                    if (elapsed < delay) fail("Blocking is not effective when events throw exceptions: expecting " + delay + ", blocked for only " + elapsed);
                 }
                 catch (RuntimeException x)
                 {
@@ -231,7 +231,7 @@ public class EventPumpTest extends FoxtrotTestCase
                     pump.pumpEvents(task);
                     long stop = System.currentTimeMillis();
                     long elapsed = stop - start;
-                    if (elapsed <= delay) fail("Blocking is not effective when events throw errors: expecting " + delay + ", blocked for only " + elapsed);
+                    if (elapsed < delay) fail("Blocking is not effective when events throw errors: expecting " + delay + ", blocked for only " + elapsed);
                 }
                 catch (Error x)
                 {
