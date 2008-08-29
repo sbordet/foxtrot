@@ -4,4 +4,4 @@ mvn clean install
 cd foxtrot-core
 mvn javadoc:javadoc
 cd ..
-mvn package assembly:assembly -Dtest=false
+mvn package assembly:assembly -Dmaven.test.skip=true
