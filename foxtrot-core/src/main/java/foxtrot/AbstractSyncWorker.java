@@ -14,6 +14,7 @@ import foxtrot.pumps.ConditionalEventPump;
 import foxtrot.pumps.QueueEventPump;
 import foxtrot.pumps.SunJDK140ConditionalEventPump;
 import foxtrot.pumps.SunJDK141ConditionalEventPump;
+import foxtrot.pumps.SunJDK17ConditionalEventPump;
 
 /**
  * Base class for Foxtrot workers that have synchronous behavior.
@@ -62,6 +63,9 @@ abstract class AbstractSyncWorker extends AbstractWorker
      */
     EventPump createDefaultEventPump()
     {
+        if (JREVersion.isJRE17()) {
+            return new SunJDK17ConditionalEventPump();
+        }
         if (JREVersion.isJRE141())
         {
             // Handles JDK 1.4.2, 5.0 and 6.0
