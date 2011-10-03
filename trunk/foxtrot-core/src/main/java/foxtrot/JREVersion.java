@@ -18,11 +18,19 @@ import java.security.PrivilegedAction;
  */
 class JREVersion
 {
+    private static Boolean jre17;
     private static Boolean jre141;
     private static Boolean jre140;
     private static Boolean jre14;
     private static Boolean jre13;
     private static Boolean jre12;
+
+    static boolean isJRE17() {
+        if (jre17 == null) {
+            jre17 = (loadClass("java.util.Objects") == null) ? Boolean.FALSE : Boolean.TRUE;
+        }
+        return jre17.booleanValue();
+    }
 
     static boolean isJRE141()
     {
