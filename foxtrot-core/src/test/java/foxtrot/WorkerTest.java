@@ -12,7 +12,6 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
 import java.util.Arrays;
-
 import javax.swing.JButton;
 import javax.swing.JDialog;
 import javax.swing.JFrame;
@@ -477,7 +476,7 @@ public class WorkerTest extends FoxtrotTestCase
                 long plainElapsed = end - start;
                 System.out.println("Plain Listener performance: " + count + " calls in " + plainElapsed + " ms");
 
-                int perthousand = 10;
+                int perthousand = 50;
                 if (Math.abs(workerElapsed - plainElapsed) * 1000 > plainElapsed * perthousand) fail();
             }
         }, null);
