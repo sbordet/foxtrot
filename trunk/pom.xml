@@ -92,14 +92,6 @@
                 </configuration>
             </plugin>
             <plugin>
-                <artifactId>maven-assembly-plugin</artifactId>
-                <configuration>
-                    <descriptors>
-                        <descriptor>src/main/assembly/assembly.xml</descriptor>
-                    </descriptors>
-                </configuration>
-            </plugin>
-            <plugin>
                 <artifactId>maven-release-plugin</artifactId>
                 <configuration>
                     <autoVersionSubmodules>true</autoVersionSubmodules>
@@ -167,6 +159,7 @@
         <module>foxtrot-core</module>
         <module>foxtrot-examples</module>
         <module>foxtrot-sandbox</module>
+        <module>foxtrot-distribution</module>
     </modules>
 
     <repositories />
