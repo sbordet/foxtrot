@@ -63,7 +63,8 @@ abstract class AbstractSyncWorker extends AbstractWorker
      */
     EventPump createDefaultEventPump()
     {
-        if (JREVersion.isJRE17()) {
+        if (JREVersion.isJRE17())
+        {
             return new SunJDK17ConditionalEventPump();
         }
         if (JREVersion.isJRE141())
