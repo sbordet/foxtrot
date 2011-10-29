@@ -4,11 +4,10 @@
     <parent>
         <groupId>foxtrot</groupId>
         <artifactId>foxtrot</artifactId>
-        <version>3.0</version>
+        <version>4.0-SNAPSHOT</version>
     </parent>
 
     <modelVersion>4.0.0</modelVersion>
-    <groupId>foxtrot</groupId>
     <artifactId>foxtrot-examples</artifactId>
     <packaging>jar</packaging>
     <name>Foxtrot Examples</name>
@@ -17,7 +16,7 @@
         <dependency>
             <groupId>foxtrot</groupId>
             <artifactId>foxtrot-core</artifactId>
-            <version>${version}</version>
+            <version>${project.version}</version>
         </dependency>
     </dependencies>
 
