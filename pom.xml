@@ -10,6 +10,10 @@
     <description>Small and powerful synchronous API for using threads with Swing and Java Web Start</description>
     <url>http://foxtrot.sourceforge.net</url>
 
+    <properties>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    </properties>
+
     <issueManagement>
         <system>sourceforge</system>
         <url>http://sourceforge.net/tracker/?group_id=49197</url>
@@ -99,7 +103,6 @@
                 <artifactId>maven-release-plugin</artifactId>
                 <configuration>
                     <autoVersionSubmodules>true</autoVersionSubmodules>
-                    <tagBase>https://foxtrot.svn.sourceforge.net/svnroot/foxtrot/tags</tagBase>
                     <goals>deploy</goals>
                     <preparationGoals>clean install</preparationGoals>
                     <mavenExecutorId>forked-path</mavenExecutorId>
@@ -109,24 +112,52 @@
         <pluginManagement>
             <plugins>
                 <plugin>
+                    <artifactId>maven-assembly-plugin</artifactId>
+                    <version>2.2.1</version>
+                </plugin>
+                <plugin>
+                    <artifactId>maven-clean-plugin</artifactId>
+                    <version>2.4.1</version>
+                </plugin>
+                <plugin>
                     <artifactId>maven-compiler-plugin</artifactId>
                     <version>2.3.2</version>
                 </plugin>
                 <plugin>
-                    <artifactId>maven-assembly-plugin</artifactId>
-                    <version>2.2</version>
+                    <artifactId>maven-deploy-plugin</artifactId>
+                    <version>2.7</version>
+                </plugin>
+                <plugin>
+                    <artifactId>maven-gpg-plugin</artifactId>
+                    <version>1.4</version>
+                </plugin>
+                <plugin>
+                    <artifactId>maven-install-plugin</artifactId>
+                    <version>2.3.1</version>
+                </plugin>
+                <plugin>
+                    <artifactId>maven-jar-plugin</artifactId>
+                    <version>2.3.2</version>
+                </plugin>
+                <plugin>
+                    <artifactId>maven-javadoc-plugin</artifactId>
+                    <version>2.8</version>
                 </plugin>
                 <plugin>
                     <artifactId>maven-release-plugin</artifactId>
                     <version>2.2.1</version>
                 </plugin>
                 <plugin>
+                    <artifactId>maven-resources-plugin</artifactId>
+                    <version>2.5</version>
+                </plugin>
+                <plugin>
                     <artifactId>maven-source-plugin</artifactId>
                     <version>2.1.2</version>
                 </plugin>
                 <plugin>
-                    <artifactId>maven-deploy-plugin</artifactId>
-                    <version>2.6</version>
+                    <artifactId>maven-surefire-plugin</artifactId>
+                    <version>2.9</version>
                 </plugin>
             </plugins>
         </pluginManagement>
