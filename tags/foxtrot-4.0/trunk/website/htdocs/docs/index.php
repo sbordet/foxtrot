@@ -1,1 +1,0 @@
-<?php include 'introduction.php'; ?>
