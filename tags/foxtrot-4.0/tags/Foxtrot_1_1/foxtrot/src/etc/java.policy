@@ -1,0 +1,10 @@
+grant codebase "file:${user.dir}/dist/lib/foxtrot-test.jar"
+{
+   // Needed by Swing implementation
+   permission java.awt.AWTPermission "accessEventQueue";
+
+   permission java.awt.AWTPermission "showWindowWithoutWarningBanner";
+
+   // Needed by Foxtrot Framework
+   permission java.lang.reflect.ReflectPermission "suppressAccessChecks";
+};
