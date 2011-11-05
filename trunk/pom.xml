@@ -4,7 +4,7 @@
     <groupId>foxtrot</groupId>
     <artifactId>foxtrot</artifactId>
     <packaging>pom</packaging>
-    <version>4.0</version>
+    <version>4.1-SNAPSHOT</version>
     <name>Foxtrot</name>
     <description>Small and powerful synchronous API for using threads with Swing and Java Web Start</description>
     <url>http://foxtrot.sourceforge.net</url>
@@ -56,9 +56,9 @@
     </distributionManagement>
 
     <scm>
-        <connection>scm:svn:https://foxtrot.svn.sourceforge.net/svnroot/foxtrot/tags/foxtrot-4.0</connection>
-        <developerConnection>scm:svn:https://foxtrot.svn.sourceforge.net/svnroot/foxtrot/tags/foxtrot-4.0</developerConnection>
-        <url>http://foxtrot.svn.sourceforge.net/tags/foxtrot-4.0</url>
+        <connection>scm:svn:https://foxtrot.svn.sourceforge.net/svnroot/foxtrot/trunk</connection>
+        <developerConnection>scm:svn:https://foxtrot.svn.sourceforge.net/svnroot/foxtrot/trunk</developerConnection>
+        <url>http://foxtrot.svn.sourceforge.net</url>
     </scm>
 
     <modules>
