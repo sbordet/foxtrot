@@ -57,8 +57,8 @@
     </distributionManagement>
 
     <scm>
-        <connection>scm:svn:https://foxtrot.svn.sourceforge.net/svnroot/foxtrot</connection>
-        <developerConnection>scm:svn:https://foxtrot.svn.sourceforge.net/svnroot/foxtrot</developerConnection>
+        <connection>scm:svn:https://foxtrot.svn.sourceforge.net/svnroot/foxtrot/trunk</connection>
+        <developerConnection>scm:svn:https://foxtrot.svn.sourceforge.net/svnroot/foxtrot/trunk</developerConnection>
         <url>http://foxtrot.svn.sourceforge.net</url>
     </scm>
 
