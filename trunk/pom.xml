@@ -179,15 +179,6 @@
 
     <distributionManagement>
         <repository>
-            <id>foxtrot</id>
-            <!--<url>scp://shell.sourceforge.net:/home/groups/f/fo/foxtrot/htdocs/maven2</url>-->
-            <url>file:///tmp/foxtrot</url>
-        </repository>
-    </distributionManagement>
-
-<!--
-    <distributionManagement>
-        <repository>
             <id>oss.sonatype.org</id>
             <name>OSS Maven2 Repository</name>
             <url>https://oss.sonatype.org/service/local/staging/deploy/maven2</url>
@@ -198,6 +189,5 @@
             <url>https://oss.sonatype.org/content/repositories/snapshots</url>
         </snapshotRepository>
     </distributionManagement>
--->
 
 </project>
