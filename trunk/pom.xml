@@ -1,11 +1,10 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 
     <modelVersion>4.0.0</modelVersion>
     <groupId>foxtrot</groupId>
     <artifactId>foxtrot</artifactId>
     <packaging>pom</packaging>
-    <version>4.0-SNAPSHOT</version>
+    <version>4.0</version>
     <name>Foxtrot</name>
     <description>Small and powerful synchronous API for using threads with Swing and Java Web Start</description>
     <url>http://foxtrot.sourceforge.net</url>
@@ -57,9 +56,9 @@
     </distributionManagement>
 
     <scm>
-        <connection>scm:svn:https://foxtrot.svn.sourceforge.net/svnroot/foxtrot</connection>
-        <developerConnection>scm:svn:https://foxtrot.svn.sourceforge.net/svnroot/foxtrot</developerConnection>
-        <url>http://foxtrot.svn.sourceforge.net</url>
+        <connection>scm:svn:https://foxtrot.svn.sourceforge.net/svnroot/foxtrot/tags/foxtrot-4.0</connection>
+        <developerConnection>scm:svn:https://foxtrot.svn.sourceforge.net/svnroot/foxtrot/tags/foxtrot-4.0</developerConnection>
+        <url>http://foxtrot.svn.sourceforge.net/tags/foxtrot-4.0</url>
     </scm>
 
     <modules>
