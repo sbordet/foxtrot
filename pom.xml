@@ -19,8 +19,6 @@
         <url>http://sourceforge.net/tracker/?group_id=49197</url>
     </issueManagement>
 
-    <ciManagement />
-
     <inceptionYear>2002</inceptionYear>
 
     <mailingLists>
@@ -39,19 +37,37 @@
         </developer>
     </developers>
 
-    <contributors />
-
     <licenses>
         <license>
             <name>The BSD license</name>
         </license>
     </licenses>
 
+    <distributionManagement>
+        <repository>
+            <id>oss.sonatype.org</id>
+            <name>OSS Maven2 Repository</name>
+            <url>https://oss.sonatype.org/service/local/staging/deploy/maven2</url>
+        </repository>
+        <snapshotRepository>
+            <id>oss.sonatype.org</id>
+            <name>OSS Maven2 Snapshot Repository</name>
+            <url>https://oss.sonatype.org/content/repositories/snapshots</url>
+        </snapshotRepository>
+    </distributionManagement>
+
     <scm>
         <connection>scm:svn:https://foxtrot.svn.sourceforge.net/svnroot/foxtrot</connection>
         <developerConnection>scm:svn:https://foxtrot.svn.sourceforge.net/svnroot/foxtrot</developerConnection>
         <url>http://foxtrot.svn.sourceforge.net</url>
     </scm>
+
+    <modules>
+        <module>foxtrot-core</module>
+        <module>foxtrot-examples</module>
+        <module>foxtrot-sandbox</module>
+        <module>foxtrot-distribution</module>
+    </modules>
 
     <profiles>
         <profile>
@@ -155,17 +171,6 @@
         </pluginManagement>
     </build>
 
-    <modules>
-        <module>foxtrot-core</module>
-        <module>foxtrot-examples</module>
-        <module>foxtrot-sandbox</module>
-        <module>foxtrot-distribution</module>
-    </modules>
-
-    <repositories />
-
-    <reporting />
-
     <dependencyManagement>
         <dependencies>
             <dependency>
@@ -176,18 +181,5 @@
             </dependency>
         </dependencies>
     </dependencyManagement>
-
-    <distributionManagement>
-        <repository>
-            <id>oss.sonatype.org</id>
-            <name>OSS Maven2 Repository</name>
-            <url>https://oss.sonatype.org/service/local/staging/deploy/maven2</url>
-        </repository>
-        <snapshotRepository>
-            <id>oss.sonatype.org</id>
-            <name>OSS Maven2 Snapshot Repository</name>
-            <url>https://oss.sonatype.org/content/repositories/snapshots</url>
-        </snapshotRepository>
-    </distributionManagement>
 
 </project>
